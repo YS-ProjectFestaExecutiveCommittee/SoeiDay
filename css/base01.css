@@ -1,0 +1,136 @@
+body {
+      overflow-x: hidden;
+      transition: background-color 0.4s ease, color 0.4s ease;
+    }
+    ::selection {
+      background-color: #ea580c;
+      color: #ffffff;
+    }
+    .dark ::selection {
+      background-color: #f97316;
+    }
+    #hero-slideshow {
+      position: absolute;
+      inset: 0;
+      z-index: 0;
+    }
+    .slide {
+      position: absolute;
+      inset: 0;
+      background-size: cover;
+      background-position: center;
+      opacity: 0;
+      transition: opacity 2s ease-in-out;
+    }
+    .slide::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(to bottom, rgba(0,0,0,0.2), rgba(0,0,0,0.4));
+    }
+    .dark .slide::after {
+      background: linear-gradient(to bottom, rgba(15,23,42,0.5), rgba(15,23,42,0.8));
+    }
+    .slide.active {
+      opacity: 1;
+    }
+    .hero-layers {
+      position: absolute;
+      inset: 0;
+      z-index: 1;
+      pointer-events: none;
+    }
+    .layer {
+      position: absolute;
+      inset: 0;
+      mix-blend-mode: multiply;
+      transition: clip-path 0.8s cubic-bezier(0.16, 1, 0.3, 1), background-color 0.4s ease;
+    }
+    .dark .layer {
+      mix-blend-mode: screen;
+    }
+    @media (min-width: 768px) {
+      .layer-1 { clip-path: polygon(0 0, 50% 0, 30% 100%, 0 100%); }
+      .layer-2 { clip-path: polygon(0 0, 35% 0, 50% 100%, 0 100%); }
+      .layer-3 { clip-path: polygon(0 0, 20% 0, 60% 100%, 0 100%); }
+      .hero-text-container { justify-content: flex-start; padding-left: 10%; align-items: center; }
+    }
+    @media (max-width: 767px) {
+      .layer-1 { clip-path: polygon(0 0, 100% 0, 100% 45%, 0 30%); }
+      .layer-2 { clip-path: polygon(0 0, 100% 0, 100% 30%, 0 50%); }
+      .layer-3 { clip-path: polygon(0 0, 100% 0, 100% 20%, 0 40%); }
+      .hero-text-container { justify-content: center; align-items: flex-start; padding-top: 25%; }
+    }
+    .layer-1 { background: rgba(234, 88, 12, 0.8); }
+    .layer-2 { background: rgba(234, 88, 12, 0.6); }
+    .layer-3 { background: rgba(234, 88, 12, 0.4); }
+    .dark .layer-1 { background: rgba(249, 115, 22, 0.3); }
+    .dark .layer-2 { background: rgba(249, 115, 22, 0.2); }
+    .dark .layer-3 { background: rgba(249, 115, 22, 0.1); }
+    .hero-title {
+      font-size: clamp(8rem, 25vw, 16rem);
+      font-weight: 800;
+      color: white;
+      text-shadow: 2px 4px 10px rgba(0,0,0,0.7), 0 0 40px rgba(0,0,0,0.9);
+      line-height: 1;
+      z-index: 2;
+    }
+    .hero-subtitle {
+      text-shadow: 1px 2px 6px rgba(0,0,0,0.8), 0 0 20px rgba(0,0,0,0.7);
+    }
+    .slant-top {
+      clip-path: polygon(0 6vw, 100% 0, 100% 100%, 0 100%);
+      margin-top: -6vw;
+      padding-top: 10vw;
+      position: relative;
+      z-index: 10;
+    }
+    .slant-bottom {
+      clip-path: polygon(0 0, 100% 0, 100% calc(100% - 6vw), 0 100%);
+      padding-bottom: 10vw;
+      position: relative;
+      z-index: 10;
+    }
+    .origami-card {
+      position: relative;
+      overflow: hidden;
+      clip-path: polygon(0 0, 100% 0, 100% calc(100% - 30px), calc(100% - 30px) 100%, 0 100%);
+      transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .origami-card::after {
+      content: '';
+      position: absolute;
+      bottom: 0; right: 0;
+      width: 30px; height: 30px;
+      transition: all 0.4s;
+      z-index: 30;
+    }
+    .origami-card:hover {
+      transform: translateY(-5px);
+      clip-path: polygon(0 0, 100% 0, 100% 100%, 100% 100%, 0 100%);
+    }
+    .origami-card:hover::after {
+      width: 0; height: 0;
+    }
+    .card-lime { background-color: #f8fafc; }
+    .card-lime::after { background: linear-gradient(135deg, transparent 50%, #e2e8f0 50%); }
+    .dark .card-lime { background-color: #1e293b; }
+    .dark .card-lime::after { background: linear-gradient(135deg, transparent 50%, #334155 50%); }
+    .card-orange { background-color: #f8fafc; }
+    .card-orange::after { background: linear-gradient(135deg, transparent 50%, #e2e8f0 50%); }
+    .dark .card-orange { background-color: #1e293b; }
+    .dark .card-orange::after { background: linear-gradient(135deg, transparent 50%, #334155 50%); }
+    .dark .dark-map iframe {
+      filter: invert(90%) hue-rotate(180deg) brightness(90%) contrast(85%);
+    }
+    .news-link {
+      transition: all 0.3s ease;
+      border-left: 2px solid transparent;
+    }
+    .news-link:hover {
+      border-left-color: #65a30d;
+      padding-left: 1rem;
+    }
+    .dark .news-link:hover {
+      border-left-color: #84cc16;
+    }

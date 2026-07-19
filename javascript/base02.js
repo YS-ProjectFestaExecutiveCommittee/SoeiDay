@@ -27,7 +27,16 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebas
       setTheme(false);
     }
 
-    themeToggleBtn.addEventListener('click', function() {
+    themeToggleBtn.addEventListener('click', (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+
+      
+      themeToggleBtn.classList.add('rotate-[360deg]');
+      setTimeout(() => {
+        themeToggleBtn.classList.remove('rotate-[360deg]');
+      }, 300);
+
       if (document.documentElement.classList.contains('dark')) {
         setTheme(false);
       } else {
@@ -68,14 +77,14 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebas
         else if (item.tag === "スケジュール") tagColor = "text-slate-600 dark:text-slate-400 border-slate-300 dark:border-slate-600";
 
         const html = `
-          <a href="news.html" class="block news-link py-5 px-4 sm:px-6 border-b border-gray-100 dark:border-white/5 hover:bg-slate-50 dark:hover:bg-slate-800/50">
+          <a href="news.html" class="block news-link py-5 px-4 sm:px-6 border-b border-gray-100 dark:border-white/5 hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors duration-300">
             <div class="flex flex-col md:flex-row md:items-center gap-3 md:gap-8">
               <div class="flex items-center gap-6 md:w-1/3 lg:w-1/4">
                 <span class="text-slate-500 dark:text-slate-400 text-sm tracking-wider font-light">${item.date}</span>
                 <span class="text-xs px-3 py-1 border ${tagColor} tracking-wider">${item.tag}</span>
               </div>
               <div class="md:w-2/3 lg:w-3/4">
-                <h3 class="font-medium md:text-[1.05rem] tracking-wide leading-relaxed">${item.title}</h3>
+                <h3 class="font-medium md:text-[1.05rem] tracking-wide leading-relaxed text-slate-900 dark:text-white">${item.title}</h3>
               </div>
             </div>
           </a>

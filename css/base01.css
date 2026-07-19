@@ -59,7 +59,7 @@ body {
       .layer-1 { clip-path: polygon(0 0, 50% 0, 30% 100%, 0 100%); }
       .layer-2 { clip-path: polygon(0 0, 35% 0, 50% 100%, 0 100%); }
       .layer-3 { clip-path: polygon(0 0, 20% 0, 60% 100%, 0 100%); }
-      .hero-text-container { justify-content: flex-start; padding-left: 15%; align-items: center; text-align: left; }
+      .hero-text-container { justify-content: flex-start; padding-left: 22%; align-items: center; text-align: left; }
     }
     @media (max-width: 767px) {
       
@@ -135,6 +135,10 @@ body {
     .card-orange::after { background: linear-gradient(135deg, transparent 50%, #e2e8f0 50%); }
     .dark .card-orange { background-color: #1e293b; }
     .dark .card-orange::after { background: linear-gradient(135deg, transparent 50%, #334155 50%); }
+
+    
+    .card-special { background-color: #0f172a !important; }
+    .card-special::after { background: linear-gradient(135deg, transparent 50%, #1e293b 50%) !important; }
 
     .dark .dark-map iframe {
       filter: invert(90%) hue-rotate(180deg) brightness(90%) contrast(85%);

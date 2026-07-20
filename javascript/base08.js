@@ -50,7 +50,7 @@ document.addEventListener('DOMContentLoaded', () => {
         pressTimer = setTimeout(() => {
           
           
-          window.location.href = 'secret.html';
+          window.location.href = 'https://ataro-qqq.github.io/guchi/';
         }, 2000);
       };
 

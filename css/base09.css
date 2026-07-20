@@ -22,115 +22,70 @@
     }
 
     
-    .geo-bg {
+    .dynamic-pattern-container {
       position: absolute;
       inset: 0;
       overflow: hidden;
-      pointer-events: none;
-      z-index: 0;
-    }
-    .geo-shape {
-      position: absolute;
-      border: 1px solid rgba(148, 163, 184, 0.15);
-    }
-    .dark .geo-shape {
-      border: 1px solid rgba(255, 255, 255, 0.05);
-    }
-    .geo-circle {
-      border-radius: 50%;
-    }
-    .geo-line-v {
-      width: 1px;
-      height: 100%;
-      background: linear-gradient(to bottom, transparent, rgba(148,163,184,0.3), transparent);
-    }
-    .dark .geo-line-v {
-      background: linear-gradient(to bottom, transparent, rgba(255,255,255,0.1), transparent);
-    }
-    .geo-line-h {
-      height: 1px;
-      width: 100%;
-      background: linear-gradient(to right, transparent, rgba(148,163,184,0.3), transparent);
-    }
-    .dark .geo-line-h {
-      background: linear-gradient(to right, transparent, rgba(255,255,255,0.1), transparent);
-    }
-
-    
-    .bg-pattern-dots {
-      background-image: radial-gradient(rgba(148, 163, 184, 0.15) 1px, transparent 1px);
-      background-size: 24px 24px;
-    }
-    .dark .bg-pattern-dots {
-      background-image: radial-gradient(rgba(255, 255, 255, 0.05) 1px, transparent 1px);
-    }
-
-    
-    .glow-orb {
-      position: absolute;
-      border-radius: 50%;
-      filter: blur(100px);
-      opacity: 0.3;
       z-index: 0;
       pointer-events: none;
     }
-    .dark .glow-orb {
-      opacity: 0.15;
-    }
-
-    
-    .particles {
+    .dynamic-pattern {
       position: absolute;
-      inset: 0;
-      overflow: hidden;
-      pointer-events: none;
-      z-index: 0;
-    }
-    .particle {
-      position: absolute;
-      width: 3px;
-      height: 3px;
-      background-color: #fb923c; 
-      border-radius: 50%;
+      
+      inset: -50%;
+      background-repeat: repeat;
+      animation-iteration-count: infinite;
+      animation-timing-function: linear;
       opacity: 0;
-      box-shadow: 0 0 6px 1px #fb923c;
-      animation: floatUp var(--duration) linear infinite;
-      animation-delay: var(--delay);
-    }
-    .dark .particle {
-      background-color: #fbd38d;
-      box-shadow: 0 0 8px 2px #fbd38d;
-    }
-    @keyframes floatUp {
-      0% {
-        transform: translateY(100vh) scale(0.5);
-        opacity: 0;
-      }
-      10% {
-        opacity: var(--max-opacity);
-        transform: translateY(80vh) scale(1.2);
-      }
-      90% {
-        opacity: var(--max-opacity);
-        transform: translateY(20vh) scale(1);
-      }
-      100% {
-        transform: translateY(-10vh) scale(0.5);
-        opacity: 0;
-      }
     }
 
     
-    @keyframes float1 {
-      0%, 100% { transform: translate(0, 0) rotate(0deg); }
-      50% { transform: translate(20px, -30px) rotate(5deg); }
+    .pattern-stripe {
+      background-image: repeating-linear-gradient(45deg, transparent, transparent 60px, currentColor 60px, currentColor 61px);
+      color: #94a3b8; 
+      animation: move-stripe 40s linear infinite, fade-1 16s ease-in-out infinite alternate;
     }
-    @keyframes float2 {
-      0%, 100% { transform: translate(0, 0) scale(1); }
-      50% { transform: translate(-20px, 20px) scale(1.05); }
+    .dark .pattern-stripe { color: #475569;  }
+
+    
+    .pattern-grid {
+      background-image: linear-gradient(currentColor 1px, transparent 1px), linear-gradient(90deg, currentColor 1px, transparent 1px);
+      background-size: 80px 80px;
+      color: #94a3b8;
+      transform: rotate(15deg);
+      animation: move-grid 50s linear infinite, fade-2 22s ease-in-out infinite alternate;
     }
-    .animate-float-1 { animation: float1 20s ease-in-out infinite; }
-    .animate-float-2 { animation: float2 25s ease-in-out infinite; }
+    .dark .pattern-grid { color: #475569; }
+
+    
+    .pattern-dots {
+      background-image: radial-gradient(circle, currentColor 2px, transparent 2px);
+      background-size: 60px 60px;
+      color: #94a3b8;
+      animation: move-dots 60s linear infinite, fade-3 18s ease-in-out infinite alternate;
+    }
+    .dark .pattern-dots { color: #475569; }
+
+    
+    .pattern-cross {
+      background-image: repeating-linear-gradient(-45deg, transparent, transparent 40px, currentColor 40px, currentColor 41px);
+      color: #94a3b8;
+      animation: move-cross 45s linear infinite, fade-4 20s ease-in-out infinite alternate;
+    }
+    .dark .pattern-cross { color: #475569; }
+
+    
+    @keyframes move-stripe { 0% { background-position: 0 0; } 100% { background-position: 600px 600px; } }
+    @keyframes move-grid { 0% { background-position: 0 0; } 100% { background-position: -400px 300px; } }
+    @keyframes move-dots { 0% { background-position: 0 0; } 100% { background-position: 400px -600px; } }
+    @keyframes move-cross { 0% { background-position: 0 0; } 100% { background-position: -500px -500px; } }
+
+    
+    
+    @keyframes fade-1 { 0%, 20% { opacity: 0; } 50%, 80% { opacity: 0.15; } 100% { opacity: 0; } }
+    @keyframes fade-2 { 0%, 30% { opacity: 0.1; } 60%, 100% { opacity: 0; } }
+    @keyframes fade-3 { 0% { opacity: 0; } 40%, 60% { opacity: 0.15; } 100% { opacity: 0; } }
+    @keyframes fade-4 { 0%, 40% { opacity: 0; } 70%, 100% { opacity: 0.12; } }
 
     
     .heading-deco {

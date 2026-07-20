@@ -1,0 +1,28 @@
+body.modal-open {
+      overflow: hidden;
+    }
+    
+    .video-container iframe {
+      width: 100%;
+      aspect-ratio: 16 / 9;
+      height: auto;
+      border: none;
+      border-radius: 4px;
+    }
+    
+    .custom-scrollbar::-webkit-scrollbar {
+      width: 8px;
+    }
+    .custom-scrollbar::-webkit-scrollbar-track {
+      background: rgba(0,0,0,0.05);
+    }
+    .custom-scrollbar::-webkit-scrollbar-thumb {
+      background: rgba(0,0,0,0.2);
+      border-radius: 4px;
+    }
+    .dark .custom-scrollbar::-webkit-scrollbar-track {
+      background: rgba(255,255,255,0.05);
+    }
+    .dark .custom-scrollbar::-webkit-scrollbar-thumb {
+      background: rgba(255,255,255,0.2);
+    }

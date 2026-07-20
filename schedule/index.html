@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" href="https://ys-projectfestaexecutivecommittee.github.io/SoeiDay/image/Favicon01.ico" />
+  <title>スケジュール | 創英祭 2026</title>
+  
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://ys-projectfestaexecutivecommittee.github.io/SoeiDay/javascript/base03.js" defer></script>
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&family=Shippori+Mincho:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  
+  
+  <script src="https://ys-projectfestaexecutivecommittee.github.io/SoeiDay/javascript/base01.js"></script>
+  <script src="https://ys-projectfestaexecutivecommittee.github.io/SoeiDay/javascript/load-components.js" defer></script>
+  <link rel="stylesheet" href="https://ys-projectfestaexecutivecommittee.github.io/SoeiDay/css/base01.css">
+  <link rel="stylesheet" href="https://ys-projectfestaexecutivecommittee.github.io/SoeiDay/css/base02.css">
+  <link rel="stylesheet" href="https://ys-projectfestaexecutivecommittee.github.io/SoeiDay/css/base04.css">
+</head>
+<body class="font-serif bg-brand-bgLight text-slate-900 dark:bg-brand-bgDark dark:text-slate-100 antialiased transition-colors duration-300">
+  
+  <div id="header-placeholder"></div>
+  
+  
+  <section class="relative w-full h-[350px] md:h-[450px] overflow-hidden flex bg-slate-900">
+    <div class="absolute inset-0 bg-cover bg-center opacity-60" style="background-image: url('https://yokohamasoei.sakura.ne.jp/wp/wp-content/uploads/2022/09/KAT_0757-scaled.jpg?auto=format&fit=crop&w=1920&q=80'); filter: grayscale(10%);"></div>
+    <div class="absolute inset-0 bg-gradient-to-t from-slate-900 via-slate-900/60 to-transparent"></div>
+    
+    <div class="relative w-full max-w-7xl mx-auto h-full flex items-end pb-16 px-6 sm:px-12 z-10">
+      <div>
+        <h1 class="text-4xl md:text-5xl font-bold tracking-widest text-white mb-4" style="filter: drop-shadow(0 2px 4px rgba(0,0,0,0.5));">
+          スケジュール<span class="text-brand-lime ml-1">.</span>
+        </h1>
+        <p class="text-slate-300 tracking-widest font-light text-sm md:text-base">Timetable & Events</p>
+      </div>
+    </div>
+  </section>
+  
+  
+  <section class="py-16 relative bg-brand-bgLight dark:bg-brand-bgDark transition-colors duration-300">
+    
+    
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 mb-8">
+      <div class="flex justify-center gap-4 border-b border-gray-200 dark:border-slate-700">
+        <button id="tab-day1" class="tab-btn active px-4 sm:px-8 py-4 font-bold tracking-widest border-b-2 border-brand-orange text-brand-orange dark:border-brand-orangeDark dark:text-brand-orangeDark transition-all text-sm sm:text-base">
+          <span class="num-font">1</span>日目 (<span class="num-font">10/3 Sat</span>)
+        </button>
+        <button id="tab-day2" class="tab-btn px-4 sm:px-8 py-4 font-bold tracking-widest border-b-2 border-transparent text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200 transition-all text-sm sm:text-base">
+          <span class="num-font">2</span>日目 (<span class="num-font">10/4 Sun</span>)
+        </button>
+      </div>
+    </div>
+
+    
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+      
+      
+      <div id="loading-indicator" class="text-center py-20 text-slate-400 font-light tracking-wider">
+        <i class="fa-solid fa-spinner fa-spin mr-3"></i> スケジュール情報を読み込んでいます...
+      </div>
+      
+      
+      <div id="timetable-wrapper" class="hidden timetable-container bg-white dark:bg-slate-800 shadow-xl rounded-sm">
+        <div id="timetable-grid" class="timetable-grid">
+          
+        </div>
+      </div>
+      
+      <div class="mt-6 flex flex-col md:flex-row justify-between items-center text-xs sm:text-sm text-slate-500 dark:text-slate-400 font-light tracking-wider gap-4">
+        <p>※スケジュールは進行状況により変更される場合があります。</p>
+        <p>※各イベントをタップ/クリックで詳細を確認できます。</p>
+      </div>
+
+    </div>
+  </section>
+  
+  
+  <section class="py-20 bg-brand-surfaceLight dark:bg-brand-surfaceDark slant-top transition-colors duration-300">
+    <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 text-center relative z-10">
+      <p class="text-sm text-slate-500 dark:text-slate-400 tracking-widest font-light mb-8">Contents</p>
+      <div class="flex flex-wrap justify-center gap-6">
+        <a href="index.html" class="inline-flex items-center gap-3 border border-slate-900 dark:border-white px-8 py-4 tracking-widest text-sm hover:bg-slate-900 hover:text-white dark:hover:bg-white dark:hover:text-slate-900 transition-colors duration-300 text-slate-900 dark:text-white">
+          <i class="fa-solid fa-house"></i> トップページへ戻る
+        </a>
+        <a href="https://ys-projectfestaexecutivecommittee.github.io/SoeiDay/map/" class="inline-flex items-center gap-3 border border-slate-900 dark:border-white px-8 py-4 tracking-widest text-sm hover:bg-slate-900 hover:text-white dark:hover:bg-white dark:hover:text-slate-900 transition-colors duration-300 text-slate-900 dark:text-white">
+          <i class="fa-solid fa-map-location-dot"></i> 会場マップ
+        </a>
+      </div>
+    </div>
+  </section>
+  
+  <div id="footer-placeholder"></div>
+  
+  
+  <div id="article-modal" class="fixed inset-0 z-[100] hidden flex items-center justify-center p-4 sm:p-6 opacity-0 transition-opacity duration-300">
+    <div class="absolute inset-0 bg-slate-900/70 backdrop-blur-sm" onclick="closeModal()"></div>
+    <div class="relative bg-white dark:bg-slate-800 w-full max-w-2xl max-h-[90vh] overflow-y-auto custom-scrollbar shadow-2xl rounded-sm transform scale-95 transition-transform duration-300" id="modal-content-container">
+      <button onclick="closeModal()" class="sticky top-4 float-right right-4 text-slate-400 hover:text-slate-900 dark:hover:text-white transition-colors w-10 h-10 flex items-center justify-center rounded-full bg-gray-100 dark:bg-slate-700 z-10 m-4">
+        <i class="fa-solid fa-xmark text-xl"></i>
+      </button>
+      <div class="p-8 sm:p-12 clear-both">
+        <div class="flex items-center gap-4 mb-4">
+          <span id="modal-date" class="text-brand-orange dark:text-brand-orangeDark tracking-wider text-sm font-medium"></span>
+          <span id="modal-category" class="px-3 py-1 bg-gray-100 dark:bg-slate-700 text-xs tracking-widest rounded-sm text-slate-600 dark:text-slate-300"></span>
+        </div>
+        <h3 id="modal-title" class="text-2xl sm:text-3xl font-bold leading-relaxed mb-6 text-slate-900 dark:text-white border-b border-gray-100 dark:border-white/10 pb-6"></h3>
+        <div id="modal-body" class="text-slate-700 dark:text-slate-300 leading-loose tracking-wide space-y-4 font-light text-sm sm:text-base">
+          
+        </div>
+      </div>
+    </div>
+  </div>
+
+  
+  <script src="https://ys-projectfestaexecutivecommittee.github.io/SoeiDay/javascript/base09.js"></script>
+  <script src="https://ys-projectfestaexecutivecommittee.github.io/SoeiDay/javascript/base02.js"></script>
+  <script src="https://ys-projectfestaexecutivecommittee.github.io/SoeiDay/javascript/base04.js"></script>
+</body>
+</html>

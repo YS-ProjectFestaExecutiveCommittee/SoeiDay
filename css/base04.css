@@ -1,0 +1,54 @@
+.slant-both {
+      clip-path: polygon(0 5vw, 100% 0, 100% calc(100% - 5vw), 0 100%);
+      padding-top: 8vw;
+      padding-bottom: 8vw;
+    }
+    @media (max-width: 768px) {
+      .slant-both {
+        clip-path: polygon(0 8vw, 100% 0, 100% calc(100% - 8vw), 0 100%);
+        padding-top: 12vw;
+        padding-bottom: 12vw;
+      }
+    }
+    
+    
+    .bg-pattern-dots {
+      background-image: radial-gradient(rgba(15, 23, 42, 0.05) 1px, transparent 1px);
+      background-size: 24px 24px;
+    }
+    .dark .bg-pattern-dots {
+      background-image: radial-gradient(rgba(255, 255, 255, 0.05) 1px, transparent 1px);
+    }
+    .bg-pattern-grid {
+      background-image: 
+        linear-gradient(rgba(15, 23, 42, 0.03) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(15, 23, 42, 0.03) 1px, transparent 1px);
+      background-size: 40px 40px;
+    }
+    .dark .bg-pattern-grid {
+      background-image: 
+        linear-gradient(rgba(255, 255, 255, 0.02) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
+    }
+
+    
+    .photo-frame {
+      background-color: #ffffff;
+      padding: 8px 8px 28px 8px; 
+      box-shadow: 3px 5px 15px rgba(0, 0, 0, 0.08), 0 1px 3px rgba(0,0,0,0.05);
+      border: 1px solid rgba(0,0,0,0.03);
+      display: inline-block;
+    }
+    .photo-frame-sm {
+      background-color: #ffffff;
+      padding: 6px 6px 20px 6px;
+      box-shadow: 2px 4px 10px rgba(0, 0, 0, 0.08);
+      border: 1px solid rgba(0,0,0,0.03);
+      display: inline-block;
+    }
+    
+    .dark .photo-frame, .dark .photo-frame-sm {
+      background-color: #f8fafc;
+      box-shadow: 3px 5px 15px rgba(0, 0, 0, 0.3);
+      border: 1px solid rgba(255,255,255,0.1);
+    }

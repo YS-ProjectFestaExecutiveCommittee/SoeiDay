@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" href="https://ys-projectfestaexecutivecommittee.github.io/SoeiDay/image/Favicon01.ico" />
+  <title>出店案内 | 創英祭 2026</title>
+  
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://ys-projectfestaexecutivecommittee.github.io/SoeiDay/javascript/base03.js" defer></script>
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&family=Shippori+Mincho:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  
+  <script src="https://ys-projectfestaexecutivecommittee.github.io/SoeiDay/javascript/base01.js"></script>
+  <script src="https://ys-projectfestaexecutivecommittee.github.io/SoeiDay/javascript/load-components.js" defer></script>
+  <link rel="stylesheet" href="https://ys-projectfestaexecutivecommittee.github.io/SoeiDay/css/base01.css">
+  <link rel="stylesheet" href="https://ys-projectfestaexecutivecommittee.github.io/SoeiDay/css/base02.css">
+
+  <link rel="stylesheet" href="https://ys-projectfestaexecutivecommittee.github.io/SoeiDay/css/base07.css">
+</head>
+<body class="font-serif bg-brand-bgLight text-slate-900 dark:bg-brand-bgDark dark:text-slate-100 antialiased transition-colors duration-300">
+  
+  <div id="header-placeholder"></div>
+  
+  
+  <section class="relative w-full h-[350px] md:h-[450px] overflow-hidden flex bg-slate-900">
+    <div class="absolute inset-0 bg-cover bg-center opacity-60" style="background-image: url('https://yokohamasoei.sakura.ne.jp/wp/wp-content/uploads/2022/09/IMG_0662-scaled.jpg?auto=format&fit=crop&w=1920&q=80'); filter: grayscale(10%);"></div>
+    <div class="absolute inset-0 bg-gradient-to-t from-slate-900 via-slate-900/60 to-transparent"></div>
+    
+    <div class="relative w-full max-w-7xl mx-auto h-full flex items-end pb-16 px-6 sm:px-12 z-10">
+      <div>
+        <h1 class="text-4xl md:text-5xl font-bold tracking-widest text-white mb-4" style="filter: drop-shadow(0 2px 4px rgba(0,0,0,0.5));">
+          出店案内<span class="text-brand-lime ml-1">.</span>
+        </h1>
+        <p class="text-slate-300 tracking-widest font-light text-sm md:text-base num-font">Booths & Exhibitions</p>
+      </div>
+    </div>
+  </section>
+  
+  
+  <section class="py-20 relative bg-brand-bgLight dark:bg-brand-bgDark transition-colors duration-300 min-h-screen">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+      
+      
+      <div class="mb-12 flex justify-between items-end border-b border-gray-200 dark:border-slate-700 pb-4">
+        <div>
+          <h2 class="text-2xl font-bold tracking-widest text-slate-900 dark:text-white">模擬店・展示一覧</h2>
+          <p class="text-sm text-slate-500 dark:text-slate-400 mt-2 tracking-widest font-light">各クラス・団体の企画をご紹介します。</p>
+        </div>
+      </div>
+
+      
+      <div id="loading-indicator" class="text-center py-20 text-slate-400 font-light tracking-wider">
+        <i class="fa-solid fa-spinner fa-spin mr-3"></i> 出店情報を読み込んでいます...
+      </div>
+
+      
+      <div id="booths-container" class="hidden space-y-20">
+        
+      </div>
+
+    </div>
+  </section>
+  
+  
+  <section class="py-20 bg-brand-surfaceLight dark:bg-brand-surfaceDark slant-top transition-colors duration-300">
+    <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 text-center relative z-10">
+      <p class="text-sm text-slate-500 dark:text-slate-400 tracking-widest font-light mb-8">Contents</p>
+      <div class="flex flex-wrap justify-center gap-6">
+        <a href="index.html" class="inline-flex items-center gap-3 border border-slate-900 dark:border-white px-8 py-4 tracking-widest text-sm hover:bg-slate-900 hover:text-white dark:hover:bg-white dark:hover:text-slate-900 transition-colors duration-300 text-slate-900 dark:text-white">
+          <i class="fa-solid fa-house"></i> トップページへ戻る
+        </a>
+        <a href="https://ys-projectfestaexecutivecommittee.github.io/SoeiDay/schedule/" class="inline-flex items-center gap-3 border border-slate-900 dark:border-white px-8 py-4 tracking-widest text-sm hover:bg-slate-900 hover:text-white dark:hover:bg-white dark:hover:text-slate-900 transition-colors duration-300 text-slate-900 dark:text-white">
+          <i class="fa-regular fa-calendar"></i> スケジュール
+        </a>
+        <a href="https://ys-projectfestaexecutivecommittee.github.io/SoeiDay/map/" class="inline-flex items-center gap-3 border border-slate-900 dark:border-white px-8 py-4 tracking-widest text-sm hover:bg-slate-900 hover:text-white dark:hover:bg-white dark:hover:text-slate-900 transition-colors duration-300 text-slate-900 dark:text-white">
+          <i class="fa-solid fa-map-location-dot"></i> 会場マップ
+        </a>
+      </div>
+    </div>
+  </section>
+  
+  <div id="footer-placeholder"></div>
+  
+  
+  <div id="booth-modal" class="fixed inset-0 z-[100] hidden flex items-center justify-center p-4 sm:p-6 opacity-0 transition-opacity duration-300">
+    <div class="absolute inset-0 bg-slate-900/70 backdrop-blur-sm" onclick="closeBoothModal()"></div>
+    <div class="relative bg-white dark:bg-slate-800 w-full max-w-3xl max-h-[90vh] overflow-y-auto custom-scrollbar shadow-2xl rounded-sm transform scale-95 transition-transform duration-300">
+      <button onclick="closeBoothModal()" class="absolute top-4 right-4 text-slate-400 hover:text-slate-900 dark:hover:text-white transition-colors w-10 h-10 flex items-center justify-center rounded-full bg-gray-100 dark:bg-slate-700 z-10">
+        <i class="fa-solid fa-xmark text-xl"></i>
+      </button>
+      
+      <div class="w-full h-64 sm:h-80 relative bg-slate-100 dark:bg-slate-900">
+        <img id="modal-booth-img" src="" alt="店舗画像" class="w-full h-full object-cover">
+        <div class="absolute inset-0 bg-gradient-to-t from-slate-900/80 to-transparent"></div>
+        <div class="absolute bottom-0 left-0 p-6 sm:p-8 text-white w-full">
+          <div class="flex items-center gap-3 mb-2">
+            <span id="modal-booth-category" class="px-3 py-1 bg-brand-orange text-white text-xs tracking-widest rounded-sm font-sans"></span>
+            <span id="modal-booth-room" class="text-sm tracking-wider opacity-90"></span>
+          </div>
+          <h3 id="modal-booth-title" class="text-2xl sm:text-3xl font-bold tracking-widest leading-tight"></h3>
+        </div>
+      </div>
+
+      <div class="p-6 sm:p-8">
+        <div class="flex items-center gap-2 mb-6 text-slate-500 dark:text-slate-400">
+          <i class="fa-solid fa-users text-sm"></i>
+          <span id="modal-booth-group" class="text-sm tracking-widest"></span>
+        </div>
+        
+        <div id="modal-booth-desc" class="text-slate-700 dark:text-slate-300 leading-loose tracking-wide space-y-4 font-light text-sm sm:text-base whitespace-pre-wrap">
+          
+        </div>
+      </div>
+    </div>
+  </div>
+
+  
+  <script src="https://ys-projectfestaexecutivecommittee.github.io/SoeiDay/javascript/base11.js"></script>
+</body>
+</html>

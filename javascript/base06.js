@@ -438,7 +438,12 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebas
     const initAuth = async () => {
       try {
         if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
-          await signInWithCustomToken(auth, __initial_auth_token);
+          try {
+            await signInWithCustomToken(auth, __initial_auth_token);
+          } catch (tokenError) {
+            console.warn("テスト環境の認証キーが一致しませんでした。匿名認証に切り替えます。", tokenError);
+            await signInAnonymously(auth);
+          }
         } else {
           await signInAnonymously(auth);
         }

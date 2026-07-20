@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" href="https://ys-projectfestaexecutivecommittee.github.io/SoeiDay/image/Favicon01.ico" />
+  <title>スケジュール管理 | 創英祭 2026</title>
+  
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&family=Shippori+Mincho:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  
+  <link rel="stylesheet" href="https://ys-projectfestaexecutivecommittee.github.io/SoeiDay/css/base06.css">
+</head>
+<body class="bg-slate-50 text-slate-900 antialiased min-h-screen flex flex-col">
+
+  
+  <header class="bg-slate-900 text-white p-4 shadow-md flex justify-between items-center z-10 relative">
+    <div class="flex items-center gap-3">
+      <h1 class="text-xl font-bold tracking-widest">スケジュール管理システム</h1>
+      <span class="text-xs bg-brand-orange text-white px-2 py-1 rounded-sm tracking-widest bg-orange-500">関係者専用</span>
+    </div>
+    <div id="header-user-info" class="hidden text-sm font-sans flex items-center gap-4">
+      <span>ログイン中: <strong id="current-user-display" class="text-lime-400"></strong></span>
+      <button onclick="window.logout()" class="text-slate-300 hover:text-white transition">
+        <i class="fa-solid fa-right-from-bracket"></i> ログアウト
+      </button>
+    </div>
+  </header>
+
+  
+  <div id="loading-overlay" class="fixed inset-0 bg-white/90 z-50 flex items-center justify-center backdrop-blur-sm transition-opacity duration-300">
+    <div class="text-center">
+      <i class="fa-solid fa-circle-notch fa-spin text-4xl text-slate-900 mb-4"></i>
+      <p class="tracking-widest text-slate-600 font-sans">システムを準備しています...</p>
+    </div>
+  </div>
+
+  
+  <section id="login-section" class="flex-grow flex items-center justify-center p-4 hidden relative">
+    <div class="absolute inset-0 bg-slate-900 overflow-hidden z-0">
+      <div class="absolute inset-0 bg-cover bg-center opacity-20 filter grayscale" style="background-image: url('https://yokohamasoei.sakura.ne.jp/wp/wp-content/uploads/2019/07/DSC_8659.jpg?auto=format&fit=crop&w=1920&q=80')"></div>
+    </div>
+    
+    <div class="bg-white p-8 md:p-12 w-full max-w-md shadow-2xl relative z-10 border-t-4 border-orange-500">
+      <h2 class="text-3xl font-bold mb-2 text-center tracking-widest">ログイン</h2>
+      <p class="text-center text-slate-500 text-sm mb-8 font-sans">専用のIDとパスワードを入力してください</p>
+      
+      <div id="login-error" class="hidden bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-6 text-sm font-sans">
+        IDまたはパスワードが間違っています。
+      </div>
+
+      <div class="space-y-6 font-sans">
+        <div>
+          <label class="block text-sm font-bold text-slate-700 mb-2">ログインID</label>
+          <input type="text" id="login-id" class="w-full px-4 py-3 border border-gray-300 rounded focus:outline-none focus:border-orange-500 focus:ring-1 focus:ring-orange-500 transition" placeholder="ID">
+        </div>
+        <div>
+          <label class="block text-sm font-bold text-slate-700 mb-2">パスワード</label>
+          <input type="password" id="login-password" class="w-full px-4 py-3 border border-gray-300 rounded focus:outline-none focus:border-orange-500 focus:ring-1 focus:ring-orange-500 transition" placeholder="••••••••">
+        </div>
+        <button onclick="window.attemptLogin()" class="w-full bg-slate-900 hover:bg-slate-800 text-white font-bold py-4 px-4 rounded tracking-widest transition duration-300 flex justify-center items-center gap-2">
+          <i class="fa-solid fa-lock"></i> ログインする
+        </button>
+      </div>
+    </div>
+  </section>
+
+  
+  <section id="dashboard-section" class="flex-grow hidden bg-slate-50">
+    <div class="max-w-6xl mx-auto p-4 sm:p-6 lg:p-8">
+      
+      
+      <div class="flex border-b border-gray-300 mb-8 font-sans overflow-x-auto">
+        <button onclick="window.switchTab('events')" id="tab-btn-events" class="py-3 px-6 whitespace-nowrap text-center font-medium border-b-2 border-slate-900 text-slate-900 transition bg-white/50">
+          <i class="fa-solid fa-calendar-days mr-2"></i> イベント管理
+        </button>
+        <button onclick="window.switchTab('locations')" id="tab-btn-locations" class="py-3 px-6 whitespace-nowrap text-center font-medium border-b-2 border-transparent text-slate-500 hover:text-slate-700 transition">
+          <i class="fa-solid fa-map-location-dot mr-2"></i> 開催場所管理
+        </button>
+        <button onclick="window.switchTab('users')" id="tab-btn-users" class="py-3 px-6 whitespace-nowrap text-center font-medium border-b-2 border-transparent text-slate-500 hover:text-slate-700 transition">
+          <i class="fa-solid fa-users-gear mr-2"></i> アカウント管理
+        </button>
+      </div>
+
+      
+      <div id="tab-content-events" class="space-y-8">
+        
+        <div class="bg-white p-6 md:p-8 shadow-md border border-gray-100 relative">
+          <div id="event-form-overlay" class="hidden absolute inset-0 bg-white/80 z-10 flex items-center justify-center backdrop-blur-sm">
+            <div class="text-slate-600"><i class="fa-solid fa-spinner fa-spin mr-2"></i> 処理中...</div>
+          </div>
+          
+          <h3 id="event-form-title" class="text-2xl font-bold mb-6 border-l-4 border-lime-500 pl-3">新規イベント作成</h3>
+          <input type="hidden" id="event-edit-id" value="">
+          
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6 font-sans">
+            <div class="md:col-span-2">
+              <label class="block text-sm font-bold text-slate-700 mb-2">イベント名 <span class="text-red-500">*</span></label>
+              <input type="text" id="ev-title" class="w-full px-4 py-2 border border-gray-300 rounded focus:outline-none focus:border-lime-500" placeholder="例：吹奏楽部コンサート">
+            </div>
+            
+            <div>
+              <label class="block text-sm font-bold text-slate-700 mb-2">開催日 <span class="text-red-500">*</span></label>
+              <select id="ev-day" class="w-full px-4 py-2 border border-gray-300 rounded focus:outline-none focus:border-lime-500 bg-white">
+                <option value="1">1日目 (10/3)</option>
+                <option value="2">2日目 (10/4)</option>
+              </select>
+            </div>
+            
+            <div>
+              <label class="block text-sm font-bold text-slate-700 mb-2">場所 <span class="text-red-500">*</span></label>
+              <select id="ev-location" class="w-full px-4 py-2 border border-gray-300 rounded focus:outline-none focus:border-lime-500 bg-white">
+                <option value="">（場所を読み込み中...）</option>
+              </select>
+            </div>
+
+            <div>
+              <label class="block text-sm font-bold text-slate-700 mb-2">開始時間 <span class="text-red-500">*</span></label>
+              <input type="time" id="ev-start" class="w-full px-4 py-2 border border-gray-300 rounded focus:outline-none focus:border-lime-500" value="09:30" min="09:30" max="15:00">
+            </div>
+            
+            <div>
+              <label class="block text-sm font-bold text-slate-700 mb-2">終了時間 <span class="text-red-500">*</span></label>
+              <input type="time" id="ev-end" class="w-full px-4 py-2 border border-gray-300 rounded focus:outline-none focus:border-lime-500" value="10:00" min="09:30" max="15:00">
+            </div>
+            
+            <div>
+              <label class="block text-sm font-bold text-slate-700 mb-2">主催団体 <span class="text-gray-400 text-xs ml-2">任意</span></label>
+              <input type="text" id="ev-group" class="w-full px-4 py-2 border border-gray-300 rounded focus:outline-none focus:border-lime-500" placeholder="例：吹奏楽部">
+            </div>
+            
+            <div>
+              <label class="block text-sm font-bold text-slate-700 mb-2">カラー設定</label>
+              <select id="ev-color" class="w-full px-4 py-2 border border-gray-300 rounded focus:outline-none focus:border-lime-500 bg-white">
+                <option value="bg-slate-700 text-white">デフォルト (グレー)</option>
+                <option value="bg-red-600 text-white">レッド</option>
+                <option value="bg-orange-500 text-white">オレンジ</option>
+                <option value="bg-green-600 text-white">グリーン</option>
+                <option value="bg-blue-600 text-white">ブルー</option>
+                <option value="bg-indigo-500 text-white">インディゴ</option>
+                <option value="bg-purple-600 text-white">パープル</option>
+                <option value="bg-pink-500 text-white">ピンク</option>
+              </select>
+            </div>
+
+            <div class="md:col-span-2">
+              <label class="block text-sm font-bold text-slate-700 mb-2">詳細説明 <span class="text-gray-400 text-xs ml-2">任意</span></label>
+              <textarea id="ev-desc" rows="4" class="w-full px-4 py-2 border border-gray-300 rounded focus:outline-none focus:border-lime-500" placeholder="イベントの内容を入力してください..."></textarea>
+            </div>
+            
+            <div class="md:col-span-2 flex justify-end gap-4 mt-4">
+              <button onclick="window.cancelEventEdit()" id="btn-cancel-ev" class="hidden bg-gray-200 hover:bg-gray-300 text-slate-700 font-bold py-3 px-6 rounded transition duration-300">
+                キャンセル
+              </button>
+              <button onclick="window.submitEvent()" id="btn-submit-ev" class="bg-lime-600 hover:bg-lime-700 text-white font-bold py-3 px-8 rounded tracking-widest transition duration-300 flex items-center gap-2">
+                <i class="fa-solid fa-floppy-disk"></i> 保存する
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <div class="bg-white p-6 md:p-8 shadow-md border border-gray-100">
+          <div class="flex justify-between items-center mb-6">
+            <h3 class="text-xl font-bold tracking-widest">登録済みイベント</h3>
+            <select id="filter-day" onchange="window.renderEventList()" class="px-3 py-1 border border-gray-300 rounded text-sm font-sans">
+              <option value="0">すべての日程</option>
+              <option value="1">1日目のみ</option>
+              <option value="2">2日目のみ</option>
+            </select>
+          </div>
+          <div class="overflow-x-auto font-sans">
+            <table class="w-full text-left border-collapse min-w-[700px]">
+              <thead>
+                <tr class="bg-slate-100 text-slate-600 text-sm">
+                  <th class="p-3 border-b border-gray-200">日程</th>
+                  <th class="p-3 border-b border-gray-200">時間</th>
+                  <th class="p-3 border-b border-gray-200">場所</th>
+                  <th class="p-3 border-b border-gray-200">イベント名</th>
+                  <th class="p-3 border-b border-gray-200 text-center">操作</th>
+                </tr>
+              </thead>
+              <tbody id="events-list-table">
+                <tr><td colspan="5" class="p-8 text-center text-slate-400">読み込み中...</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      
+      <div id="tab-content-locations" class="space-y-8 hidden">
+        <div class="bg-white p-6 md:p-8 shadow-md border border-gray-100">
+          <h3 id="loc-form-title" class="text-2xl font-bold mb-6 border-l-4 border-blue-500 pl-3">新規場所の追加</h3>
+          <input type="hidden" id="loc-edit-id" value="">
+          
+          <div class="flex flex-col md:flex-row gap-6 font-sans items-end">
+            <div class="flex-[2] w-full">
+              <label class="block text-sm font-bold text-slate-700 mb-2">場所の名前 <span class="text-red-500">*</span></label>
+              <input type="text" id="loc-name" class="w-full px-4 py-2 border border-gray-300 rounded focus:outline-none focus:border-blue-500" placeholder="例：体育館">
+            </div>
+            <div class="flex-1 w-full">
+              <label class="block text-sm font-bold text-slate-700 mb-2">表示順 <span class="text-gray-400 text-xs font-normal">※左から表示されます</span></label>
+              <input type="number" id="loc-order" class="w-full px-4 py-2 border border-gray-300 rounded focus:outline-none focus:border-blue-500" value="1">
+            </div>
+            <div class="flex gap-2 w-full md:w-auto">
+              <button onclick="window.cancelLocEdit()" id="btn-cancel-loc" class="hidden bg-gray-200 hover:bg-gray-300 text-slate-700 font-bold py-2.5 px-4 rounded transition duration-300">
+                取消
+              </button>
+              <button onclick="window.submitLocation()" id="btn-submit-loc" class="w-full md:w-auto bg-blue-600 hover:bg-blue-700 text-white font-bold py-2.5 px-6 rounded transition duration-300 flex items-center justify-center gap-2">
+                <i class="fa-solid fa-plus"></i> 追加
+              </button>
+            </div>
+          </div>
+          <p class="text-xs text-slate-500 font-sans mt-3">※表示順の数字が小さい場所ほど、スケジュール表の左側に配置されます。</p>
+        </div>
+
+        <div class="bg-white p-6 md:p-8 shadow-md border border-gray-100">
+          <h3 class="text-xl font-bold mb-6 tracking-widest">登録済み場所一覧</h3>
+          <div class="overflow-x-auto font-sans">
+            <table class="w-full text-left border-collapse">
+              <thead>
+                <tr class="bg-slate-100 text-slate-600 text-sm">
+                  <th class="p-3 border-b border-gray-200 w-24 text-center">表示順</th>
+                  <th class="p-3 border-b border-gray-200">場所の名前</th>
+                  <th class="p-3 border-b border-gray-200 text-center w-40">操作</th>
+                </tr>
+              </thead>
+              <tbody id="locations-list-table">
+                <tr><td colspan="3" class="p-8 text-center text-slate-400">読み込み中...</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      
+      <div id="tab-content-users" class="space-y-8 hidden">
+        <div class="bg-orange-50 border-l-4 border-orange-500 p-4 mb-6">
+          <p class="text-sm text-orange-800 font-sans">
+            <strong>【セキュリティの注意】</strong><br>
+            設定したパスワードはブラウザ上で暗号化（ハッシュ化）されてから通信・保存されるため、通信経路上でパスワードが漏れることはありません。<br>
+            管理画面を開ける関係者のみにアカウントを発行してください。
+          </p>
+        </div>
+
+        <div class="bg-white p-6 md:p-8 shadow-md border border-gray-100">
+          <h3 class="text-2xl font-bold mb-6 border-l-4 border-orange-500 pl-3">新しいアカウントを作成</h3>
+          
+          <div class="flex flex-col md:flex-row gap-6 font-sans items-end">
+            <div class="flex-1 w-full">
+              <label class="block text-sm font-bold text-slate-700 mb-2">ログインID <span class="text-red-500">*</span></label>
+              <input type="text" id="new-user-id" class="w-full px-4 py-2 border border-gray-300 rounded focus:outline-none focus:border-orange-500" placeholder="半角英数字">
+            </div>
+            <div class="flex-1 w-full">
+              <label class="block text-sm font-bold text-slate-700 mb-2">パスワード <span class="text-red-500">*</span></label>
+              <input type="password" id="new-user-password" class="w-full px-4 py-2 border border-gray-300 rounded focus:outline-none focus:border-orange-500" placeholder="推測されにくい文字列">
+            </div>
+            <div class="w-full md:w-auto">
+              <button onclick="window.createUser()" class="w-full md:w-auto bg-orange-600 hover:bg-orange-700 text-white font-bold py-2.5 px-6 rounded transition duration-300 flex items-center justify-center gap-2">
+                <i class="fa-solid fa-user-plus"></i> 追加
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <div class="bg-white p-6 md:p-8 shadow-md border border-gray-100">
+          <h3 class="text-xl font-bold mb-6 tracking-widest">登録済みアカウント一覧</h3>
+          <div class="overflow-x-auto font-sans">
+            <table class="w-full text-left border-collapse">
+              <thead>
+                <tr class="bg-slate-100 text-slate-600 text-sm">
+                  <th class="p-3 border-b border-gray-200">ログインID</th>
+                  <th class="p-3 border-b border-gray-200">登録日</th>
+                  <th class="p-3 border-b border-gray-200 text-center">操作</th>
+                </tr>
+              </thead>
+              <tbody id="users-list-table">
+                <tr><td colspan="3" class="p-8 text-center text-slate-400">読み込み中...</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  
+  <div id="toast-container" class="fixed bottom-4 right-4 z-[100] flex flex-col gap-2 font-sans pointer-events-none"></div>
+
+  
+  <div id="confirm-modal" class="fixed inset-0 z-[100] hidden flex items-center justify-center p-4">
+    <div class="absolute inset-0 bg-slate-900/50 backdrop-blur-sm" onclick="window.closeConfirmModal()"></div>
+    <div class="bg-white rounded-md shadow-xl w-full max-w-sm relative z-10 fade-in p-6">
+      <h3 id="confirm-title" class="text-lg font-bold mb-2">確認</h3>
+      <p id="confirm-msg" class="text-slate-600 text-sm mb-6 font-sans">本当に削除しますか？</p>
+      <div class="flex justify-end gap-3 font-sans">
+        <button onclick="window.closeConfirmModal()" class="px-4 py-2 bg-gray-200 hover:bg-gray-300 text-gray-800 rounded">キャンセル</button>
+        <button id="confirm-btn-exec" class="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded font-bold">削除する</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://ys-projectfestaexecutivecommittee.github.io/SoeiDay/script/base10.js"></script>
+</body>
+</html>

@@ -411,7 +411,7 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebas
       document.getElementById('ev-color').value = 'bg-slate-700 text-white';
       document.getElementById('ev-desc').value = '';
       
-      document.getElementById('btn-submit-ev').innerHTML = '<i class="fa-solid fa-floppy-disk"></i> 保存する';
+      document.getElementById('btn-submit-ev').innerHTML = '<i class="fa-solid fa-floppy-disk"></i> 保存';
       document.getElementById('btn-cancel-ev').classList.add('hidden');
     };
 

@@ -17,20 +17,14 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebas
     const auth = getAuth(app);
     const db = getFirestore(app);
 
-    
     let currentUser = null; 
     let adminUsers = [];    
     let newsData = [];      
     let currentAdminId = null; 
     let unsubs = [];        
 
-    
     document.getElementById('news-date').valueAsDate = new Date();
 
-    
-    
-    
-    
     async function hashPassword(password) {
       const encoder = new TextEncoder();
       const data = encoder.encode(password);
@@ -41,9 +35,6 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebas
       return hashHex;
     }
 
-    
-    
-    
     window.switchTab = function(tabName) {
       const newsContent = document.getElementById('tab-content-news');
       const usersContent = document.getElementById('tab-content-users');
@@ -77,7 +68,6 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebas
       
       container.appendChild(toast);
       
-      
       setTimeout(() => {
         toast.style.opacity = '0';
         toast.style.transform = 'translateX(100%)';
@@ -86,9 +76,6 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebas
       }, 3000);
     }
 
-    
-    
-    
     document.getElementById('news-image-input').addEventListener('change', function(e) {
       const file = e.target.files[0];
       if (!file) return;
@@ -119,7 +106,6 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebas
           const ctx = canvas.getContext('2d');
           ctx.drawImage(img, 0, 0, width, height);
           
-          
           const base64String = canvas.toDataURL('image/jpeg', 0.8);
           
           document.getElementById('news-image-base64').value = base64String;
@@ -138,19 +124,12 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebas
       document.getElementById('image-preview-container').classList.add('hidden');
     };
 
-    
-    
-    
-    
-    
     const fetchData = () => {
       if (!currentUser) return;
-      
       
       unsubs.forEach(unsub => unsub());
       unsubs = [];
 
-      
       const adminRef = collection(db, 'artifacts', appId, 'public', 'data', 'admin_users');
       const unsubAdmin = onSnapshot(adminRef, async (snapshot) => {
         adminUsers = [];
@@ -158,22 +137,28 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebas
           adminUsers.push({ id: doc.id, ...doc.data() });
         });
 
-        
         if (adminUsers.length === 0) {
-          const hashedPW = await hashPassword('soei2026');
-          await setDoc(doc(adminRef, 'admin'), {
-            passwordHash: hashedPW,
-            createdAt: new Date().toISOString()
-          });
-          console.log("初期管理者アカウントを作成しました (ID: admin)");
+          try {
+            const hashedPW = await hashPassword('soei2026');
+            await setDoc(doc(adminRef, 'admin'), {
+              passwordHash: hashedPW,
+              createdAt: new Date().toISOString()
+            });
+            console.log("初期管理者アカウントを作成しました (ID: admin)");
+          } catch (err) {
+            console.error("初期アカウント作成エラー:", err);
+          }
         }
 
         renderUsersList();
-      }, (error) => { console.error("Admin fetch error:", error); });
+      }, (error) => { 
+        console.error("Admin fetch error:", error); 
+        document.getElementById('loading-overlay').classList.add('hidden');
+        document.getElementById('login-section').classList.remove('hidden');
+      });
       
       unsubs.push(unsubAdmin);
 
-      
       const newsRef = collection(db, 'artifacts', appId, 'public', 'data', 'school_news');
       const unsubNews = onSnapshot(newsRef, (snapshot) => {
         newsData = [];
@@ -181,26 +166,28 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebas
           newsData.push({ id: doc.id, ...doc.data() });
         });
         
-        
         newsData.sort((a, b) => new Date(b.date || 0) - new Date(a.date || 0));
         renderNewsList();
         
-        
         document.getElementById('loading-overlay').classList.add('hidden');
-        
-        
         checkSession();
 
-      }, (error) => { console.error("News fetch error:", error); });
+      }, (error) => { 
+        console.error("News fetch error:", error); 
+        
+        document.getElementById('loading-overlay').classList.add('hidden');
+        document.getElementById('login-section').classList.remove('hidden');
+        const errEl = document.getElementById('login-error');
+        errEl.innerHTML = "データベースへの接続が拒否されました。<br>Firebaseの「Firestore Database」のルール設定を確認してください。";
+        errEl.classList.remove('hidden');
+      });
 
       unsubs.push(unsubNews);
     };
 
-    
     function checkSession() {
       const savedAdmin = sessionStorage.getItem('soei_admin_id');
       if (savedAdmin) {
-        
         const userExists = adminUsers.find(u => u.id === savedAdmin);
         if (userExists) {
           showDashboard(savedAdmin);
@@ -212,7 +199,6 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebas
       document.getElementById('dashboard-section').classList.add('hidden');
     }
 
-    
     window.attemptLogin = async function() {
       const idInput = document.getElementById('login-id').value.trim();
       const pwInput = document.getElementById('login-password').value;
@@ -224,12 +210,10 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebas
         return;
       }
 
-      
       const hashedPW = await hashPassword(pwInput);
       const targetUser = adminUsers.find(u => u.id === idInput);
 
       if (targetUser && targetUser.passwordHash === hashedPW) {
-        
         sessionStorage.setItem('soei_admin_id', idInput);
         errorEl.classList.add('hidden');
         document.getElementById('login-id').value = '';
@@ -237,7 +221,6 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebas
         showDashboard(idInput);
         showToast('ログインしました');
       } else {
-        
         errorEl.textContent = "IDまたはパスワードが間違っています。";
         errorEl.classList.remove('hidden');
       }
@@ -260,9 +243,6 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebas
       document.getElementById('header-user-info').classList.remove('hidden');
     }
 
-    
-    
-    
     window.submitNews = async function() {
       if (!currentUser) return;
       
@@ -288,7 +268,6 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebas
         });
         
         showToast('お知らせを投稿しました');
-        
         
         document.getElementById('news-title').value = '';
         document.getElementById('news-content').value = '';
@@ -340,9 +319,6 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebas
       tbody.innerHTML = html;
     }
 
-    
-    
-    
     window.createUser = async function() {
       if (!currentUser) return;
       
@@ -354,7 +330,6 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebas
         return;
       }
       
-      
       if (adminUsers.find(u => u.id === newId)) {
         alert("このIDはすでに使われています。");
         return;
@@ -363,7 +338,6 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebas
       try {
         const hashedPW = await hashPassword(newPw);
         const adminRef = collection(db, 'artifacts', appId, 'public', 'data', 'admin_users');
-        
         
         await setDoc(doc(adminRef, newId), {
           passwordHash: hashedPW,
@@ -384,7 +358,6 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebas
 
     window.deleteUser = async function(id) {
       if (!currentUser) return;
-      
       
       if (adminUsers.length <= 1) {
         alert("最後のアカウントは削除できません。");
@@ -432,9 +405,6 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebas
       tbody.innerHTML = html;
     }
 
-    
-    
-    
     const initAuth = async () => {
       try {
         if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
@@ -449,6 +419,12 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebas
         }
       } catch (error) {
         console.error("Auth init failed:", error);
+        
+        document.getElementById('loading-overlay').classList.add('hidden');
+        document.getElementById('login-section').classList.remove('hidden');
+        const errEl = document.getElementById('login-error');
+        errEl.innerHTML = "認証に失敗しました。<br>Firebaseの「Authentication」で「匿名」が有効になっているか確認してください。";
+        errEl.classList.remove('hidden');
       }
     };
 

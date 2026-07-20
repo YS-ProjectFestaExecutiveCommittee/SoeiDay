@@ -3,27 +3,11 @@ document.addEventListener('DOMContentLoaded', () => {
       const themeToggleBtn = document.getElementById('theme-toggle');
       const darkIcon = document.getElementById('theme-toggle-dark-icon');
       const lightIcon = document.getElementById('theme-toggle-light-icon');
-
-      if (localStorage.theme === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
-        document.documentElement.classList.add('dark');
-        if (lightIcon) lightIcon.classList.remove('hidden');
-      } else {
         document.documentElement.classList.remove('dark');
         if (darkIcon) darkIcon.classList.remove('hidden');
-      }
 
       if (themeToggleBtn) {
         themeToggleBtn.addEventListener('click', () => {
-          if (darkIcon) darkIcon.classList.toggle('hidden');
-          if (lightIcon) lightIcon.classList.toggle('hidden');
-          
-          if (document.documentElement.classList.contains('dark')) {
-            document.documentElement.classList.remove('dark');
-            localStorage.theme = 'light';
-          } else {
-            document.documentElement.classList.add('dark');
-            localStorage.theme = 'dark';
-          }
         });
       }
 

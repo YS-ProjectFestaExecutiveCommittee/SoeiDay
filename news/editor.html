@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" href="https://ys-projectfestaexecutivecommittee.github.io/SoeiDay/image/Favicon01.ico" />
+  <title>管理画面 | 創英祭 2026</title>
+  
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  
+  <link rel="stylesheet" href="https://ys-projectfestaexecutivecommittee.github.io/SoeiDay/css/base03.css">
+</head>
+<body class="bg-slate-50 text-slate-900 antialiased min-h-screen flex flex-col">
+
+  
+  <header class="bg-slate-900 text-white p-4 shadow-md flex justify-between items-center z-10 relative">
+    <div class="flex items-center gap-3">
+      <h1 class="text-xl font-bold tracking-widest">創英祭 管理システム</h1>
+      <span class="text-xs bg-brand-orange text-white px-2 py-1 rounded-sm tracking-widest bg-orange-500">関係者専用</span>
+    </div>
+    <div id="header-user-info" class="hidden text-sm font-sans flex items-center gap-4">
+      <span>ログイン中: <strong id="current-user-display" class="text-brand-lime text-lime-400"></strong></span>
+      <button onclick="logout()" class="text-slate-300 hover:text-white transition">
+        <i class="fa-solid fa-right-from-bracket"></i> ログアウト
+      </button>
+    </div>
+  </header>
+
+  
+  <div id="loading-overlay" class="fixed inset-0 bg-white/80 z-50 flex items-center justify-center backdrop-blur-sm">
+    <div class="text-center">
+      <i class="fa-solid fa-circle-notch fa-spin text-4xl text-slate-900 mb-4"></i>
+      <p class="tracking-widest text-slate-600 font-sans">システムを準備しています...</p>
+    </div>
+  </div>
+
+  
+  <section id="login-section" class="flex-grow flex items-center justify-center p-4 hidden relative">
+    
+    <div class="absolute inset-0 bg-slate-900 overflow-hidden z-0">
+      <div class="absolute inset-0 bg-[url('https://yokohamasoei.sakura.ne.jp/wp/wp-content/uploads/2019/07/DSC_8659.jpg?auto=format&fit=crop&w=1920&q=80')] bg-cover bg-center opacity-20 filter grayscale"></div>
+    </div>
+    
+    <div class="bg-white p-8 md:p-12 w-full max-w-md shadow-2xl relative z-10 border-t-4 border-orange-500">
+      <h2 class="text-3xl font-bold mb-2 text-center tracking-widest">ログイン</h2>
+      <p class="text-center text-slate-500 text-sm mb-8 font-sans">専用のIDとパスワードを入力してください</p>
+      
+      <div id="login-error" class="hidden bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-6 text-sm font-sans">
+        IDまたはパスワードが間違っています。
+      </div>
+
+      <div class="space-y-6 font-sans">
+        <div>
+          <label class="block text-sm font-bold text-slate-700 mb-2">ログインID</label>
+          <input type="text" id="login-id" class="w-full px-4 py-3 border border-gray-300 rounded focus:outline-none focus:border-orange-500 focus:ring-1 focus:ring-orange-500 transition" placeholder="ID">
+        </div>
+        <div>
+          <label class="block text-sm font-bold text-slate-700 mb-2">パスワード</label>
+          <input type="password" id="login-password" class="w-full px-4 py-3 border border-gray-300 rounded focus:outline-none focus:border-orange-500 focus:ring-1 focus:ring-orange-500 transition" placeholder="••••••••">
+        </div>
+        <button onclick="attemptLogin()" class="w-full bg-slate-900 hover:bg-slate-800 text-white font-bold py-4 px-4 rounded tracking-widest transition duration-300 flex justify-center items-center gap-2">
+          <i class="fa-solid fa-lock"></i> ログインする
+        </button>
+      </div>
+    </div>
+  </section>
+
+  
+  <section id="dashboard-section" class="flex-grow hidden bg-slate-50">
+    <div class="max-w-6xl mx-auto p-4 sm:p-6 lg:p-8">
+      
+      
+      <div class="flex border-b border-gray-300 mb-8 font-sans">
+        <button onclick="switchTab('news')" id="tab-btn-news" class="py-3 px-6 text-center font-medium border-b-2 border-slate-900 text-slate-900 transition bg-white/50">
+          <i class="fa-regular fa-newspaper mr-2"></i> ニュース投稿・管理
+        </button>
+        <button onclick="switchTab('users')" id="tab-btn-users" class="py-3 px-6 text-center font-medium border-b-2 border-transparent text-slate-500 hover:text-slate-700 transition">
+          <i class="fa-solid fa-users-gear mr-2"></i> アカウント管理
+        </button>
+      </div>
+
+      
+      <div id="tab-content-news" class="space-y-8">
+        
+        
+        <div class="bg-white p-6 md:p-8 shadow-md border border-gray-100">
+          <h3 class="text-2xl font-bold mb-6 border-l-4 border-lime-500 pl-3">新規お知らせ作成</h3>
+          
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6 font-sans">
+            <div>
+              <label class="block text-sm font-bold text-slate-700 mb-2">タイトル <span class="text-red-500">*</span></label>
+              <input type="text" id="news-title" class="w-full px-4 py-2 border border-gray-300 rounded focus:outline-none focus:border-lime-500">
+            </div>
+            
+            <div class="flex gap-4">
+              <div class="flex-1">
+                <label class="block text-sm font-bold text-slate-700 mb-2">日付 <span class="text-red-500">*</span></label>
+                <input type="date" id="news-date" class="w-full px-4 py-2 border border-gray-300 rounded focus:outline-none focus:border-lime-500">
+              </div>
+              <div class="flex-1">
+                <label class="block text-sm font-bold text-slate-700 mb-2">カテゴリ <span class="text-red-500">*</span></label>
+                <select id="news-category" class="w-full px-4 py-2 border border-gray-300 rounded focus:outline-none focus:border-lime-500 bg-white">
+                  <option value="release">ニュースリリース</option>
+                  <option value="topic">トピック</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="md:col-span-2">
+              <label class="block text-sm font-bold text-slate-700 mb-2">本文 <span class="text-red-500">*</span></label>
+              <textarea id="news-content" rows="6" class="w-full px-4 py-2 border border-gray-300 rounded focus:outline-none focus:border-lime-500" placeholder="お知らせの内容を入力してください..."></textarea>
+            </div>
+
+            <div>
+              <label class="block text-sm font-bold text-slate-700 mb-2">画像添付 (自動で縮小されます)</label>
+              <input type="file" id="news-image-input" accept="image/*" class="w-full text-sm text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded file:border-0 file:text-sm file:font-semibold file:bg-lime-50 file:text-lime-700 hover:file:bg-lime-100 transition">
+              <input type="hidden" id="news-image-base64">
+              <div id="image-preview-container" class="mt-3 hidden relative inline-block border border-gray-200 p-1">
+                <img id="image-preview" src="" class="max-h-32 object-contain">
+                <button onclick="clearImage()" class="absolute -top-2 -right-2 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center text-xs shadow hover:bg-red-600">
+                  <i class="fa-solid fa-times"></i>
+                </button>
+              </div>
+            </div>
+
+            <div>
+              <label class="block text-sm font-bold text-slate-700 mb-2">YouTube 埋め込みコード</label>
+              <textarea id="news-video" rows="3" class="w-full px-4 py-2 border border-gray-300 rounded focus:outline-none focus:border-lime-500 text-xs font-mono" placeholder='<iframe width="560" height="315" src="..."></iframe>'></textarea>
+              <p class="text-xs text-slate-500 mt-1">※YouTubeの「共有」→「埋め込む」からコピーしたコードを貼り付けてください。</p>
+            </div>
+            
+            <div class="md:col-span-2 flex justify-end mt-4">
+              <button onclick="submitNews()" class="bg-lime-600 hover:bg-lime-700 text-white font-bold py-3 px-8 rounded tracking-widest transition duration-300 flex items-center gap-2">
+                <i class="fa-solid fa-paper-plane"></i> 投稿する
+              </button>
+            </div>
+          </div>
+        </div>
+
+        
+        <div class="bg-white p-6 md:p-8 shadow-md border border-gray-100">
+          <h3 class="text-xl font-bold mb-6 tracking-widest">投稿済み一覧</h3>
+          <div class="overflow-x-auto font-sans">
+            <table class="w-full text-left border-collapse">
+              <thead>
+                <tr class="bg-slate-100 text-slate-600 text-sm">
+                  <th class="p-3 border-b border-gray-200">日付</th>
+                  <th class="p-3 border-b border-gray-200">カテゴリ</th>
+                  <th class="p-3 border-b border-gray-200">タイトル</th>
+                  <th class="p-3 border-b border-gray-200 text-center">操作</th>
+                </tr>
+              </thead>
+              <tbody id="news-list-table">
+                
+                <tr><td colspan="4" class="p-8 text-center text-slate-400">読み込み中...</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      
+      <div id="tab-content-users" class="space-y-8 hidden">
+        <div class="bg-orange-50 border-l-4 border-orange-500 p-4 mb-6">
+          <p class="text-sm text-orange-800 font-sans">
+            <strong>【セキュリティの注意】</strong><br>
+            ここでのパスワードは通信の安全のために暗号化（ハッシュ化）されて保存されます。管理画面を開ける関係者のみにアカウントを発行してください。
+          </p>
+        </div>
+
+        
+        <div class="bg-white p-6 md:p-8 shadow-md border border-gray-100">
+          <h3 class="text-2xl font-bold mb-6 border-l-4 border-orange-500 pl-3">新しいアカウントを作成</h3>
+          
+          <div class="flex flex-col md:flex-row gap-6 font-sans items-end">
+            <div class="flex-1 w-full">
+              <label class="block text-sm font-bold text-slate-700 mb-2">ログインID <span class="text-red-500">*</span></label>
+              <input type="text" id="new-user-id" class="w-full px-4 py-2 border border-gray-300 rounded focus:outline-none focus:border-orange-500">
+            </div>
+            <div class="flex-1 w-full">
+              <label class="block text-sm font-bold text-slate-700 mb-2">パスワード <span class="text-red-500">*</span></label>
+              <input type="password" id="new-user-password" class="w-full px-4 py-2 border border-gray-300 rounded focus:outline-none focus:border-orange-500">
+            </div>
+            <div class="w-full md:w-auto">
+              <button onclick="createUser()" class="w-full md:w-auto bg-orange-600 hover:bg-orange-700 text-white font-bold py-2.5 px-6 rounded transition duration-300 flex items-center justify-center gap-2">
+                <i class="fa-solid fa-user-plus"></i> 追加
+              </button>
+            </div>
+          </div>
+        </div>
+
+        
+        <div class="bg-white p-6 md:p-8 shadow-md border border-gray-100">
+          <h3 class="text-xl font-bold mb-6 tracking-widest">登録済みアカウント一覧</h3>
+          <div class="overflow-x-auto font-sans">
+            <table class="w-full text-left border-collapse">
+              <thead>
+                <tr class="bg-slate-100 text-slate-600 text-sm">
+                  <th class="p-3 border-b border-gray-200">ログインID</th>
+                  <th class="p-3 border-b border-gray-200">登録日</th>
+                  <th class="p-3 border-b border-gray-200 text-center">操作</th>
+                </tr>
+              </thead>
+              <tbody id="users-list-table">
+                
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  
+  <div id="toast-container" class="fixed bottom-4 right-4 z-50 flex flex-col gap-2 font-sans"></div>
+
+  
+  <script src="https://ys-projectfestaexecutivecommittee.github.io/SoeiDay/javascript/base06.js"></script>
+</body>
+</html>

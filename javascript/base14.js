@@ -180,112 +180,155 @@ import { initializeApp } from 'https://www.gstatic.com/firebasejs/11.6.1/firebas
         }
       }
 
+      container.appendChild(blueprintBox);
+
       
       if (!renderedSuccessfully) {
-        let mapDataObj = null;
-        if (typeof mapData !== 'undefined') {
-          mapDataObj = mapData;
-        } else if (window[`mapData_${floorKey}`]) {
-          mapDataObj = window[`mapData_${floorKey}`];
-        } else if (window.mapData) {
-          mapDataObj = window.mapData;
+        
+        
+        fetchMapDataAndRender(floorKey, blueprintBox);
+      } else {
+        
+        renderPins(floorKey, blueprintBox);
+      }
+    }
+
+    async function fetchMapDataAndRender(floorKey, blueprintBox) {
+      try {
+        blueprintBox.innerHTML = `<div class="w-full h-full flex items-center justify-center text-slate-400"><i class="fa-solid fa-spinner fa-spin mr-2"></i> マップデータを読み込んでいます...</div>`;
+        
+        const url = `https://ys-projectfestaexecutivecommittee.github.io/SoeiDay/blueprint/${floorKey}.js`;
+        const response = await fetch(url);
+        if (!response.ok) throw new Error('Network response was not ok');
+        const text = await response.text();
+        
+        
+        const func = new Function(`
+          var mapData;
+          ${text.replace(/(const|let)\s+mapData\s*=/g, 'mapData =')}
+          return mapData;
+        `);
+        const floorMapData = func();
+        
+        if (floorMapData) {
+          renderSvgPaths(floorMapData, floorKey, blueprintBox);
+        } else {
+          throw new Error('Parsed mapData is empty');
         }
-
+      } catch (err) {
+        console.warn(`Failed to fetch/parse ${floorKey}.js, using fallback:`, err);
+        
+        let mapDataObj = null;
+        if (typeof mapData !== 'undefined') { mapDataObj = mapData; } 
+        else if (window[`mapData_${floorKey}`]) { mapDataObj = window[`mapData_${floorKey}`]; }
+        
         if (mapDataObj) {
-          let currentMapPaths = null;
-          
-          const searchFloorMap = {
-            'h1': '本館1F', 'h2': '本館2F', 'h3': '本館3F',
-            's1': '新館1F', 's2': '新館2F', 's3': '新館3F'
-          };
-          const searchStr = searchFloorMap[floorKey] || floorKey;
-          
-          for (const key in mapDataObj) {
-            if (key.includes(searchStr)) {
-              currentMapPaths = mapDataObj[key];
-              break;
-            }
-          }
-          
-          
-          if (!currentMapPaths && Object.keys(mapDataObj).length > 0) {
-            currentMapPaths = mapDataObj[Object.keys(mapDataObj)[0]];
-          }
+          renderSvgPaths(mapDataObj, floorKey, blueprintBox);
+        } else {
+          showFallbackGrid(blueprintBox, floorKey);
+        }
+      }
+    }
 
-          if (currentMapPaths && Array.isArray(currentMapPaths)) {
-            let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
+    function renderSvgPaths(mapDataObj, floorKey, blueprintBox) {
+      let currentMapPaths = null;
+      
+      const searchPatterns = {
+        'h1': ['h1', '本館1', '本館 1'],
+        'h2': ['h2', '本館2', '本館 2'],
+        'h3': ['h3', '本館3', '本館 3', '新館b1', '新館 b1'],
+        's1': ['s1', '新館1', '新館 1', '本館4', '本館 4', '体育館'],
+        's2': ['s2', '新館2', '新館 2'],
+        's3': ['s3', '新館3', '新館 3']
+      };
+      
+      const patterns = searchPatterns[floorKey] || [floorKey];
+      for (const key in mapDataObj) {
+        const lowerKey = key.toLowerCase();
+        if (patterns.some(p => lowerKey.includes(p.toLowerCase()))) {
+          currentMapPaths = mapDataObj[key];
+          break;
+        }
+      }
+      
+      
+      if (!currentMapPaths && Object.keys(mapDataObj).length > 0) {
+        currentMapPaths = mapDataObj[Object.keys(mapDataObj)[0]];
+      }
+
+      if (currentMapPaths && Array.isArray(currentMapPaths)) {
+        let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
+        
+        let pathsHtml = currentMapPaths.map(p => {
+          let attrs = '';
+          if (p.attributes) {
+            attrs = Object.entries(p.attributes).map(([k, v]) => `${k}="${v}"`).join(' ');
             
-            let pathsHtml = currentMapPaths.map(p => {
-              let attrs = '';
-              if (p.attributes) {
-                attrs = Object.entries(p.attributes).map(([k, v]) => `${k}="${v}"`).join(' ');
-                
-                
-                if (p.attributes.d) {
-                  const parts = p.attributes.d.trim().split(/\s+/);
-                  for (let i = 0; i < parts.length; i++) {
-                    const cmd = parts[i].toUpperCase();
-                    if (cmd === 'M' || cmd === 'L') {
-                      const x = parseFloat(parts[i+1]);
-                      const y = parseFloat(parts[i+2]);
-                      if (!isNaN(x) && !isNaN(y)) {
-                        if (x < minX) minX = x;
-                        if (x > maxX) maxX = x;
-                        if (y < minY) minY = y;
-                        if (y > maxY) maxY = y;
-                      }
-                    }
+            
+            if (p.attributes.d) {
+              const parts = p.attributes.d.trim().split(/\s+/);
+              for (let i = 0; i < parts.length; i++) {
+                const cmd = parts[i].toUpperCase();
+                if (cmd === 'M' || cmd === 'L') {
+                  const x = parseFloat(parts[i+1]);
+                  const y = parseFloat(parts[i+2]);
+                  if (!isNaN(x) && !isNaN(y)) {
+                    if (x < minX) minX = x;
+                    if (x > maxX) maxX = x;
+                    if (y < minY) minY = y;
+                    if (y > maxY) maxY = y;
                   }
                 }
               }
-              const tagName = p.type || 'path';
-              return `<${tagName} id="${p.id || ''}" ${attrs}></${tagName}>`;
-            }).join('');
-
-            let viewBoxStr = "0 0 5000 2000"; 
-            if (minX !== Infinity && maxX !== -Infinity) {
-              const padX = (maxX - minX) * 0.05;
-              const padY = (maxY - minY) * 0.05;
-              const vX = Math.max(0, minX - padX);
-              const vY = Math.max(0, minY - padY);
-              const vW = (maxX - minX) + padX * 2;
-              const vH = (maxY - minY) + padY * 2;
-              viewBoxStr = `${vX} ${vY} ${vW} ${vH}`;
             }
-
-            blueprintBox.innerHTML = `
-              <div class="relative w-full h-full flex items-center justify-center p-2">
-                <svg viewBox="${viewBoxStr}" class="w-full h-full max-h-[600px] drop-shadow-sm" preserveAspectRatio="xMidYMid meet">
-                  ${pathsHtml}
-                </svg>
-                <div id="pins-layer" class="absolute inset-0 pointer-events-auto"></div>
-              </div>
-            `;
-            renderedSuccessfully = true;
           }
-        }
-      }
+          const tagName = p.type || 'path';
+          return `<${tagName} id="${p.id || ''}" ${attrs}></${tagName}>`;
+        }).join('');
 
-      
-      if (!renderedSuccessfully) {
+        let viewBoxStr = "0 0 5000 2000"; 
+        if (minX !== Infinity && maxX !== -Infinity) {
+          const padX = (maxX - minX) * 0.05;
+          const padY = (maxY - minY) * 0.05;
+          const vX = Math.max(0, minX - padX);
+          const vY = Math.max(0, minY - padY);
+          const vW = (maxX - minX) + padX * 2;
+          const vH = (maxY - minY) + padY * 2;
+          viewBoxStr = `${vX} ${vY} ${vW} ${vH}`;
+        }
+
         blueprintBox.innerHTML = `
-          <div class="relative w-full h-[400px] bg-slate-100 dark:bg-slate-950 flex items-center justify-center rounded overflow-hidden">
-            <svg class="absolute inset-0 w-full h-full stroke-slate-300 dark:stroke-slate-800" xmlns="http://www.w3.org/2000/svg">
-              <defs>
-                <pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse">
-                  <path d="M 40 0 L 0 0 0 40" fill="none" stroke-width="0.5"/>
-                </pattern>
-              </defs>
-              <rect width="100%" height="100%" fill="url(#grid)" />
+          <div class="relative w-full h-full flex items-center justify-center p-2">
+            <svg viewBox="${viewBoxStr}" class="w-full h-full max-h-[600px] drop-shadow-sm" preserveAspectRatio="xMidYMid meet">
+              ${pathsHtml}
             </svg>
             <div id="pins-layer" class="absolute inset-0 pointer-events-auto"></div>
           </div>
         `;
+        renderPins(floorKey, blueprintBox);
+      } else {
+        showFallbackGrid(blueprintBox, floorKey);
       }
+    }
 
-      container.appendChild(blueprintBox);
+    function showFallbackGrid(blueprintBox, floorKey) {
+      blueprintBox.innerHTML = `
+        <div class="relative w-full h-[400px] bg-slate-100 dark:bg-slate-950 flex items-center justify-center rounded overflow-hidden">
+          <svg class="absolute inset-0 w-full h-full stroke-slate-300 dark:stroke-slate-800" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+              <pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse">
+                <path d="M 40 0 L 0 0 0 40" fill="none" stroke-width="0.5"/>
+              </pattern>
+            </defs>
+            <rect width="100%" height="100%" fill="url(#grid)" />
+          </svg>
+          <div id="pins-layer" class="absolute inset-0 pointer-events-auto"></div>
+        </div>
+      `;
+      renderPins(floorKey, blueprintBox);
+    }
 
-      
+    function renderPins(floorKey, blueprintBox) {
       let pinsLayer = blueprintBox.querySelector('#pins-layer');
       if (!pinsLayer) {
         pinsLayer = document.createElement('div');

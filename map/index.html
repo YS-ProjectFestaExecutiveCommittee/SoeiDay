@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" href="https://ys-projectfestaexecutivecommittee.github.io/SoeiDay/image/Favicon01.ico" />
+  <title>会場マップ | 創英祭 2026</title>
+
+  
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  
+  <script src="https://ys-projectfestaexecutivecommittee.github.io/SoeiDay/javascript/base01.js"></script>
+  <script src="https://ys-projectfestaexecutivecommittee.github.io/SoeiDay/javascript/load-components.js" defer></script>
+  <link rel="stylesheet" href="https://ys-projectfestaexecutivecommittee.github.io/SoeiDay/css/base01.css">
+
+  
+  <script src="https://ys-projectfestaexecutivecommittee.github.io/SoeiDay/blueprint/h1.js" defer></script>
+  <script src="https://ys-projectfestaexecutivecommittee.github.io/SoeiDay/blueprint/h2.js" defer></script>
+  <script src="https://ys-projectfestaexecutivecommittee.github.io/SoeiDay/blueprint/h3.js" defer></script>
+  <script src="https://ys-projectfestaexecutivecommittee.github.io/SoeiDay/blueprint/s1.js" defer></script>
+  <script src="https://ys-projectfestaexecutivecommittee.github.io/SoeiDay/blueprint/s2.js" defer></script>
+  <script src="https://ys-projectfestaexecutivecommittee.github.io/SoeiDay/blueprint/s3.js" defer></script>
+
+  <link rel="stylesheet" href="https://ys-projectfestaexecutivecommittee.github.io/SoeiDay/css/base12.css">
+</head>
+
+<body class="font-serif bg-brand-bgLight text-slate-900 dark:bg-brand-bgDark dark:text-slate-100 antialiased transition-colors duration-300">
+
+  
+  <div id="header-placeholder"></div>
+
+  
+  <section class="relative w-full h-[350px] md:h-[400px] overflow-hidden flex bg-slate-900">
+    <div class="absolute inset-0 bg-cover bg-center opacity-50" style="background-image: url('https://www.soei.ed.jp/oclp_j/assets/img/sec01_thumb.jpg?auto=format&fit=crop&w=1920&q=80'); filter: grayscale(20%);"></div>
+    <div class="absolute inset-0 bg-gradient-to-t from-slate-900 via-slate-900/50 to-transparent"></div>
+
+    <div class="relative w-full max-w-7xl mx-auto h-full flex items-end pb-16 px-6 sm:px-12 z-10">
+      <div>
+        <h1 class="text-4xl md:text-5xl font-bold tracking-widest text-white mb-4" style="filter: drop-shadow(0 2px 4px rgba(0,0,0,0.5));">
+          会場マップ<span class="text-brand-orange ml-1">.</span>
+        </h1>
+        <p class="text-slate-300 tracking-widest font-light text-sm md:text-base">Floor Guide & Campus Map</p>
+      </div>
+    </div>
+  </section>
+
+  
+  <section class="py-16 relative bg-brand-bgLight dark:bg-brand-bgDark transition-colors duration-300">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+      
+      
+      <div class="mb-10 flex flex-wrap justify-center gap-2 sm:gap-3 border-b border-gray-200 dark:border-white/10 pb-6">
+        <button onclick="switchFloor('h1')" id="btn-h1" class="floor-btn active-floor px-5 py-3 text-sm tracking-widest border transition-all duration-200 rounded-sm font-medium">
+          本館 1F
+        </button>
+        <button onclick="switchFloor('h2')" id="btn-h2" class="floor-btn px-5 py-3 text-sm tracking-widest border border-gray-300 dark:border-slate-700 hover:border-brand-orange text-slate-700 dark:text-slate-300 transition-all duration-200 rounded-sm font-medium">
+          本館 2F
+        </button>
+        <button onclick="switchFloor('h3')" id="btn-h3" class="floor-btn px-5 py-3 text-sm tracking-widest border border-gray-300 dark:border-slate-700 hover:border-brand-orange text-slate-700 dark:text-slate-300 transition-all duration-200 rounded-sm font-medium">
+          本館 3F / 新館 B1F
+        </button>
+        <button onclick="switchFloor('s1')" id="btn-s1" class="floor-btn px-5 py-3 text-sm tracking-widest border border-gray-300 dark:border-slate-700 hover:border-brand-orange text-slate-700 dark:text-slate-300 transition-all duration-200 rounded-sm font-medium">
+          本館 4F / 新館 1F / 体育館
+        </button>
+        <button onclick="switchFloor('s2')" id="btn-s2" class="floor-btn px-5 py-3 text-sm tracking-widest border border-gray-300 dark:border-slate-700 hover:border-brand-orange text-slate-700 dark:text-slate-300 transition-all duration-200 rounded-sm font-medium">
+          新館 2F
+        </button>
+        <button onclick="switchFloor('s3')" id="btn-s3" class="floor-btn px-5 py-3 text-sm tracking-widest border border-gray-300 dark:border-slate-700 hover:border-brand-orange text-slate-700 dark:text-slate-300 transition-all duration-200 rounded-sm font-medium">
+          新館 3F
+        </button>
+      </div>
+
+      
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
+        
+        
+        <div class="lg:col-span-2 bg-white dark:bg-slate-800 p-6 shadow-xl border border-gray-100 dark:border-white/5 relative rounded-sm">
+          <div class="flex items-center justify-between mb-4 border-b border-gray-100 dark:border-white/10 pb-3">
+            <h2 id="current-floor-title" class="text-xl font-bold tracking-widest text-slate-900 dark:text-white flex items-center gap-2">
+              <i class="fa-solid fa-map border-l-2 border-brand-orange pl-2 text-brand-orange"></i>
+              <span>本館 1F フロアマップ</span>
+            </h2>
+            <span class="text-xs text-slate-400 tracking-wider font-sans"><i class="fa-solid fa-hand-pointer mr-1"></i>部屋をタップで詳細表示</span>
+          </div>
+
+          
+          <div id="map-viewport" class="map-canvas-container flex items-center justify-center border border-gray-200 dark:border-slate-700 p-4">
+            
+            <div id="blueprint-render-target" class="w-full h-full relative min-h-[400px] flex items-center justify-center">
+              <div class="text-center text-slate-400 font-light tracking-wider py-20">
+                <i class="fa-solid fa-spinner fa-spin text-2xl mb-3 block"></i>
+                マップデータを読み込んでいます...
+              </div>
+            </div>
+          </div>
+
+          
+          <div class="mt-6 flex flex-wrap items-center justify-center gap-6 text-xs text-slate-600 dark:text-slate-300 border-t border-gray-100 dark:border-white/10 pt-4">
+            <div class="flex items-center gap-2">
+              <span class="w-3 h-3 bg-brand-orange rounded-full inline-block"></span>
+              <span>模擬店・飲食</span>
+            </div>
+            <div class="flex items-center gap-2">
+              <span class="w-3 h-3 bg-brand-lime rounded-full inline-block"></span>
+              <span>展示・体験</span>
+            </div>
+            <div class="flex items-center gap-2">
+              <span class="w-3 h-3 bg-blue-500 rounded-full inline-block"></span>
+              <span>ステージ・公演</span>
+            </div>
+            <div class="flex items-center gap-2">
+              <span class="w-3 h-3 bg-slate-400 rounded-full inline-block"></span>
+              <span>本部・休憩所・その他</span>
+            </div>
+          </div>
+        </div>
+
+        
+        <div class="bg-white dark:bg-slate-800 p-6 shadow-xl border border-gray-100 dark:border-white/5 rounded-sm sticky top-6">
+          <div class="flex items-center justify-between mb-4 border-b border-gray-100 dark:border-white/10 pb-3">
+            <h3 class="text-lg font-bold tracking-widest text-slate-900 dark:text-white">
+              ブース詳細情報
+            </h3>
+            <span id="selected-room-id" class="text-xs px-2.5 py-1 bg-gray-100 dark:bg-slate-700 text-brand-orange font-mono rounded">未選択</span>
+          </div>
+
+          
+          <div id="room-detail-container" class="space-y-4">
+            <div class="text-center py-12 text-slate-400 font-light">
+              <i class="fa-solid fa-compass text-4xl mb-3 block opacity-40"></i>
+              <p class="text-sm">マップ上の部屋やブースを選択すると<br>詳細情報が表示されます</p>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      
+      <div class="mt-16">
+        <div class="flex flex-col sm:flex-row sm:items-end justify-between mb-8 border-b-2 border-brand-orange dark:border-brand-orangeDark pb-3 gap-4">
+          <div>
+            <h2 class="text-2xl md:text-3xl font-bold tracking-widest text-slate-900 dark:text-white">ブース・出展一覧</h2>
+            <span class="text-xs text-slate-500 dark:text-slate-400 font-sans tracking-wider">Booths & Attractions</span>
+          </div>
+          
+          <div class="flex items-center gap-2">
+            <input type="text" id="booth-search-input" placeholder="団体名・キーワード検索..." class="px-4 py-2 text-sm bg-gray-50 dark:bg-slate-900 border border-gray-200 dark:border-slate-700 text-slate-800 dark:text-slate-200 focus:outline-none focus:border-brand-orange rounded-sm w-full sm:w-64">
+          </div>
+        </div>
+
+        
+        <div id="booths-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div class="col-span-full text-center py-12 text-slate-400 font-light tracking-wider">
+            <i class="fa-solid fa-spinner fa-spin mr-2"></i> データを読み込んでいます...
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  
+  <section class="py-20 bg-brand-surfaceLight dark:bg-brand-surfaceDark slant-top transition-colors duration-300">
+    <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 text-center relative z-10">
+      <p class="text-sm text-slate-500 dark:text-slate-400 tracking-widest font-light mb-8">Contents</p>
+      
+      <div class="flex flex-wrap justify-center gap-6">
+        <a href="index.html" class="inline-flex items-center gap-3 border border-slate-900 dark:border-white px-8 py-4 tracking-widest text-sm hover:bg-slate-900 hover:text-white dark:hover:bg-white dark:hover:text-slate-900 transition-colors duration-300 text-slate-900 dark:text-white">
+          <i class="fa-solid fa-house"></i> トップページへ戻る
+        </a>
+        <a href="https://ys-projectfestaexecutivecommittee.github.io/SoeiDay/schedule/" class="inline-flex items-center gap-3 border border-slate-900 dark:border-white px-8 py-4 tracking-widest text-sm hover:bg-slate-900 hover:text-white dark:hover:bg-white dark:hover:text-slate-900 transition-colors duration-300 text-slate-900 dark:text-white">
+          <i class="fa-regular fa-calendar"></i> スケジュール
+        </a>
+        <a href="https://ys-projectfestaexecutivecommittee.github.io/SoeiDay/booth/" class="inline-flex items-center gap-3 border border-slate-900 dark:border-white px-8 py-4 tracking-widest text-sm hover:bg-slate-900 hover:text-white dark:hover:bg-white dark:hover:text-slate-900 transition-colors duration-300 text-slate-900 dark:text-white">
+          <i class="fa-solid fa-store"></i> 出店案内
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <div id="footer-placeholder"></div>
+
+  
+  <script src="https://ys-projectfestaexecutivecommittee.github.io/SoeiDay/javascript/base02.js"></script>
+  <script src="https://ys-projectfestaexecutivecommittee.github.io/SoeiDay/javascript/base04.js"></script>
+
+  
+  <script type="module" src="https://ys-projectfestaexecutivecommittee.github.io/SoeiDay/javascript/base14.js"></script>
+</body>
+</html>

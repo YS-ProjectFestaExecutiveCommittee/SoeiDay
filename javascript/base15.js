@@ -1,6 +1,6 @@
 import { initializeApp } from 'https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js';
     import { getAuth, signInAnonymously } from 'https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js';
-    import { getFirestore, collection, doc, setDoc, deleteDoc, onSnapshot } from 'https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js';
+    import { getFirestore, collection, doc, setDoc, getDoc, deleteDoc, onSnapshot } from 'https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js';
 
     const firebaseConfig = {
       apiKey: "AIzaSyCDWj4xWfU42x2NG1tOSlXcBC-f2vhC3lA",
@@ -16,6 +16,7 @@ import { initializeApp } from 'https://www.gstatic.com/firebasejs/11.6.1/firebas
     let db;
     let auth;
     let localRoomsData = {};
+    let localUsersData = {};
     let currentFloor = 'h1';
 
     const floorTitles = {
@@ -27,37 +28,83 @@ import { initializeApp } from 'https://www.gstatic.com/firebasejs/11.6.1/firebas
       's3': '新館 3F フロアマップ'
     };
 
+    
+    window.switchTab = function(tabName) {
+      const mapContent = document.getElementById('tab-content-map');
+      const usersContent = document.getElementById('tab-content-users');
+      const mapBtn = document.getElementById('tab-btn-map');
+      const usersBtn = document.getElementById('tab-btn-users');
+
+      if (tabName === 'map') {
+        mapContent.classList.remove('hidden');
+        usersContent.classList.add('hidden');
+        mapBtn.className = "py-3 px-6 text-center font-medium border-b-2 border-slate-900 text-slate-900 bg-white/50 transition";
+        usersBtn.className = "py-3 px-6 text-center font-medium border-b-2 border-transparent text-slate-500 hover:text-slate-700 transition";
+      } else {
+        mapContent.classList.add('hidden');
+        usersContent.classList.remove('hidden');
+        usersBtn.className = "py-3 px-6 text-center font-medium border-b-2 border-slate-900 text-slate-900 bg-white/50 transition";
+        mapBtn.className = "py-3 px-6 text-center font-medium border-b-2 border-transparent text-slate-500 hover:text-slate-700 transition";
+      }
+    };
+
+    
     window.attemptLogin = async function() {
-      const id = document.getElementById('login-id').value;
+      const id = document.getElementById('login-id').value.trim();
       const pass = document.getElementById('login-password').value;
+      const errorEl = document.getElementById('login-error');
       
-      if (id === 'admin' && pass === 'soei2026') {
-        document.getElementById('login-error').classList.add('hidden');
-        document.getElementById('loading-overlay').classList.remove('hidden');
+      if (!id || !pass) {
+        errorEl.classList.remove('hidden');
+        errorEl.textContent = 'IDとパスワードを入力してください。';
+        return;
+      }
+
+      errorEl.classList.add('hidden');
+      document.getElementById('loading-overlay').classList.remove('hidden');
+      
+      try {
+        const app = initializeApp(firebaseConfig);
+        auth = getAuth(app);
+        db = getFirestore(app);
         
-        try {
-          const app = initializeApp(firebaseConfig);
-          auth = getAuth(app);
-          db = getFirestore(app);
+        
+        await signInAnonymously(auth);
+        
+        let loginSuccess = false;
+
+        
+        if (id === 'admin' && pass === 'soei2026') {
+          loginSuccess = true;
+        } else {
           
-          await signInAnonymously(auth);
-          
+          const userDocRef = doc(db, 'artifacts', appId, 'public', 'data', 'admin_users', id);
+          const userSnap = await getDoc(userDocRef);
+          if (userSnap.exists() && userSnap.data().password === pass) {
+            loginSuccess = true;
+          }
+        }
+
+        if (loginSuccess) {
           document.getElementById('login-section').classList.add('hidden');
           document.getElementById('dashboard-section').classList.remove('hidden');
           document.getElementById('header-user-info').classList.remove('hidden');
           document.getElementById('current-user-display').textContent = id;
           
           startListeningToRooms();
+          startListeningToUsers();
           window.switchFloor('h1');
           window.resetForm();
-        } catch (error) {
-          console.error("Auth Error:", error);
-          document.getElementById('loading-overlay').classList.add('hidden');
-          showToast('データベース接続に失敗しました。', 'error');
+        } else {
+          errorEl.classList.remove('hidden');
+          errorEl.textContent = 'IDまたはパスワードが間違っています。';
         }
-      } else {
-        document.getElementById('login-error').classList.remove('hidden');
-        document.getElementById('login-error').textContent = 'IDまたはパスワードが間違っています。';
+      } catch (error) {
+        console.error("Auth/DB Error:", error);
+        errorEl.classList.remove('hidden');
+        errorEl.textContent = 'データベース接続に失敗しました。';
+      } finally {
+        document.getElementById('loading-overlay').classList.add('hidden');
       }
     };
 
@@ -69,7 +116,7 @@ import { initializeApp } from 'https://www.gstatic.com/firebasejs/11.6.1/firebas
       const container = document.getElementById('toast-container');
       const toast = document.createElement('div');
       const bgColor = type === 'success' ? 'bg-lime-600' : 'bg-red-600';
-      toast.className = `${bgColor} text-white px-5 py-3 rounded shadow-lg transition-all duration-300 opacity-0 transform translate-y-2 text-sm font-medium flex items-center gap-2`;
+      toast.className = `${bgColor} text-white px-5 py-3 rounded shadow-lg transition-all duration-300 opacity-0 transform translate-y-2 text-sm font-medium flex items-center gap-2 pointer-events-auto`;
       toast.innerHTML = `<i class="fa-solid ${type === 'success' ? 'fa-check-circle' : 'fa-triangle-exclamation'}"></i> ${message}`;
       container.appendChild(toast);
       setTimeout(() => toast.classList.remove('opacity-0', 'translate-y-2'), 10);
@@ -79,6 +126,7 @@ import { initializeApp } from 'https://www.gstatic.com/firebasejs/11.6.1/firebas
       }, 3000);
     };
 
+    
     function startListeningToRooms() {
       const roomsRef = collection(db, 'artifacts', appId, 'public', 'data', 'map_rooms');
       onSnapshot(roomsRef, (snapshot) => {
@@ -87,13 +135,84 @@ import { initializeApp } from 'https://www.gstatic.com/firebasejs/11.6.1/firebas
           localRoomsData[doc.id] = doc.data();
         });
         renderRoomsTable();
-        
         renderPins(currentFloor);
-        document.getElementById('loading-overlay').classList.add('hidden');
-      }, (error) => {
-        console.error("Data fetch error:", error);
-        document.getElementById('loading-overlay').classList.add('hidden');
-      });
+      }, (error) => console.error("Map Data fetch error:", error));
+    }
+
+    function startListeningToUsers() {
+      const usersRef = collection(db, 'artifacts', appId, 'public', 'data', 'admin_users');
+      onSnapshot(usersRef, (snapshot) => {
+        localUsersData = {};
+        snapshot.forEach((doc) => {
+          localUsersData[doc.id] = doc.data();
+        });
+        renderUsersTable();
+      }, (error) => console.error("Users Data fetch error:", error));
+    }
+
+    
+    window.createUser = async function() {
+      const id = document.getElementById('new-user-id').value.trim();
+      const pass = document.getElementById('new-user-password').value;
+      
+      if (!id || !pass) { showToast('IDとパスワードを入力してください', 'error'); return; }
+      if (id === 'admin') { showToast('admin は予約されたマスターIDです', 'error'); return; }
+      if (id.length < 4 || pass.length < 6) { showToast('IDは4文字以上、パスワードは6文字以上にしてください', 'error'); return; }
+
+      try {
+        await setDoc(doc(db, 'artifacts', appId, 'public', 'data', 'admin_users', id), {
+          password: pass, 
+          createdAt: new Date().toISOString()
+        });
+        showToast('アカウントを作成しました', 'success');
+        document.getElementById('new-user-id').value = '';
+        document.getElementById('new-user-password').value = '';
+      } catch (error) {
+        console.error("Create User Error:", error);
+        showToast('アカウント作成に失敗しました', 'error');
+      }
+    };
+
+    window.deleteUser = async function(id) {
+      if (id === 'admin') { showToast('マスターアカウントは削除できません', 'error'); return; }
+      if (confirm(`アカウント [${id}] を削除しますか？\nこの操作は元に戻せません。`)) {
+        try {
+          await deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', 'admin_users', id));
+          showToast('アカウントを削除しました', 'success');
+        } catch (error) {
+          console.error("Delete User Error:", error);
+          showToast('削除に失敗しました', 'error');
+        }
+      }
+    };
+
+    function renderUsersTable() {
+      const tbody = document.getElementById('users-list-table');
+      const entries = Object.entries(localUsersData);
+      
+      let html = `
+        <tr class="hover:bg-slate-50 border-b border-gray-100">
+          <td class="p-3 font-mono text-sm text-slate-700">admin <span class="text-[10px] bg-orange-100 text-orange-700 px-2 py-0.5 rounded ml-2">マスター</span></td>
+          <td class="p-3 text-sm text-slate-500">初期登録</td>
+          <td class="p-3 text-center text-xs text-slate-400">削除不可</td>
+        </tr>
+      `;
+
+      if (entries.length > 0) {
+        html += entries.map(([id, user]) => {
+          const date = user.createdAt ? new Date(user.createdAt).toLocaleDateString('ja-JP') : '不明';
+          return `
+            <tr class="hover:bg-slate-50 border-b border-gray-100">
+              <td class="p-3 font-mono text-sm text-slate-700">${id}</td>
+              <td class="p-3 text-sm text-slate-500">${date}</td>
+              <td class="p-3 text-center">
+                <button onclick="deleteUser('${id}')" class="text-red-400 hover:text-red-600 p-2"><i class="fa-solid fa-trash"></i></button>
+              </td>
+            </tr>
+          `;
+        }).join('');
+      }
+      tbody.innerHTML = html;
     }
 
     
@@ -112,7 +231,6 @@ import { initializeApp } from 'https://www.gstatic.com/firebasejs/11.6.1/firebas
       }
       document.getElementById('current-floor-title').innerHTML = `<i class="fa-solid fa-map text-orange-500"></i> <span>${floorTitles[floorKey]}</span>`;
 
-      
       if(!document.getElementById('form-title').innerHTML.includes('編集中')) {
           resetForm();
       }
@@ -187,9 +305,10 @@ import { initializeApp } from 'https://www.gstatic.com/firebasejs/11.6.1/firebas
           viewBoxStr = `${Math.max(0, minX - padX)} ${Math.max(0, minY - padY)} ${(maxX - minX) + padX * 2} ${(maxY - minY) + padY * 2}`;
         }
 
+        
         blueprintBox.innerHTML = `
-          <div class="relative w-full h-full flex items-center justify-center p-2">
-            <svg viewBox="${viewBoxStr}" class="w-full h-full max-h-[600px] drop-shadow-sm pointer-events-none" preserveAspectRatio="xMidYMid meet">
+          <div class="relative w-full h-full flex items-center justify-center p-2 min-w-0">
+            <svg width="100%" height="100%" viewBox="${viewBoxStr}" class="max-w-full max-h-[600px] drop-shadow-sm pointer-events-none" preserveAspectRatio="xMidYMid meet">
               ${pathsHtml}
             </svg>
             <div id="pins-layer" class="absolute inset-0 pointer-events-auto"></div>
@@ -216,13 +335,11 @@ import { initializeApp } from 'https://www.gstatic.com/firebasejs/11.6.1/firebas
       renderPins(currentFloor);
     }
 
-    
     function setupMapInteractions() {
       const pinsLayer = document.getElementById('pins-layer');
       if(!pinsLayer) return;
 
       pinsLayer.addEventListener('click', (e) => {
-        
         if (e.target.closest('.room-pin')) return;
 
         const rect = pinsLayer.getBoundingClientRect();
@@ -232,7 +349,6 @@ import { initializeApp } from 'https://www.gstatic.com/firebasejs/11.6.1/firebas
         document.getElementById('room-posx').value = xPercent.toFixed(2) + '%';
         document.getElementById('room-posy').value = yPercent.toFixed(2) + '%';
 
-        
         let tempPin = document.getElementById('temp-pin-preview');
         if (!tempPin) {
           tempPin = document.createElement('div');
@@ -244,7 +360,6 @@ import { initializeApp } from 'https://www.gstatic.com/firebasejs/11.6.1/firebas
         tempPin.style.left = xPercent + '%';
         tempPin.style.top = yPercent + '%';
 
-        
         if (!document.getElementById('form-title').innerHTML.includes('編集中')) {
            document.getElementById('form-title').innerHTML = '新規追加 <span class="text-xs font-normal text-slate-500 ml-2 text-orange-500">位置を選択しました</span>';
         }
@@ -255,7 +370,6 @@ import { initializeApp } from 'https://www.gstatic.com/firebasejs/11.6.1/firebas
       const pinsLayer = document.getElementById('pins-layer');
       if (!pinsLayer) return;
 
-      
       Array.from(pinsLayer.querySelectorAll('.room-pin')).forEach(el => el.remove());
 
       Object.keys(localRoomsData).forEach(roomId => {
@@ -273,7 +387,7 @@ import { initializeApp } from 'https://www.gstatic.com/firebasejs/11.6.1/firebas
 
           
           pin.innerHTML = `
-            <button onclick="editRoom('${roomId}', event)" class="px-2 py-1 ${badgeColor} font-bold text-[10px] shadow-sm rounded-full flex items-center gap-1 hover:ring-2 hover:ring-orange-400">
+            <button onclick="editRoom('${roomId}', event)" class="pointer-events-auto px-2 py-1 ${badgeColor} font-bold text-[10px] shadow-sm rounded-full flex items-center gap-1 hover:ring-2 hover:ring-orange-400">
               <i class="fa-solid fa-pen text-[8px]"></i>
               <span>${room.roomName || roomId}</span>
             </button>
@@ -284,12 +398,9 @@ import { initializeApp } from 'https://www.gstatic.com/firebasejs/11.6.1/firebas
     }
 
     
-
     window.resetForm = function() {
-      
       const newId = currentFloor + '-' + Math.floor(Math.random() * 100000);
       document.getElementById('room-id').value = newId;
-      
       document.getElementById('room-name').value = '';
       document.getElementById('room-title').value = '';
       document.getElementById('room-category').value = 'food';
@@ -305,15 +416,16 @@ import { initializeApp } from 'https://www.gstatic.com/firebasejs/11.6.1/firebas
     };
 
     window.editRoom = function(id, event) {
-      if(event) event.stopPropagation(); 
+      if(event) {
+        event.preventDefault();
+        event.stopPropagation(); 
+      }
 
       const room = localRoomsData[id];
       if (!room) return;
 
-      
       if(currentFloor !== room.floor) {
         window.switchFloor(room.floor);
-        
         setTimeout(() => loadDataToForm(id, room), 500);
       } else {
         loadDataToForm(id, room);
@@ -332,7 +444,6 @@ import { initializeApp } from 'https://www.gstatic.com/firebasejs/11.6.1/firebas
       document.getElementById('room-posy').value = room.posY || '';
       
       document.getElementById('form-title').innerHTML = '編集モード <span class="text-xs font-normal text-orange-600 ml-2">※位置の再指定も可能です</span>';
-      
       
       const tempPin = document.getElementById('temp-pin-preview');
       if (tempPin) tempPin.remove();

@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" href="https://ys-projectfestaexecutivecommittee.github.io/SoeiDay/image/Favicon01.ico" />
+  <title>会場マップ管理 | 創英祭 2026</title>
+  
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  
+  <link rel="stylesheet" href="https://ys-projectfestaexecutivecommittee.github.io/SoeiDay/css/base13.css">
+</head>
+<body class="bg-slate-50 text-slate-900 antialiased min-h-screen flex flex-col font-serif">
+
+  <header class="bg-slate-900 text-white p-4 shadow-md flex justify-between items-center z-10 relative">
+    <div class="flex items-center gap-3">
+      <h1 class="text-xl font-bold tracking-widest">創英祭 マップ管理</h1>
+      <span class="text-xs bg-orange-500 text-white px-2 py-1 rounded-sm tracking-widest">関係者専用</span>
+    </div>
+    <div id="header-user-info" class="hidden text-sm font-sans flex items-center gap-4">
+      <span>ログイン中: <strong id="current-user-display" class="text-lime-400"></strong></span>
+      <button onclick="logout()" class="text-slate-300 hover:text-white transition">
+        <i class="fa-solid fa-right-from-bracket"></i> ログアウト
+      </button>
+    </div>
+  </header>
+
+  <div id="loading-overlay" class="fixed inset-0 bg-white/80 z-50 flex items-center justify-center backdrop-blur-sm hidden">
+    <div class="text-center">
+      <i class="fa-solid fa-circle-notch fa-spin text-4xl text-slate-900 mb-4"></i>
+      <p class="tracking-widest text-slate-600 font-sans">システムを準備しています...</p>
+    </div>
+  </div>
+
+  
+  <section id="login-section" class="flex-grow flex items-center justify-center p-4 relative fade-in">
+    <div class="absolute inset-0 bg-slate-900 overflow-hidden z-0">
+      <div class="absolute inset-0 bg-[url('https://yokohamasoei.sakura.ne.jp/wp/wp-content/uploads/2019/07/DSC_8659.jpg?auto=format&fit=crop&w=1920&q=80')] bg-cover bg-center opacity-20 filter grayscale"></div>
+    </div>
+    
+    <div class="bg-white p-8 md:p-12 w-full max-w-md shadow-2xl relative z-10 border-t-4 border-orange-500">
+      <h2 class="text-3xl font-bold mb-2 text-center tracking-widest">ログイン</h2>
+      <p class="text-center text-slate-500 text-sm mb-8 font-sans">専用のIDとパスワードを入力してください</p>
+      
+      <div id="login-error" class="hidden bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-6 text-sm font-sans">
+        IDまたはパスワードが間違っています。
+      </div>
+
+      <div class="space-y-6 font-sans">
+        <div>
+          <label class="block text-sm font-bold text-slate-700 mb-2">ログインID</label>
+          <input type="text" id="login-id" class="w-full px-4 py-3 border border-gray-300 rounded focus:outline-none focus:border-orange-500 focus:ring-1 focus:ring-orange-500 transition" placeholder="admin">
+        </div>
+        <div>
+          <label class="block text-sm font-bold text-slate-700 mb-2">パスワード</label>
+          <input type="password" id="login-password" class="w-full px-4 py-3 border border-gray-300 rounded focus:outline-none focus:border-orange-500 focus:ring-1 focus:ring-orange-500 transition" placeholder="••••••••">
+        </div>
+        <button onclick="attemptLogin()" class="w-full bg-slate-900 hover:bg-slate-800 text-white font-bold py-4 px-4 rounded tracking-widest transition duration-300 flex justify-center items-center gap-2">
+          <i class="fa-solid fa-lock"></i> ログインする
+        </button>
+      </div>
+    </div>
+  </section>
+
+  
+  <section id="dashboard-section" class="flex-grow hidden bg-slate-50 fade-in">
+    <div class="max-w-7xl mx-auto p-4 sm:p-6 lg:p-8">
+      
+      <div class="flex border-b border-gray-300 mb-8 font-sans">
+        <button class="py-3 px-6 text-center font-medium border-b-2 border-slate-900 text-slate-900 bg-white/50 cursor-default">
+          <i class="fa-solid fa-map-location-dot mr-2"></i> マップ部屋情報管理
+        </button>
+      </div>
+
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
+        
+        
+        <div class="lg:col-span-1 bg-white p-6 shadow-md border border-gray-100 sticky top-6">
+          <h3 id="form-title" class="text-xl font-bold mb-6 border-l-4 border-orange-500 pl-3 tracking-widest">
+            部屋情報の新規登録
+          </h3>
+          
+          <div class="space-y-5 font-sans">
+            <div>
+              <label class="block text-sm font-bold text-slate-700 mb-1">部屋ID <span class="text-red-500">*</span></label>
+              <input type="text" id="room-id" placeholder="例: h1-101" class="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:border-orange-500 bg-white text-sm">
+              <p class="text-[11px] text-slate-400 mt-1">※変更不可（地図上のピンIDと一致させてください）</p>
+            </div>
+            
+            <div class="flex gap-4">
+              <div class="flex-1">
+                <label class="block text-sm font-bold text-slate-700 mb-1">フロア <span class="text-red-500">*</span></label>
+                <select id="room-floor" class="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:border-orange-500 bg-white text-sm">
+                  <option value="h1">本館 1F</option>
+                  <option value="h2">本館 2F</option>
+                  <option value="h3">本館 3F / 新館 B1F</option>
+                  <option value="s1">本館 4F / 新館 1F / 体育館</option>
+                  <option value="s2">新館 2F</option>
+                  <option value="s3">新館 3F</option>
+                </select>
+              </div>
+              <div class="flex-1">
+                <label class="block text-sm font-bold text-slate-700 mb-1">部屋名</label>
+                <input type="text" id="room-name" placeholder="例: 101教室" class="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:border-orange-500 text-sm">
+              </div>
+            </div>
+
+            <div>
+              <label class="block text-sm font-bold text-slate-700 mb-1">企画タイトル <span class="text-red-500">*</span></label>
+              <input type="text" id="room-title" placeholder="例: 3年A組 縁日屋台" class="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:border-orange-500 text-sm">
+            </div>
+
+            <div>
+              <label class="block text-sm font-bold text-slate-700 mb-1">カテゴリ <span class="text-red-500">*</span></label>
+              <select id="room-category" class="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:border-orange-500 bg-white text-sm">
+                <option value="food">模擬店・飲食</option>
+                <option value="exhibition">展示・体験</option>
+                <option value="stage">ステージ・公演</option>
+                <option value="other">本部・休憩所・その他</option>
+              </select>
+            </div>
+
+            <div>
+              <label class="block text-sm font-bold text-slate-700 mb-1">詳細説明</label>
+              <textarea id="room-desc" rows="4" class="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:border-orange-500 text-sm" placeholder="企画の詳しい説明を入力"></textarea>
+            </div>
+
+            <div>
+              <label class="block text-sm font-bold text-slate-700 mb-1">タグ</label>
+              <input type="text" id="room-tags" placeholder="例: 体験, 景品あり, 飲食" class="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:border-orange-500 text-sm">
+              <p class="text-[11px] text-slate-400 mt-1">※カンマ(,)区切りで複数入力</p>
+            </div>
+
+            <div class="flex gap-4">
+              <div class="flex-1">
+                <label class="block text-sm font-bold text-slate-700 mb-1">X座標 (左から)</label>
+                <input type="text" id="room-posx" placeholder="例: 25%" class="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:border-orange-500 text-sm">
+              </div>
+              <div class="flex-1">
+                <label class="block text-sm font-bold text-slate-700 mb-1">Y座標 (上から)</label>
+                <input type="text" id="room-posy" placeholder="例: 35%" class="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:border-orange-500 text-sm">
+              </div>
+            </div>
+
+            <div class="pt-4 flex gap-3">
+              <button onclick="resetForm()" class="flex-1 bg-gray-200 hover:bg-gray-300 text-slate-700 font-bold py-2.5 px-4 rounded transition duration-300 text-sm">
+                クリア
+              </button>
+              <button onclick="saveRoom()" class="flex-[2] bg-orange-600 hover:bg-orange-700 text-white font-bold py-2.5 px-4 rounded transition duration-300 text-sm flex items-center justify-center gap-2">
+                <i class="fa-solid fa-floppy-disk"></i> 保存する
+              </button>
+            </div>
+          </div>
+        </div>
+
+        
+        <div class="lg:col-span-2 bg-white p-6 shadow-md border border-gray-100">
+          <h3 class="text-xl font-bold mb-6 tracking-widest">登録済み部屋・ブース一覧</h3>
+          
+          <div class="overflow-x-auto font-sans">
+            <table class="w-full text-left border-collapse min-w-[600px]">
+              <thead>
+                <tr class="bg-slate-100 text-slate-600 text-sm">
+                  <th class="p-3 border-b border-gray-200 w-24">部屋ID</th>
+                  <th class="p-3 border-b border-gray-200 w-24">フロア</th>
+                  <th class="p-3 border-b border-gray-200">企画タイトル</th>
+                  <th class="p-3 border-b border-gray-200 w-28">カテゴリ</th>
+                  <th class="p-3 border-b border-gray-200 text-center w-32">操作</th>
+                </tr>
+              </thead>
+              <tbody id="rooms-list-table">
+                <tr><td colspan="5" class="p-8 text-center text-slate-400">データを読み込んでいます...</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  
+  <div id="toast-container" class="fixed bottom-4 right-4 z-50 flex flex-col gap-2 font-sans"></div>
+
+  
+  <script type="module" rc="https://ys-projectfestaexecutivecommittee.github.io/SoeiDay/javascript/base15.js"></script>
+</body>
+</html>

@@ -1,0 +1,21 @@
+.map-canvas-container {
+      position: relative;
+      width: 100%;
+      min-height: 450px;
+      background-color: rgba(15, 23, 42, 0.03);
+      overflow: hidden;
+      border-radius: 4px;
+    }
+    .dark .map-canvas-container {
+      background-color: rgba(15, 23, 42, 0.4);
+    }
+    .room-pin {
+      position: absolute;
+      transform: translate(-50%, -50%);
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+    .room-pin:hover {
+      transform: translate(-50%, -50%) scale(1.1);
+      z-index: 30;
+    }

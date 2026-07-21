@@ -7,27 +7,28 @@
     .map-canvas-container {
       position: relative;
       width: 100%;
-      min-height: 400px;
+      max-width: 100%;
+      min-height: 450px;
       background-color: rgba(15, 23, 42, 0.03);
       overflow: hidden;
       border-radius: 4px;
-      cursor: crosshair; 
+      cursor: crosshair;
     }
     .room-pin {
       position: absolute;
       transform: translate(-50%, -50%);
       cursor: pointer;
       transition: all 0.2s ease;
-      z-index: 10;
+      z-index: 30; 
     }
     .room-pin:hover {
       transform: translate(-50%, -50%) scale(1.1);
-      z-index: 30;
+      z-index: 50;
     }
     .temp-pin {
       position: absolute;
       transform: translate(-50%, -50%);
-      z-index: 20;
+      z-index: 40;
       animation: bounce 0.5s infinite alternate;
     }
     @keyframes bounce {

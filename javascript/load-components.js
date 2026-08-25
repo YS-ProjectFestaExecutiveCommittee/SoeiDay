@@ -1,6 +1,6 @@
 document.addEventListener("DOMContentLoaded", () => {
     
-    fetch('https://ys-projectfestaexecutivecommittee.github.io/SoeiDay/associated/header.html')
+    fetch('https://www.soei-fes.com/associated/header.html')
         .then(response => response.text())
         .then(data => {
             document.getElementById('header-placeholder').innerHTML = data;
@@ -8,7 +8,7 @@ document.addEventListener("DOMContentLoaded", () => {
         .catch(error => console.error('ヘッダーの読み込みに失敗しました:', error));
 
     
-    fetch('https://ys-projectfestaexecutivecommittee.github.io/SoeiDay/associated/footer.html')
+    fetch('https://www.soei-fes.com/associated/footer.html')
         .then(response => response.text())
         .then(data => {
             document.getElementById('footer-placeholder').innerHTML = data;

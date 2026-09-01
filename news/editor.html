@@ -43,6 +43,11 @@
       min-height: 300px;
       line-height: 1.7;
     }
+    .ql-editor img {
+      max-width: 100%;
+      height: auto;
+      border-radius: 0.375rem;
+    }
   </style>
 </head>
 <body class="bg-slate-50 text-slate-900 antialiased min-h-screen flex flex-col">
@@ -118,15 +123,14 @@
       <div id="tab-content-news" class="space-y-8">
         
         
-        <div class="bg-white p-6 md:p-8 shadow-md border border-gray-100">
-          <div class="flex justify-between items-center mb-6 border-l-4 border-lime-500 pl-3">
+        <div class="flex justify-between items-center mb-6 border-l-4 border-lime-500 pl-3">
             <h3 id="form-title" class="text-2xl font-bold font-serif">新規お知らせ作成</h3>
             <button id="cancel-edit-btn" class="hidden text-sm px-4 py-1.5 bg-gray-100 text-gray-600 hover:bg-gray-200 rounded transition-colors font-sans">
               <i class="fa-solid fa-xmark mr-1"></i> 編集キャンセル
             </button>
           </div>
           
-          <form id="editor-form" class="grid grid-cols-1 md:grid-cols-2 gap-6 font-sans">
+          <form id="editor-form" class="space-y-6 font-sans">
             <input type="hidden" id="edit-id">
             
             <div>
@@ -134,7 +138,7 @@
               <input type="text" id="news-title" required class="w-full px-4 py-2 border border-gray-300 rounded focus:outline-none focus:border-lime-500 focus:ring-1 focus:ring-lime-500">
             </div>
             
-            <div class="flex flex-col sm:flex-row gap-4">
+            <div class="flex flex-col sm:flex-row gap-6">
               <div class="flex-1">
                 <label class="block text-sm font-bold text-slate-700 mb-2">日付 <span class="text-red-500">*</span></label>
                 <input type="date" id="news-date" required class="w-full px-4 py-2 border border-gray-300 rounded focus:outline-none focus:border-lime-500 focus:ring-1 focus:ring-lime-500">
@@ -148,31 +152,36 @@
               </div>
             </div>
 
-            
-            <div class="md:col-span-2">
-              <label class="block text-sm font-bold text-slate-700 mb-2">本文 <span class="text-red-500">*</span></label>
-              <div id="quill-editor" class="bg-white rounded-b border-gray-300"></div>
+            <div>
+              <label class="block text-sm font-bold text-slate-700 mb-2">サムネイル画像 (任意)</label>
+              <input type="file" id="news-image-file" accept="image/*" class="w-full px-4 py-2 border border-gray-300 rounded focus:outline-none focus:border-lime-500 focus:ring-1 focus:ring-lime-500 bg-white text-sm">
+              <input type="hidden" id="news-image-base64">
+              <div id="image-preview-container" class="mt-3 hidden bg-gray-50 p-4 border border-gray-200 rounded text-center inline-block">
+                <img id="image-preview" src="" alt="プレビュー" class="max-h-48 mx-auto rounded shadow-sm">
+                <button type="button" id="remove-image-btn" class="mt-3 text-sm text-red-600 hover:text-red-800 bg-white border border-red-200 px-3 py-1 rounded transition shadow-sm">
+                  <i class="fa-solid fa-trash mr-1"></i> 画像を削除
+                </button>
+              </div>
             </div>
 
             <div>
-              <label class="block text-sm font-bold text-slate-700 mb-2">画像URL (任意)</label>
-              <input type="url" id="news-image" class="w-full px-4 py-2 border border-gray-300 rounded focus:outline-none focus:border-lime-500 focus:ring-1 focus:ring-lime-500" placeholder="https://...">
+              <label class="block text-sm font-bold text-slate-700 mb-2">本文 <span class="text-red-500">*</span></label>
+              <div id="quill-editor" class="bg-white rounded-b border-gray-300"></div>
             </div>
-
+            
             <div>
               <label class="block text-sm font-bold text-slate-700 mb-2">YouTube 埋め込みコード (任意)</label>
               <input type="text" id="news-video" class="w-full px-4 py-2 border border-gray-300 rounded focus:outline-none focus:border-lime-500 focus:ring-1 focus:ring-lime-500 text-sm font-mono" placeholder='<iframe width="..." src="..."></iframe>'>
               <p class="text-xs text-slate-500 mt-1">※「共有」→「埋め込む」からコピーしたコード</p>
             </div>
             
-            <div class="md:col-span-2 flex justify-end mt-4">
+            <div class="flex justify-end mt-8 pt-4 border-t border-gray-100">
               <button type="submit" id="save-btn" class="bg-lime-600 hover:bg-lime-700 text-white font-bold py-3 px-8 rounded tracking-widest transition duration-300 flex items-center gap-2">
                 <i class="fa-solid fa-paper-plane"></i> <span>投稿する</span>
               </button>
             </div>
           </form>
         </div>
-
         
         <div class="bg-white p-6 md:p-8 shadow-md border border-gray-100">
           <h3 class="text-xl font-bold mb-6 tracking-widest font-serif border-l-4 border-slate-900 pl-3">投稿済み一覧</h3>
@@ -285,7 +294,7 @@
               ['bold', 'italic', 'underline', 'strike'],
               [{ 'color': [] }, { 'background': [] }],
               [{ 'list': 'ordered'}, { 'list': 'bullet' }],
-              ['link', 'clean']
+              ['link', 'image', 'clean']
             ]
           }
         });
@@ -429,8 +438,24 @@
       };
       document.getElementById('tab-btn-news').addEventListener('click', () => switchTab('news'));
       document.getElementById('tab-btn-mypage').addEventListener('click', () => switchTab('mypage'));
-
       document.getElementById('cancel-edit-btn').addEventListener('click', resetForm);
+
+      document.getElementById('news-image-file').addEventListener('change', function(e) {
+        const file = e.target.files[0];
+        if (!file) {
+          clearImagePreview();
+          return;
+        }
+        const reader = new FileReader();
+        reader.onload = function(event) {
+          const base64String = event.target.result;
+          document.getElementById('news-image-base64').value = base64String;
+          document.getElementById('image-preview').src = base64String;
+          document.getElementById('image-preview-container').classList.remove('hidden');
+        };
+        reader.readAsDataURL(file);
+      });
+      document.getElementById('remove-image-btn').addEventListener('click', clearImagePreview);
 
       document.getElementById('editor-form').addEventListener('submit', async (e) => {
         e.preventDefault();
@@ -441,10 +466,9 @@
           date: document.getElementById('news-date').value,
           type: document.getElementById('news-category').value,
           content: quill.root.innerHTML,
-          image: document.getElementById('news-image').value,
+          image: document.getElementById('news-image-base64').value,
           video: document.getElementById('news-video').value
         };
-
         const id = document.getElementById('edit-id').value;
         const saveBtn = document.getElementById('save-btn');
         
@@ -535,7 +559,6 @@
         tbody.innerHTML = '<tr><td colspan="4" class="p-8 text-center text-gray-500">記事がありません。</td></tr>';
         return;
       }
-
       tbody.innerHTML = data.map(item => `
         <tr class="hover:bg-slate-50 transition border-b border-gray-100">
           <td class="p-3 text-sm text-slate-600">${item.date || '----.--.--'}</td>
@@ -555,6 +578,12 @@
       `).join('');
     };
 
+    const clearImagePreview = () => {
+      document.getElementById('news-image-file').value = '';
+      document.getElementById('news-image-base64').value = '';
+      document.getElementById('image-preview').src = '';
+      document.getElementById('image-preview-container').classList.add('hidden');
+    };
     
     const resetForm = () => {
       document.getElementById('editor-form').reset();
@@ -562,17 +591,25 @@
       if(quill) quill.root.innerHTML = '';
       document.getElementById('form-title').textContent = '新規お知らせ作成';
       document.getElementById('cancel-edit-btn').classList.add('hidden');
+      clearImagePreview();
     };
-
     window.editDoc = (id) => {
       const item = currentNewsData.find(d => d.id === id);
       if(!item) return;
-
       document.getElementById('edit-id').value = item.id;
       document.getElementById('news-title').value = item.title || '';
       document.getElementById('news-date').value = item.date || '';
       document.getElementById('news-category').value = item.type || 'news';
-      document.getElementById('news-image').value = item.image || '';
+      
+      const imgData = item.image || '';
+      document.getElementById('news-image-base64').value = imgData;
+      if (imgData) {
+        document.getElementById('image-preview').src = imgData;
+        document.getElementById('image-preview-container').classList.remove('hidden');
+      } else {
+        clearImagePreview();
+      }
+      
       document.getElementById('news-video').value = item.video || '';
       if(quill) quill.root.innerHTML = item.content || '';
       

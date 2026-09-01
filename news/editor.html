@@ -14,24 +14,29 @@
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
         <link rel="stylesheet" href="https://www.soei-fes.com/css/base03.css">
+
+        <link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
+        <script src="https://cdn.quilljs.com/1.3.6/quill.min.js"></script>
+
+        <link rel="stylesheet" href="https://soei-fes.com/base15.css">
     </head>
 
     <body class="bg-slate-50 text-slate-900 antialiased min-h-screen flex flex-col">
 
         <header class="bg-slate-900 text-white p-4 shadow-md flex justify-between items-center z-10 relative">
             <div class="flex items-center gap-3">
-                <h1 class="text-xl font-bold tracking-widest">創英祭 管理システム</h1>
-                <span class="text-xs bg-brand-orange text-white px-2 py-1 rounded-sm tracking-widest bg-orange-500">関係者専用</span>
+                <h1 class="text-xl font-bold tracking-widest font-serif">創英祭 管理システム</h1>
+                <span class="text-xs bg-brand-orange text-white px-2 py-1 rounded-sm tracking-widest bg-orange-500 font-sans">関係者専用</span>
             </div>
             <div id="header-user-info" class="hidden text-sm font-sans flex items-center gap-4">
-                <span>ログイン中: <strong id="current-user-display" class="text-brand-lime text-lime-400"></strong></span>
-                <button onclick="logout()" class="text-slate-300 hover:text-white transition">
+                <span class="hidden sm:inline">ログイン中: <strong id="current-user-display" class="text-brand-lime text-lime-400"></strong></span>
+                <button id="logout-btn" class="text-slate-300 hover:text-white transition">
                     <i class="fa-solid fa-right-from-bracket"></i> ログアウト
                 </button>
             </div>
         </header>
 
-        <div id="loading-overlay" class="fixed inset-0 bg-white/80 z-50 flex items-center justify-center backdrop-blur-sm">
+        <div id="loading-overlay" class="fixed inset-0 bg-white/90 z-50 flex items-center justify-center backdrop-blur-sm transition-opacity duration-300">
             <div class="text-center">
                 <i class="fa-solid fa-circle-notch fa-spin text-4xl text-slate-900 mb-4"></i>
                 <p class="tracking-widest text-slate-600 font-sans">システムを準備しています...</p>
@@ -44,42 +49,31 @@
             </div>
 
             <div class="bg-white p-8 md:p-12 w-full max-w-md shadow-2xl relative z-10 border-t-4 border-orange-500">
-                <h2 class="text-3xl font-bold mb-2 text-center tracking-widest">ログイン</h2>
-                <p class="text-center text-slate-500 text-sm mb-8 font-sans">許可されたアカウントでログインしてください</p>
+                <h2 class="text-3xl font-bold mb-2 text-center tracking-widest font-serif">ログイン</h2>
+                <p class="text-center text-slate-500 text-sm mb-8 font-sans">専用のIDとパスワードを入力してください</p>
 
-                <div id="login-error" class="hidden bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-6 text-sm font-sans">
-                    認証に失敗しました。
-                </div>
-
-                <div class="space-y-4 font-sans">
-
+                <form id="login-form" class="space-y-6 font-sans">
                     <div>
                         <label class="block text-sm font-bold text-slate-700 mb-2">メールアドレス</label>
-                        <input type="email" id="login-email" class="w-full px-4 py-3 border border-gray-300 rounded focus:outline-none focus:border-orange-500 focus:ring-1 focus:ring-orange-500 transition" placeholder="example@soei-fes.com">
+                        <input type="email" id="login-email" required class="w-full px-4 py-3 border border-gray-300 rounded focus:outline-none focus:border-orange-500 focus:ring-1 focus:ring-orange-500 transition" placeholder="admin@example.com">
                     </div>
                     <div>
                         <label class="block text-sm font-bold text-slate-700 mb-2">パスワード</label>
-                        <input type="password" id="login-password" class="w-full px-4 py-3 border border-gray-300 rounded focus:outline-none focus:border-orange-500 focus:ring-1 focus:ring-orange-500 transition" placeholder="••••••••">
+                        <input type="password" id="login-password" required class="w-full px-4 py-3 border border-gray-300 rounded focus:outline-none focus:border-orange-500 focus:ring-1 focus:ring-orange-500 transition" placeholder="••••••••">
                     </div>
-                    <button onclick="attemptLogin()" class="w-full bg-slate-900 hover:bg-slate-800 text-white font-bold py-4 px-4 rounded tracking-widest transition duration-300 flex justify-center items-center gap-2">
-                        <i class="fa-solid fa-envelope"></i> メールアドレスでログイン
+                    <button type="submit" class="w-full bg-slate-900 hover:bg-slate-800 text-white font-bold py-4 px-4 rounded tracking-widest transition duration-300 flex justify-center items-center gap-2">
+                        <i class="fa-solid fa-lock"></i> ログインする
                     </button>
+                </form>
 
-                    <div class="flex items-center my-4">
-                        <div class="flex-grow border-t border-gray-300"></div>
-                        <span class="px-3 text-sm text-gray-500 font-sans">または</span>
-                        <div class="flex-grow border-t border-gray-300"></div>
-                    </div>
-
-                    <button onclick="loginWithGoogle()" class="w-full bg-white hover:bg-gray-50 text-gray-700 font-bold py-3 px-4 rounded border border-gray-300 tracking-widest transition duration-300 flex justify-center items-center gap-2 shadow-sm">
-                        <svg class="w-5 h-5" viewBox="0 0 24 24">
-                            <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" />
-                            <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" />
-                            <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" />
-                            <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" />
-                        </svg>
-                        Googleアカウントでログイン
+                <div class="mt-8 pt-6 border-t border-gray-200 font-sans">
+                    <button id="google-login-btn" class="w-full bg-white border border-gray-300 text-slate-700 hover:bg-gray-50 font-bold py-3 px-4 rounded transition-colors flex items-center justify-center gap-2 shadow-sm">
+                        <img src="https://www.svgrepo.com/show/475656/google-color.svg" alt="Google" class="w-5 h-5">
+                        連携済みGoogleアカウントでログイン
                     </button>
+                    <p class="mt-4 text-xs text-red-500 text-center leading-relaxed">
+                        ※ 新規のアカウント作成はできません。<br>Googleアカウントでのログインは、マイページにて @soei.ed.jp アカウントを連携した場合のみ可能です。
+                    </p>
                 </div>
             </div>
         </section>
@@ -87,80 +81,85 @@
         <section id="dashboard-section" class="flex-grow hidden bg-slate-50">
             <div class="max-w-6xl mx-auto p-4 sm:p-6 lg:p-8">
 
-                <div class="flex border-b border-gray-300 mb-8 font-sans">
-                    <button onclick="switchTab('news')" id="tab-btn-news" class="py-3 px-6 text-center font-medium border-b-2 border-slate-900 text-slate-900 transition bg-white/50">
+
+                <div class="flex border-b border-gray-300 mb-8 font-sans overflow-x-auto whitespace-nowrap">
+                    <button id="tab-btn-news" class="py-3 px-6 text-center font-medium border-b-2 border-slate-900 text-slate-900 transition bg-white/50">
                         <i class="fa-regular fa-newspaper mr-2"></i> ニュース投稿・管理
                     </button>
-                    <button onclick="switchTab('users')" id="tab-btn-users" class="py-3 px-6 text-center font-medium border-b-2 border-transparent text-slate-500 hover:text-slate-700 transition">
-                        <i class="fa-solid fa-users-gear mr-2"></i> アカウント管理
+                    <button id="tab-btn-mypage" class="py-3 px-6 text-center font-medium border-b-2 border-transparent text-slate-500 hover:text-slate-700 transition">
+                        <i class="fa-solid fa-user-gear mr-2"></i> マイページ・設定
                     </button>
                 </div>
 
                 <div id="tab-content-news" class="space-y-8">
-                    <div class="bg-white p-6 md:p-8 shadow-md border border-gray-100">
-                        <h3 class="text-2xl font-bold mb-6 border-l-4 border-lime-500 pl-3">新規お知らせ作成</h3>
 
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 font-sans">
+
+                    <div class="bg-white p-6 md:p-8 shadow-md border border-gray-100">
+                        <div class="flex justify-between items-center mb-6 border-l-4 border-lime-500 pl-3">
+                            <h3 id="form-title" class="text-2xl font-bold font-serif">新規お知らせ作成</h3>
+                            <button id="cancel-edit-btn" class="hidden text-sm px-4 py-1.5 bg-gray-100 text-gray-600 hover:bg-gray-200 rounded transition-colors font-sans">
+                                <i class="fa-solid fa-xmark mr-1"></i> 編集キャンセル
+                            </button>
+                        </div>
+
+                        <form id="editor-form" class="grid grid-cols-1 md:grid-cols-2 gap-6 font-sans">
+                            <input type="hidden" id="edit-id">
+
                             <div>
                                 <label class="block text-sm font-bold text-slate-700 mb-2">タイトル <span class="text-red-500">*</span></label>
-                                <input type="text" id="news-title" class="w-full px-4 py-2 border border-gray-300 rounded focus:outline-none focus:border-lime-500">
+                                <input type="text" id="news-title" required class="w-full px-4 py-2 border border-gray-300 rounded focus:outline-none focus:border-lime-500 focus:ring-1 focus:ring-lime-500">
                             </div>
 
                             <div class="flex gap-4">
                                 <div class="flex-1">
                                     <label class="block text-sm font-bold text-slate-700 mb-2">日付 <span class="text-red-500">*</span></label>
-                                    <input type="date" id="news-date" class="w-full px-4 py-2 border border-gray-300 rounded focus:outline-none focus:border-lime-500">
+                                    <input type="date" id="news-date" required class="w-full px-4 py-2 border border-gray-300 rounded focus:outline-none focus:border-lime-500 focus:ring-1 focus:ring-lime-500">
                                 </div>
                                 <div class="flex-1">
                                     <label class="block text-sm font-bold text-slate-700 mb-2">カテゴリ <span class="text-red-500">*</span></label>
-                                    <select id="news-category" class="w-full px-4 py-2 border border-gray-300 rounded focus:outline-none focus:border-lime-500 bg-white">
-                                        <option value="release">ニュースリリース</option>
+                                    <select id="news-category" class="w-full px-4 py-2 border border-gray-300 rounded focus:outline-none focus:border-lime-500 focus:ring-1 focus:ring-lime-500 bg-white">
+                                        <option value="news">ニュースリリース</option>
                                         <option value="topic">トピック</option>
                                     </select>
                                 </div>
                             </div>
 
+
                             <div class="md:col-span-2">
                                 <label class="block text-sm font-bold text-slate-700 mb-2">本文 <span class="text-red-500">*</span></label>
-                                <textarea id="news-content" rows="6" class="w-full px-4 py-2 border border-gray-300 rounded focus:outline-none focus:border-lime-500" placeholder="お知らせの内容を入力してください..."></textarea>
+                                <div id="quill-editor" class="bg-white rounded-b border-gray-300"></div>
                             </div>
 
                             <div>
-                                <label class="block text-sm font-bold text-slate-700 mb-2">画像添付 (自動で縮小されます)</label>
-                                <input type="file" id="news-image-input" accept="image/*" class="w-full text-sm text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded file:border-0 file:text-sm file:font-semibold file:bg-lime-50 file:text-lime-700 hover:file:bg-lime-100 transition">
-                                <input type="hidden" id="news-image-base64">
-                                <div id="image-preview-container" class="mt-3 hidden relative inline-block border border-gray-200 p-1">
-                                    <img id="image-preview" src="" class="max-h-32 object-contain">
-                                    <button onclick="clearImage()" class="absolute -top-2 -right-2 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center text-xs shadow hover:bg-red-600">
-                                        <i class="fa-solid fa-times"></i>
-                                    </button>
-                                </div>
+                                <label class="block text-sm font-bold text-slate-700 mb-2">画像URL (任意)</label>
+                                <input type="url" id="news-image" class="w-full px-4 py-2 border border-gray-300 rounded focus:outline-none focus:border-lime-500 focus:ring-1 focus:ring-lime-500" placeholder="https://...">
                             </div>
 
                             <div>
-                                <label class="block text-sm font-bold text-slate-700 mb-2">YouTube 埋め込みコード</label>
-                                <textarea id="news-video" rows="3" class="w-full px-4 py-2 border border-gray-300 rounded focus:outline-none focus:border-lime-500 text-xs font-mono" placeholder='<iframe width="560" height="315" src="..."></iframe>'></textarea>
-                                <p class="text-xs text-slate-500 mt-1">※YouTubeの「共有」→「埋め込む」からコピーしたコードを貼り付けてください。</p>
+                                <label class="block text-sm font-bold text-slate-700 mb-2">YouTube 埋め込みコード (任意)</label>
+                                <input type="text" id="news-video" class="w-full px-4 py-2 border border-gray-300 rounded focus:outline-none focus:border-lime-500 focus:ring-1 focus:ring-lime-500 text-sm font-mono" placeholder='<iframe width="..." src="..."></iframe>'>
+                                <p class="text-xs text-slate-500 mt-1">※「共有」→「埋め込む」からコピーしたコード</p>
                             </div>
 
                             <div class="md:col-span-2 flex justify-end mt-4">
-                                <button onclick="submitNews()" class="bg-lime-600 hover:bg-lime-700 text-white font-bold py-3 px-8 rounded tracking-widest transition duration-300 flex items-center gap-2">
-                                    <i class="fa-solid fa-paper-plane"></i> 投稿する
+                                <button type="submit" id="save-btn" class="bg-lime-600 hover:bg-lime-700 text-white font-bold py-3 px-8 rounded tracking-widest transition duration-300 flex items-center gap-2">
+                                    <i class="fa-solid fa-paper-plane"></i> <span>投稿する</span>
                                 </button>
                             </div>
-                        </div>
+                        </form>
                     </div>
 
+
                     <div class="bg-white p-6 md:p-8 shadow-md border border-gray-100">
-                        <h3 class="text-xl font-bold mb-6 tracking-widest">投稿済み一覧</h3>
+                        <h3 class="text-xl font-bold mb-6 tracking-widest font-serif border-l-4 border-slate-900 pl-3">投稿済み一覧</h3>
                         <div class="overflow-x-auto font-sans">
-                            <table class="w-full text-left border-collapse">
+                            <table class="w-full text-left border-collapse min-w-[600px]">
                                 <thead>
                                     <tr class="bg-slate-100 text-slate-600 text-sm">
-                                        <th class="p-3 border-b border-gray-200">日付</th>
-                                        <th class="p-3 border-b border-gray-200">カテゴリ</th>
+                                        <th class="p-3 border-b border-gray-200 w-32">日付</th>
+                                        <th class="p-3 border-b border-gray-200 w-32">カテゴリ</th>
                                         <th class="p-3 border-b border-gray-200">タイトル</th>
-                                        <th class="p-3 border-b border-gray-200 text-center">操作</th>
+                                        <th class="p-3 border-b border-gray-200 text-center w-36">操作</th>
                                     </tr>
                                 </thead>
                                 <tbody id="news-list-table">
@@ -173,39 +172,29 @@
                     </div>
                 </div>
 
-                <div id="tab-content-users" class="space-y-8 hidden">
+                <div id="tab-content-mypage" class="space-y-8 hidden">
                     <div class="bg-orange-50 border-l-4 border-orange-500 p-4 mb-6">
-                        <p class="text-sm text-orange-800 font-sans">
-                            <strong>【セキュアな認証システム】</strong><br>
-                            新しい管理者を招待するには、ここにメールアドレスとパスワードを入力してください。<br>
-                            ※仕様上、作成直後にその新しいアカウントで自動ログインされます。作成後、作業を続ける場合は一度ログアウトしてください。
+                        <p class="text-sm text-orange-800 font-sans leading-relaxed">
+                            <strong>【アカウント管理について】</strong><br>
+                            セキュリティ保護のため、新規アカウントの作成はシステム管理者のみに制限されています。ご自身のアカウントと @soei.ed.jp の Google アカウントを連携することで、次回から Google ログインが利用可能になります。
                         </p>
                     </div>
 
                     <div class="bg-white p-6 md:p-8 shadow-md border border-gray-100">
-                        <h3 class="text-2xl font-bold mb-6 border-l-4 border-orange-500 pl-3">新しいアカウントを作成</h3>
+                        <h3 class="text-2xl font-bold mb-6 border-l-4 border-orange-500 pl-3 font-serif">マイページ・設定</h3>
 
-                        <div class="flex flex-col md:flex-row gap-6 font-sans items-end">
-                            <div class="flex-1 w-full">
-                                <label class="block text-sm font-bold text-slate-700 mb-2">メールアドレス <span class="text-red-500">*</span></label>
-                                <input type="email" id="new-user-email" class="w-full px-4 py-2 border border-gray-300 rounded focus:outline-none focus:border-orange-500">
-                            </div>
-                            <div class="flex-1 w-full">
-                                <label class="block text-sm font-bold text-slate-700 mb-2">パスワード <span class="text-red-500">*</span></label>
-                                <input type="password" id="new-user-password" class="w-full px-4 py-2 border border-gray-300 rounded focus:outline-none focus:border-orange-500">
-                            </div>
-                            <div class="w-full md:w-auto">
-                                <button onclick="createUser()" class="w-full md:w-auto bg-orange-600 hover:bg-orange-700 text-white font-bold py-2.5 px-6 rounded transition duration-300 flex items-center justify-center gap-2">
-                                    <i class="fa-solid fa-user-plus"></i> 追加
-                                </button>
-                            </div>
+                        <div class="mb-8 font-sans">
+                            <p class="text-sm font-bold text-slate-700 mb-2">現在のログインアドレス</p>
+                            <p id="mypage-email" class="text-lg text-slate-900 bg-gray-50 px-4 py-3 border border-gray-200 rounded inline-block">...</p>
                         </div>
-                    </div>
 
-                    <div class="bg-white p-6 md:p-8 shadow-md border border-gray-100">
-                        <h3 class="text-xl font-bold mb-6 tracking-widest">登録済みアカウントについて</h3>
-                        <div class="font-sans text-sm text-slate-600">
-                            <p>アカウントの管理（パスワードリセット、無効化、削除など）はセキュリティ保護のため、Firebaseの管理コンソールからのみ行うことができます。</p>
+                        <div class="border-t border-gray-200 pt-8 font-sans">
+                            <h4 class="text-lg font-bold text-slate-800 mb-4">Googleアカウント連携</h4>
+                            <div id="link-status" class="mb-6"></div>
+                            <button id="link-google-btn" class="bg-white border-2 border-gray-200 hover:border-blue-500 text-slate-700 font-bold py-3 px-6 rounded transition-all flex items-center justify-center gap-3 shadow-sm">
+                                <img src="https://www.svgrepo.com/show/475656/google-color.svg" alt="Google" class="w-5 h-5">
+                                <span>Googleアカウントを連携する</span>
+                            </button>
                         </div>
                     </div>
                 </div>
@@ -213,13 +202,7 @@
             </div>
         </section>
 
-        <div id="toast-container" class="fixed bottom-4 right-4 z-50 flex flex-col gap-2 font-sans"></div>
-
-
-        <script type="module" src="https://www.soei-fes.com/javascript/base06.js"></script>
-
-
-        <script type="module" src="https://www.soei-fes.com/javascript/base18.js"></script>
+        <script type="module" src="script1.js"></script>
     </body>
 
 </html>

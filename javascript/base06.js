@@ -1,438 +1,278 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-    import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-    import { getFirestore, collection, onSnapshot, addDoc, deleteDoc, doc, setDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+    import { 
+      getAuth, signInWithEmailAndPassword, signInWithPopup, GoogleAuthProvider, 
+      getAdditionalUserInfo, deleteUser, onAuthStateChanged, signOut, linkWithPopup, unlink
+    } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+    import { 
+      getFirestore, collection, addDoc, updateDoc, deleteDoc, doc, onSnapshot
+    } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
     const firebaseConfig = {
-      apiKey: "AIzaSyCDWj4xWfU42x2NG1tOSlXcBC-f2vhC3lA",
-      authDomain: "soeiday.firebaseapp.com",
-      projectId: "soeiday",
-      storageBucket: "soeiday.firebasestorage.app",
-      messagingSenderId: "122257503471",
-      appId: "1:122257503471:web:8014972f2bc10f84ea971a",
-      measurementId: "G-EX7FJGF5R0"
-    };
-    const appId = typeof __app_id !== 'undefined' ? __app_id : 'soei-fes-app';
+  apiKey: "AIzaSyCDWj4xWfU42x2NG1tOSlXcBC-f2vhC3lA",
+  authDomain: "soeiday.firebaseapp.com",
+  projectId: "soeiday",
+  storageBucket: "soeiday.firebasestorage.app",
+  messagingSenderId: "122257503471",
+  appId: "1:122257503471:web:8014972f2bc10f84ea971a",
+  measurementId: "G-EX7FJGF5R0"
+};
 
     const app = initializeApp(firebaseConfig);
     const auth = getAuth(app);
     const db = getFirestore(app);
 
-    let currentUser = null; 
-    let adminUsers = [];    
-    let newsData = [];      
-    let currentAdminId = null; 
-    let unsubs = [];        
-
-    document.getElementById('news-date').valueAsDate = new Date();
-
-    async function hashPassword(password) {
-      const encoder = new TextEncoder();
-      const data = encoder.encode(password);
-      
-      const hashBuffer = await crypto.subtle.digest('SHA-256', data);
-      const hashArray = Array.from(new Uint8Array(hashBuffer));
-      const hashHex = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
-      return hashHex;
-    }
-
-    window.switchTab = function(tabName) {
-      const newsContent = document.getElementById('tab-content-news');
-      const usersContent = document.getElementById('tab-content-users');
-      const newsBtn = document.getElementById('tab-btn-news');
-      const usersBtn = document.getElementById('tab-btn-users');
-
-      if (tabName === 'news') {
-        newsContent.classList.remove('hidden');
-        usersContent.classList.add('hidden');
-        
-        newsBtn.className = "py-3 px-6 text-center font-medium border-b-2 border-slate-900 text-slate-900 transition bg-white/50";
-        usersBtn.className = "py-3 px-6 text-center font-medium border-b-2 border-transparent text-slate-500 hover:text-slate-700 transition";
-      } else {
-        newsContent.classList.add('hidden');
-        usersContent.classList.remove('hidden');
-        
-        usersBtn.className = "py-3 px-6 text-center font-medium border-b-2 border-slate-900 text-slate-900 transition bg-white/50";
-        newsBtn.className = "py-3 px-6 text-center font-medium border-b-2 border-transparent text-slate-500 hover:text-slate-700 transition";
+    
+    const quill = new Quill('#quill-editor', {
+      theme: 'snow',
+      modules: {
+        toolbar: [
+          [{ 'header': [2, 3, false] }],
+          ['bold', 'italic', 'underline', 'strike'],
+          [{ 'color': [] }, { 'background': [] }],
+          [{ 'list': 'ordered'}, { 'list': 'bullet' }],
+          ['link', 'clean']
+        ]
       }
-    };
-
-    function showToast(message, type = 'success') {
-      const container = document.getElementById('toast-container');
-      const toast = document.createElement('div');
-      
-      const bgColor = type === 'success' ? 'bg-lime-600' : 'bg-red-600';
-      const icon = type === 'success' ? 'fa-check-circle' : 'fa-exclamation-circle';
-      
-      toast.className = `toast-enter ${bgColor} text-white px-6 py-3 rounded shadow-lg flex items-center gap-3`;
-      toast.innerHTML = `<i class="fa-solid ${icon}"></i> <span>${message}</span>`;
-      
-      container.appendChild(toast);
-      
-      setTimeout(() => {
-        toast.style.opacity = '0';
-        toast.style.transform = 'translateX(100%)';
-        toast.style.transition = 'all 0.3s ease-out';
-        setTimeout(() => toast.remove(), 300);
-      }, 3000);
-    }
-
-    document.getElementById('news-image-input').addEventListener('change', function(e) {
-      const file = e.target.files[0];
-      if (!file) return;
-
-      const reader = new FileReader();
-      reader.onload = function(event) {
-        const img = new Image();
-        img.onload = function() {
-          const canvas = document.createElement('canvas');
-          let width = img.width;
-          let height = img.height;
-          const MAX_SIZE = 500; 
-
-          if (width > height) {
-            if (width > MAX_SIZE) {
-              height *= MAX_SIZE / width;
-              width = MAX_SIZE;
-            }
-          } else {
-            if (height > MAX_SIZE) {
-              width *= MAX_SIZE / height;
-              height = MAX_SIZE;
-            }
-          }
-
-          canvas.width = width;
-          canvas.height = height;
-          const ctx = canvas.getContext('2d');
-          ctx.drawImage(img, 0, 0, width, height);
-          
-          const base64String = canvas.toDataURL('image/jpeg', 0.8);
-          
-          document.getElementById('news-image-base64').value = base64String;
-          document.getElementById('image-preview').src = base64String;
-          document.getElementById('image-preview-container').classList.remove('hidden');
-        };
-        img.src = event.target.result;
-      };
-      reader.readAsDataURL(file);
     });
 
-    window.clearImage = function() {
-      document.getElementById('news-image-input').value = '';
-      document.getElementById('news-image-base64').value = '';
-      document.getElementById('image-preview').src = '';
-      document.getElementById('image-preview-container').classList.add('hidden');
+    let currentNewsData = [];
+    let unsubscribeNews = null;
+
+    
+    const els = {
+      loading: document.getElementById('loading-overlay'),
+      login: document.getElementById('login-section'),
+      dashboard: document.getElementById('dashboard-section'),
+      headerUser: document.getElementById('header-user-info'),
+      userDisplay: document.getElementById('current-user-display'),
+      mypageEmail: document.getElementById('mypage-email')
     };
 
-    const fetchData = () => {
-      if (!currentUser) return;
-      
-      unsubs.forEach(unsub => unsub());
-      unsubs = [];
+    
+    onAuthStateChanged(auth, (user) => {
+      els.loading.classList.add('opacity-0');
+      setTimeout(() => els.loading.classList.add('hidden'), 300);
 
-      const adminRef = collection(db, 'artifacts', appId, 'public', 'data', 'admin_users');
-      const unsubAdmin = onSnapshot(adminRef, async (snapshot) => {
-        adminUsers = [];
-        snapshot.forEach(doc => {
-          adminUsers.push({ id: doc.id, ...doc.data() });
-        });
-
-        if (adminUsers.length === 0) {
-          try {
-            const hashedPW = await hashPassword('soei2026');
-            await setDoc(doc(adminRef, 'admin'), {
-              passwordHash: hashedPW,
-              createdAt: new Date().toISOString()
-            });
-            console.log("初期管理者アカウントを作成しました (ID: admin)");
-          } catch (err) {
-            console.error("初期アカウント作成エラー:", err);
-          }
-        }
-
-        renderUsersList();
-      }, (error) => { 
-        console.error("Admin fetch error:", error); 
-        document.getElementById('loading-overlay').classList.add('hidden');
-        document.getElementById('login-section').classList.remove('hidden');
-      });
-      
-      unsubs.push(unsubAdmin);
-
-      const newsRef = collection(db, 'artifacts', appId, 'public', 'data', 'school_news');
-      const unsubNews = onSnapshot(newsRef, (snapshot) => {
-        newsData = [];
-        snapshot.forEach(doc => {
-          newsData.push({ id: doc.id, ...doc.data() });
-        });
+      if (user) {
+        els.login.classList.add('hidden');
+        els.dashboard.classList.remove('hidden');
+        els.headerUser.classList.remove('hidden');
+        els.headerUser.classList.add('flex');
         
-        newsData.sort((a, b) => new Date(b.date || 0) - new Date(a.date || 0));
-        renderNewsList();
-        
-        document.getElementById('loading-overlay').classList.add('hidden');
-        checkSession();
-
-      }, (error) => { 
-        console.error("News fetch error:", error); 
-        
-        document.getElementById('loading-overlay').classList.add('hidden');
-        document.getElementById('login-section').classList.remove('hidden');
-        const errEl = document.getElementById('login-error');
-        errEl.innerHTML = "データベースへの接続が拒否されました。<br>Firebaseの「Firestore Database」のルール設定を確認してください。";
-        errEl.classList.remove('hidden');
-      });
-
-      unsubs.push(unsubNews);
-    };
-
-    function checkSession() {
-      const savedAdmin = sessionStorage.getItem('soei_admin_id');
-      if (savedAdmin) {
-        const userExists = adminUsers.find(u => u.id === savedAdmin);
-        if (userExists) {
-          showDashboard(savedAdmin);
-          return;
-        }
-      }
-      
-      document.getElementById('login-section').classList.remove('hidden');
-      document.getElementById('dashboard-section').classList.add('hidden');
-    }
-
-    window.attemptLogin = async function() {
-      const idInput = document.getElementById('login-id').value.trim();
-      const pwInput = document.getElementById('login-password').value;
-      const errorEl = document.getElementById('login-error');
-      
-      if (!idInput || !pwInput) {
-        errorEl.textContent = "IDとパスワードを入力してください。";
-        errorEl.classList.remove('hidden');
-        return;
-      }
-
-      const hashedPW = await hashPassword(pwInput);
-      const targetUser = adminUsers.find(u => u.id === idInput);
-
-      if (targetUser && targetUser.passwordHash === hashedPW) {
-        sessionStorage.setItem('soei_admin_id', idInput);
-        errorEl.classList.add('hidden');
-        document.getElementById('login-id').value = '';
-        document.getElementById('login-password').value = '';
-        showDashboard(idInput);
-        showToast('ログインしました');
+        els.userDisplay.textContent = user.email;
+        els.mypageEmail.textContent = user.email;
+        checkLinkStatus(user);
+        fetchNews();
       } else {
-        errorEl.textContent = "IDまたはパスワードが間違っています。";
-        errorEl.classList.remove('hidden');
+        els.dashboard.classList.add('hidden');
+        els.headerUser.classList.add('hidden');
+        els.headerUser.classList.remove('flex');
+        els.login.classList.remove('hidden');
+        
+        if (unsubscribeNews) unsubscribeNews();
+        document.getElementById('login-form').reset();
       }
-    };
+    });
 
-    window.logout = function() {
-      sessionStorage.removeItem('soei_admin_id');
-      currentAdminId = null;
-      document.getElementById('login-section').classList.remove('hidden');
-      document.getElementById('dashboard-section').classList.add('hidden');
-      document.getElementById('header-user-info').classList.add('hidden');
-      showToast('ログアウトしました');
-    };
-
-    function showDashboard(adminId) {
-      currentAdminId = adminId;
-      document.getElementById('login-section').classList.add('hidden');
-      document.getElementById('dashboard-section').classList.remove('hidden');
-      document.getElementById('current-user-display').textContent = adminId;
-      document.getElementById('header-user-info').classList.remove('hidden');
-    }
-
-    window.submitNews = async function() {
-      if (!currentUser) return;
-      
-      const title = document.getElementById('news-title').value.trim();
-      const date = document.getElementById('news-date').value;
-      const type = document.getElementById('news-category').value;
-      const content = document.getElementById('news-content').value.trim();
-      const image = document.getElementById('news-image-base64').value;
-      const video = document.getElementById('news-video').value.trim();
-
-      if (!title || !date || !content) {
-        alert("タイトル、日付、本文は必須入力です。");
-        return;
-      }
-
-      const newsRef = collection(db, 'artifacts', appId, 'public', 'data', 'school_news');
-      
+    
+    document.getElementById('login-form').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const email = document.getElementById('login-email').value;
+      const password = document.getElementById('login-password').value;
       try {
-        await addDoc(newsRef, {
-          title, date, type, content, image, video,
-          createdAt: new Date().toISOString(),
-          authorId: currentAdminId
-        });
-        
-        showToast('お知らせを投稿しました');
-        
-        document.getElementById('news-title').value = '';
-        document.getElementById('news-content').value = '';
-        document.getElementById('news-video').value = '';
-        clearImage();
-        
-      } catch(e) {
-        console.error(e);
-        showToast('エラーが発生しました', 'error');
+        await signInWithEmailAndPassword(auth, email, password);
+      } catch (error) {
+        alert("ログインに失敗しました。メールアドレスまたはパスワードが間違っています。");
       }
-    };
+    });
 
-    window.deleteNews = async function(id) {
-      if (!currentUser) return;
-      if (confirm("このお知らせを削除してもよろしいですか？\n※この操作は取り消せません。")) {
-        try {
-          await deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', 'school_news', id));
-          showToast('お知らせを削除しました');
-        } catch(e) {
-          console.error(e);
-          showToast('削除に失敗しました', 'error');
-        }
-      }
-    };
-
-    function renderNewsList() {
-      const tbody = document.getElementById('news-list-table');
-      if (newsData.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="4" class="p-4 text-center text-slate-400">投稿データがありません</td></tr>';
-        return;
-      }
-      
-      let html = '';
-      newsData.forEach(item => {
-        const catLabel = item.type === 'topic' ? '<span class="bg-lime-100 text-lime-800 px-2 py-1 rounded text-xs">トピック</span>' : '<span class="bg-blue-100 text-blue-800 px-2 py-1 rounded text-xs">リリース</span>';
-        html += `
-          <tr class="border-b border-gray-100 hover:bg-slate-50 transition">
-            <td class="p-3 whitespace-nowrap text-sm text-slate-500">${item.date}</td>
-            <td class="p-3 whitespace-nowrap">${catLabel}</td>
-            <td class="p-3 font-medium text-slate-900">${item.title}</td>
-            <td class="p-3 text-center whitespace-nowrap">
-              <button onclick="deleteNews('${item.id}')" class="text-red-500 hover:text-red-700 bg-red-50 hover:bg-red-100 px-3 py-1 rounded transition text-sm">
-                削除
-              </button>
-            </td>
-          </tr>
-        `;
-      });
-      tbody.innerHTML = html;
-    }
-
-    window.createUser = async function() {
-      if (!currentUser) return;
-      
-      const newId = document.getElementById('new-user-id').value.trim();
-      const newPw = document.getElementById('new-user-password').value;
-
-      if (!newId || !newPw) {
-        alert("IDとパスワードを入力してください。");
-        return;
-      }
-      
-      if (adminUsers.find(u => u.id === newId)) {
-        alert("このIDはすでに使われています。");
-        return;
-      }
-
+    
+    document.getElementById('google-login-btn').addEventListener('click', async () => {
+      const provider = new GoogleAuthProvider();
+      provider.setCustomParameters({ hd: 'soei.ed.jp' }); 
       try {
-        const hashedPW = await hashPassword(newPw);
-        const adminRef = collection(db, 'artifacts', appId, 'public', 'data', 'admin_users');
-        
-        await setDoc(doc(adminRef, newId), {
-          passwordHash: hashedPW,
-          createdAt: new Date().toISOString(),
-          createdBy: currentAdminId
-        });
-        
-        showToast(`ユーザー「${newId}」を追加しました`);
-        
-        document.getElementById('new-user-id').value = '';
-        document.getElementById('new-user-password').value = '';
-        
-      } catch(e) {
-        console.error(e);
-        showToast('ユーザーの追加に失敗しました', 'error');
-      }
-    };
-
-    window.deleteUser = async function(id) {
-      if (!currentUser) return;
-      
-      if (adminUsers.length <= 1) {
-        alert("最後のアカウントは削除できません。");
-        return;
-      }
-      
-      if (id === currentAdminId) {
-        alert("現在ログイン中のアカウントは削除できません。");
-        return;
-      }
-
-      if (confirm(`ユーザー「${id}」を削除してもよろしいですか？`)) {
-        try {
-          await deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', 'admin_users', id));
-          showToast('アカウントを削除しました');
-        } catch(e) {
-          console.error(e);
-          showToast('削除に失敗しました', 'error');
-        }
-      }
-    };
-
-    function renderUsersList() {
-      const tbody = document.getElementById('users-list-table');
-      if (adminUsers.length === 0) return;
-      
-      let html = '';
-      adminUsers.forEach(user => {
-        const dateStr = user.createdAt ? new Date(user.createdAt).toLocaleDateString('ja-JP') : '-';
-        const isMe = user.id === currentAdminId;
-        
-        html += `
-          <tr class="border-b border-gray-100 hover:bg-slate-50 transition">
-            <td class="p-3 font-medium text-slate-900">
-              <i class="fa-solid fa-user-circle text-slate-400 mr-2"></i> ${user.id}
-              ${isMe ? '<span class="ml-2 text-xs bg-orange-100 text-orange-700 px-2 py-0.5 rounded">You</span>' : ''}
-            </td>
-            <td class="p-3 text-sm text-slate-500">${dateStr}</td>
-            <td class="p-3 text-center whitespace-nowrap">
-              ${!isMe ? `<button onclick="deleteUser('${user.id}')" class="text-slate-500 hover:text-red-600 bg-slate-100 hover:bg-red-50 px-3 py-1 rounded transition text-sm">削除</button>` : '<span class="text-xs text-slate-300">操作不可</span>'}
-            </td>
-          </tr>
-        `;
-      });
-      tbody.innerHTML = html;
-    }
-
-    const initAuth = async () => {
-      try {
-        if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
-          try {
-            await signInWithCustomToken(auth, __initial_auth_token);
-          } catch (tokenError) {
-            console.warn("テスト環境の認証キーが一致しませんでした。匿名認証に切り替えます。", tokenError);
-            await signInAnonymously(auth);
-          }
-        } else {
-          await signInAnonymously(auth);
+        const result = await signInWithPopup(auth, provider);
+        const details = getAdditionalUserInfo(result);
+        if (details.isNewUser) {
+          await deleteUser(result.user);
+          await signOut(auth);
+          alert("【エラー】新規アカウントの作成は許可されていません。\nまずは発行されたメールアドレスでログインし、マイページからGoogleアカウントを連携してください。");
         }
       } catch (error) {
-        console.error("Auth init failed:", error);
-        
-        document.getElementById('loading-overlay').classList.add('hidden');
-        document.getElementById('login-section').classList.remove('hidden');
-        const errEl = document.getElementById('login-error');
-        errEl.innerHTML = "認証に失敗しました。<br>Firebaseの「Authentication」で「匿名」が有効になっているか確認してください。";
-        errEl.classList.remove('hidden');
-      }
-    };
-
-    onAuthStateChanged(auth, (user) => {
-      currentUser = user;
-      if (user) {
-        fetchData();
+        if(error.code !== 'auth/popup-closed-by-user'){
+           alert("Googleログインに失敗しました。\n未連携のアカウントの可能性があります。");
+        }
       }
     });
 
-    initAuth();
+    document.getElementById('logout-btn').addEventListener('click', () => signOut(auth));
+
+    
+    const checkLinkStatus = (user) => {
+      const isLinked = user.providerData.some(p => p.providerId === 'google.com');
+      const statusEl = document.getElementById('link-status');
+      const btn = document.getElementById('link-google-btn');
+      
+      if (isLinked) {
+        statusEl.innerHTML = `<span class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-green-100 text-green-800 text-sm font-bold"><i class="fa-solid fa-check-circle"></i> 連携済み</span>`;
+        btn.innerHTML = `<span>Googleアカウントの連携を解除</span>`;
+        btn.onclick = async () => {
+          if(confirm("Googleアカウントの連携を解除しますか？")) {
+            try {
+              await unlink(user, GoogleAuthProvider.PROVIDER_ID);
+              alert("連携を解除しました。");
+              checkLinkStatus(auth.currentUser);
+            } catch(e) { alert("解除に失敗しました: " + e.message); }
+          }
+        };
+      } else {
+        statusEl.innerHTML = `<span class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-gray-200 text-gray-700 text-sm font-bold"><i class="fa-solid fa-circle-info"></i> 未連携</span>`;
+        btn.innerHTML = `<img src="https://www.svgrepo.com/show/475656/google-color.svg" class="w-5 h-5"><span>Googleアカウントを連携する</span>`;
+        btn.onclick = async () => {
+          const provider = new GoogleAuthProvider();
+          try {
+            const result = await linkWithPopup(user, provider);
+            if (!result.user.email.endsWith('@soei.ed.jp')) {
+              await unlink(user, GoogleAuthProvider.PROVIDER_ID);
+              alert("エラー: @soei.ed.jp ドメインのGoogleアカウントのみ連携可能です。");
+              return;
+            }
+            alert("Googleアカウントの連携が完了しました。次回からGoogleでログイン可能です。");
+            checkLinkStatus(auth.currentUser);
+          } catch(e) {
+             if(e.code !== 'auth/popup-closed-by-user') alert("連携に失敗しました: " + e.message);
+          }
+        };
+      }
+    };
+
+    
+    const switchTab = (tabName) => {
+      const tabs = { news: document.getElementById('tab-content-news'), mypage: document.getElementById('tab-content-mypage') };
+      const btns = { news: document.getElementById('tab-btn-news'), mypage: document.getElementById('tab-btn-mypage') };
+      
+      Object.keys(tabs).forEach(key => {
+        if (key === tabName) {
+          tabs[key].classList.remove('hidden');
+          btns[key].className = "py-3 px-6 text-center font-medium border-b-2 border-slate-900 text-slate-900 transition bg-white/50";
+        } else {
+          tabs[key].classList.add('hidden');
+          btns[key].className = "py-3 px-6 text-center font-medium border-b-2 border-transparent text-slate-500 hover:text-slate-700 transition";
+        }
+      });
+    };
+    document.getElementById('tab-btn-news').addEventListener('click', () => switchTab('news'));
+    document.getElementById('tab-btn-mypage').addEventListener('click', () => switchTab('mypage'));
+
+    
+    const fetchNews = () => {
+      const newsRef = collection(db, 'news');
+      unsubscribeNews = onSnapshot(newsRef, (snapshot) => {
+        const data = [];
+        snapshot.forEach(doc => data.push({ id: doc.id, ...doc.data() }));
+        data.sort((a, b) => new Date(b.date || '1970').getTime() - new Date(a.date || '1970').getTime());
+        currentNewsData = data;
+        renderList(data);
+      }, (error) => {
+        document.getElementById('news-list-table').innerHTML = `<tr><td colspan="4" class="p-8 text-center text-red-500">データ取得エラー: ${error.message}</td></tr>`;
+      });
+    };
+
+    const renderList = (data) => {
+      const tbody = document.getElementById('news-list-table');
+      if (data.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="4" class="p-8 text-center text-gray-500">記事がありません。</td></tr>';
+        return;
+      }
+
+      tbody.innerHTML = data.map(item => `
+        <tr class="hover:bg-slate-50 transition border-b border-gray-100">
+          <td class="p-3 text-sm text-slate-600">${item.date || '----.--.--'}</td>
+          <td class="p-3">
+            <span class="px-2 py-1 text-xs rounded-sm ${item.type === 'topic' ? 'bg-blue-100 text-blue-700' : 'bg-gray-100 text-gray-700'} tracking-wider">
+              ${item.type === 'topic' ? 'トピック' : 'リリース'}
+            </span>
+          </td>
+          <td class="p-3 font-medium text-slate-800">${item.title || '無題'}</td>
+          <td class="p-3 text-center">
+            <div class="flex justify-center gap-2">
+              <button onclick="editDoc('${item.id}')" class="px-3 py-1 bg-white border border-gray-300 text-slate-600 hover:bg-gray-100 rounded text-sm transition shadow-sm">編集</button>
+              <button onclick="deleteDocHandler('${item.id}')" class="px-3 py-1 bg-red-50 border border-red-200 text-red-600 hover:bg-red-100 rounded text-sm transition shadow-sm">削除</button>
+            </div>
+          </td>
+        </tr>
+      `).join('');
+    };
+
+    
+    const resetForm = () => {
+      document.getElementById('editor-form').reset();
+      document.getElementById('edit-id').value = '';
+      quill.root.innerHTML = '';
+      document.getElementById('form-title').textContent = '新規お知らせ作成';
+      document.getElementById('cancel-edit-btn').classList.add('hidden');
+    };
+
+    document.getElementById('cancel-edit-btn').addEventListener('click', resetForm);
+
+    window.editDoc = (id) => {
+      const item = currentNewsData.find(d => d.id === id);
+      if(!item) return;
+
+      document.getElementById('edit-id').value = item.id;
+      document.getElementById('news-title').value = item.title || '';
+      document.getElementById('news-date').value = item.date || '';
+      document.getElementById('news-category').value = item.type || 'news';
+      document.getElementById('news-image').value = item.image || '';
+      document.getElementById('news-video').value = item.video || '';
+      quill.root.innerHTML = item.content || '';
+      
+      document.getElementById('form-title').textContent = 'お知らせの編集';
+      document.getElementById('cancel-edit-btn').classList.remove('hidden');
+      
+      
+      document.getElementById('form-title').scrollIntoView({ behavior: 'smooth', block: 'start' });
+    };
+
+    window.deleteDocHandler = async (id) => {
+      if(confirm('本当にこの記事を削除しますか？')) {
+        try {
+          await deleteDoc(doc(db, 'news', id));
+        } catch(e) { alert("削除エラー: " + e.message); }
+      }
+    };
+
+    document.getElementById('editor-form').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      
+      const payload = {
+        title: document.getElementById('news-title').value,
+        date: document.getElementById('news-date').value,
+        type: document.getElementById('news-category').value,
+        content: quill.root.innerHTML,
+        image: document.getElementById('news-image').value,
+        video: document.getElementById('news-video').value
+      };
+
+      const id = document.getElementById('edit-id').value;
+      const saveBtn = document.getElementById('save-btn');
+      
+      saveBtn.disabled = true;
+      saveBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> <span>保存中...</span>';
+
+      try {
+        if (id) {
+          await updateDoc(doc(db, 'news', id), payload);
+          alert("更新しました。");
+        } else {
+          await addDoc(collection(db, 'news'), payload);
+          alert("投稿しました。");
+        }
+        resetForm();
+      } catch(e) {
+        alert("保存エラー: " + e.message);
+      } finally {
+        saveBtn.disabled = false;
+        saveBtn.innerHTML = '<i class="fa-solid fa-paper-plane"></i> <span>投稿する</span>';
+      }
+    });

@@ -8,49 +8,65 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebas
     } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
     const firebaseConfig = {
-      apiKey: "AIzaSyCDWj4xWfU42x2NG1tOSlXcBC-f2vhC3lA",
-      authDomain: "soeiday.firebaseapp.com",
-      projectId: "soeiday",
-      storageBucket: "soeiday.firebasestorage.app",
-      messagingSenderId: "122257503471",
-      appId: "1:122257503471:web:8014972f2bc10f84ea971a"
-    };
-
-    const app = initializeApp(firebaseConfig);
-    const auth = getAuth(app);
-    const db = getFirestore(app);
+  apiKey: "AIzaSyCDWj4xWfU42x2NG1tOSlXcBC-f2vhC3lA",
+  authDomain: "soeiday.firebaseapp.com",
+  projectId: "soeiday",
+  storageBucket: "soeiday.firebasestorage.app",
+  messagingSenderId: "122257503471",
+  appId: "1:122257503471:web:8014972f2bc10f84ea971a",
+  measurementId: "G-EX7FJGF5R0"
+};
 
     
-    const quill = new Quill('#quill-editor', {
-      theme: 'snow',
-      modules: {
-        toolbar: [
-          [{ 'header': [2, 3, false] }],
-          ['bold', 'italic', 'underline', 'strike'],
-          [{ 'color': [] }, { 'background': [] }],
-          [{ 'list': 'ordered'}, { 'list': 'bullet' }],
-          ['link', 'clean']
-        ]
-      }
-    });
+    let app, auth, db, quill;
+    try {
+      app = initializeApp(firebaseConfig);
+      auth = getAuth(app);
+      db = getFirestore(app);
+    } catch (error) {
+      console.error("Firebase initialization error:", error);
+      alert("システムの初期化に失敗しました。ページを再読み込みしてください。");
+      
+    }
 
     let currentNewsData = [];
     let unsubscribeNews = null;
 
     
-    const els = {
-      loading: document.getElementById('loading-overlay'),
-      login: document.getElementById('login-section'),
-      dashboard: document.getElementById('dashboard-section'),
-      headerUser: document.getElementById('header-user-info'),
-      userDisplay: document.getElementById('current-user-display'),
-      mypageEmail: document.getElementById('mypage-email')
+    let els = {};
+    const initDOM = () => {
+      els = {
+        loading: document.getElementById('loading-overlay'),
+        login: document.getElementById('login-section'),
+        dashboard: document.getElementById('dashboard-section'),
+        headerUser: document.getElementById('header-user-info'),
+        userDisplay: document.getElementById('current-user-display'),
+        mypageEmail: document.getElementById('mypage-email')
+      };
+      
+      
+      try {
+        quill = new Quill('#quill-editor', {
+          theme: 'snow',
+          modules: {
+            toolbar: [
+              [{ 'header': [2, 3, false] }],
+              ['bold', 'italic', 'underline', 'strike'],
+              [{ 'color': [] }, { 'background': [] }],
+              [{ 'list': 'ordered'}, { 'list': 'bullet' }],
+              ['link', 'clean']
+            ]
+          }
+        });
+      } catch (error) {
+        console.error("Quill initialization error:", error);
+      }
     };
 
     
     const hideLoading = () => {
+      if (!els.loading) return; 
       els.loading.classList.add('opacity-0');
-      
       setTimeout(() => {
         els.loading.classList.add('hidden');
         els.loading.style.display = 'none'; 
@@ -58,65 +74,139 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebas
     };
 
     
-    setTimeout(hideLoading, 5000);
+    document.addEventListener('DOMContentLoaded', () => {
+      initDOM();
 
-    
-    onAuthStateChanged(auth, (user) => {
-      hideLoading();
+      
+      const loadingTimeout = setTimeout(hideLoading, 5000);
 
-      if (user) {
-        els.login.classList.add('hidden');
-        els.dashboard.classList.remove('hidden');
-        els.headerUser.classList.remove('hidden');
-        els.headerUser.classList.add('flex');
+      if (auth) {
         
-        els.userDisplay.textContent = user.email;
-        els.mypageEmail.textContent = user.email;
-        checkLinkStatus(user);
-        fetchNews();
+        onAuthStateChanged(auth, (user) => {
+          clearTimeout(loadingTimeout); 
+          hideLoading();
+
+          if (user) {
+            els.login.classList.add('hidden');
+            els.dashboard.classList.remove('hidden');
+            els.headerUser.classList.remove('hidden');
+            els.headerUser.classList.add('flex');
+            
+            els.userDisplay.textContent = user.email;
+            els.mypageEmail.textContent = user.email;
+            checkLinkStatus(user);
+            fetchNews();
+          } else {
+            els.dashboard.classList.add('hidden');
+            els.headerUser.classList.add('hidden');
+            els.headerUser.classList.remove('flex');
+            els.login.classList.remove('hidden');
+            
+            if (unsubscribeNews) unsubscribeNews();
+            document.getElementById('login-form').reset();
+          }
+        }, (error) => {
+          console.error("Auth state change error:", error);
+          hideLoading(); 
+        });
       } else {
-        els.dashboard.classList.add('hidden');
-        els.headerUser.classList.add('hidden');
-        els.headerUser.classList.remove('flex');
-        els.login.classList.remove('hidden');
+         hideLoading(); 
+      }
+
+      
+      document.getElementById('login-form').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const email = document.getElementById('login-email').value;
+        const password = document.getElementById('login-password').value;
+        try {
+          await signInWithEmailAndPassword(auth, email, password);
+        } catch (error) {
+          console.error("Login error:", error);
+          alert("ログインに失敗しました。メールアドレスまたはパスワードが間違っています。");
+        }
+      });
+
+      document.getElementById('google-login-btn').addEventListener('click', async () => {
+        if (!auth) return;
+        const provider = new GoogleAuthProvider();
+        provider.setCustomParameters({ hd: 'soei.ed.jp' }); 
+        try {
+          const result = await signInWithPopup(auth, provider);
+          const details = getAdditionalUserInfo(result);
+          if (details.isNewUser) {
+            await deleteUser(result.user);
+            await signOut(auth);
+            alert("【エラー】新規アカウントの作成は許可されていません。\nまずは発行されたメールアドレスでログインし、マイページからGoogleアカウントを連携してください。");
+          }
+        } catch (error) {
+          console.error("Google Login error:", error);
+          if(error.code !== 'auth/popup-closed-by-user'){
+             alert("Googleログインに失敗しました。\n未連携のアカウントの可能性があります。");
+          }
+        }
+      });
+
+      document.getElementById('logout-btn').addEventListener('click', () => {
+        if(auth) signOut(auth);
+      });
+
+      
+      const switchTab = (tabName) => {
+        const tabs = { news: document.getElementById('tab-content-news'), mypage: document.getElementById('tab-content-mypage') };
+        const btns = { news: document.getElementById('tab-btn-news'), mypage: document.getElementById('tab-btn-mypage') };
         
-        if (unsubscribeNews) unsubscribeNews();
-        document.getElementById('login-form').reset();
-      }
-    });
+        Object.keys(tabs).forEach(key => {
+          if (key === tabName) {
+            tabs[key].classList.remove('hidden');
+            btns[key].className = "py-3 px-6 text-center font-medium border-b-2 border-slate-900 text-slate-900 transition bg-white/50";
+          } else {
+            tabs[key].classList.add('hidden');
+            btns[key].className = "py-3 px-6 text-center font-medium border-b-2 border-transparent text-slate-500 hover:text-slate-700 transition";
+          }
+        });
+      };
+      document.getElementById('tab-btn-news').addEventListener('click', () => switchTab('news'));
+      document.getElementById('tab-btn-mypage').addEventListener('click', () => switchTab('mypage'));
 
-    
-    document.getElementById('login-form').addEventListener('submit', async (e) => {
-      e.preventDefault();
-      const email = document.getElementById('login-email').value;
-      const password = document.getElementById('login-password').value;
-      try {
-        await signInWithEmailAndPassword(auth, email, password);
-      } catch (error) {
-        alert("ログインに失敗しました。メールアドレスまたはパスワードが間違っています。");
-      }
-    });
+      document.getElementById('cancel-edit-btn').addEventListener('click', resetForm);
 
-    
-    document.getElementById('google-login-btn').addEventListener('click', async () => {
-      const provider = new GoogleAuthProvider();
-      provider.setCustomParameters({ hd: 'soei.ed.jp' }); 
-      try {
-        const result = await signInWithPopup(auth, provider);
-        const details = getAdditionalUserInfo(result);
-        if (details.isNewUser) {
-          await deleteUser(result.user);
-          await signOut(auth);
-          alert("【エラー】新規アカウントの作成は許可されていません。\nまずは発行されたメールアドレスでログインし、マイページからGoogleアカウントを連携してください。");
+      document.getElementById('editor-form').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        if (!db || !quill) return;
+        
+        const payload = {
+          title: document.getElementById('news-title').value,
+          date: document.getElementById('news-date').value,
+          type: document.getElementById('news-category').value,
+          content: quill.root.innerHTML,
+          image: document.getElementById('news-image').value,
+          video: document.getElementById('news-video').value
+        };
+
+        const id = document.getElementById('edit-id').value;
+        const saveBtn = document.getElementById('save-btn');
+        
+        saveBtn.disabled = true;
+        saveBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> <span>保存中...</span>';
+
+        try {
+          if (id) {
+            await updateDoc(doc(db, 'news', id), payload);
+            alert("更新しました。");
+          } else {
+            await addDoc(collection(db, 'news'), payload);
+            alert("投稿しました。");
+          }
+          resetForm();
+        } catch(e) {
+          console.error("Save error:", e);
+          alert("保存エラー: " + e.message);
+        } finally {
+          saveBtn.disabled = false;
+          saveBtn.innerHTML = '<i class="fa-solid fa-paper-plane"></i> <span>投稿する</span>';
         }
-      } catch (error) {
-        if(error.code !== 'auth/popup-closed-by-user'){
-           alert("Googleログインに失敗しました。\n未連携のアカウントの可能性があります。");
-        }
-      }
+      });
     });
-
-    document.getElementById('logout-btn').addEventListener('click', () => signOut(auth));
 
     
     const checkLinkStatus = (user) => {
@@ -133,7 +223,10 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebas
               await unlink(user, GoogleAuthProvider.PROVIDER_ID);
               alert("連携を解除しました。");
               checkLinkStatus(auth.currentUser);
-            } catch(e) { alert("解除に失敗しました: " + e.message); }
+            } catch(e) { 
+              console.error("Unlink error:", e);
+              alert("解除に失敗しました: " + e.message); 
+            }
           }
         };
       } else {
@@ -151,6 +244,7 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebas
             alert("Googleアカウントの連携が完了しました。次回からGoogleでログイン可能です。");
             checkLinkStatus(auth.currentUser);
           } catch(e) {
+             console.error("Link error:", e);
              if(e.code !== 'auth/popup-closed-by-user') alert("連携に失敗しました: " + e.message);
           }
         };
@@ -158,25 +252,8 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebas
     };
 
     
-    const switchTab = (tabName) => {
-      const tabs = { news: document.getElementById('tab-content-news'), mypage: document.getElementById('tab-content-mypage') };
-      const btns = { news: document.getElementById('tab-btn-news'), mypage: document.getElementById('tab-btn-mypage') };
-      
-      Object.keys(tabs).forEach(key => {
-        if (key === tabName) {
-          tabs[key].classList.remove('hidden');
-          btns[key].className = "py-3 px-6 text-center font-medium border-b-2 border-slate-900 text-slate-900 transition bg-white/50";
-        } else {
-          tabs[key].classList.add('hidden');
-          btns[key].className = "py-3 px-6 text-center font-medium border-b-2 border-transparent text-slate-500 hover:text-slate-700 transition";
-        }
-      });
-    };
-    document.getElementById('tab-btn-news').addEventListener('click', () => switchTab('news'));
-    document.getElementById('tab-btn-mypage').addEventListener('click', () => switchTab('mypage'));
-
-    
     const fetchNews = () => {
+      if (!db) return;
       const newsRef = collection(db, 'news');
       unsubscribeNews = onSnapshot(newsRef, (snapshot) => {
         const data = [];
@@ -185,6 +262,7 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebas
         currentNewsData = data;
         renderList(data);
       }, (error) => {
+        console.error("Fetch news error:", error);
         document.getElementById('news-list-table').innerHTML = `<tr><td colspan="4" class="p-8 text-center text-red-500">データ取得エラー: ${error.message}</td></tr>`;
       });
     };
@@ -219,12 +297,10 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebas
     const resetForm = () => {
       document.getElementById('editor-form').reset();
       document.getElementById('edit-id').value = '';
-      quill.root.innerHTML = '';
+      if(quill) quill.root.innerHTML = '';
       document.getElementById('form-title').textContent = '新規お知らせ作成';
       document.getElementById('cancel-edit-btn').classList.add('hidden');
     };
-
-    document.getElementById('cancel-edit-btn').addEventListener('click', resetForm);
 
     window.editDoc = (id) => {
       const item = currentNewsData.find(d => d.id === id);
@@ -236,7 +312,7 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebas
       document.getElementById('news-category').value = item.type || 'news';
       document.getElementById('news-image').value = item.image || '';
       document.getElementById('news-video').value = item.video || '';
-      quill.root.innerHTML = item.content || '';
+      if(quill) quill.root.innerHTML = item.content || '';
       
       document.getElementById('form-title').textContent = 'お知らせの編集';
       document.getElementById('cancel-edit-btn').classList.remove('hidden');
@@ -248,42 +324,10 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebas
     window.deleteDocHandler = async (id) => {
       if(confirm('本当にこの記事を削除しますか？')) {
         try {
-          await deleteDoc(doc(db, 'news', id));
-        } catch(e) { alert("削除エラー: " + e.message); }
+          if(db) await deleteDoc(doc(db, 'news', id));
+        } catch(e) { 
+          console.error("Delete error:", e);
+          alert("削除エラー: " + e.message); 
+        }
       }
     };
-
-    document.getElementById('editor-form').addEventListener('submit', async (e) => {
-      e.preventDefault();
-      
-      const payload = {
-        title: document.getElementById('news-title').value,
-        date: document.getElementById('news-date').value,
-        type: document.getElementById('news-category').value,
-        content: quill.root.innerHTML,
-        image: document.getElementById('news-image').value,
-        video: document.getElementById('news-video').value
-      };
-
-      const id = document.getElementById('edit-id').value;
-      const saveBtn = document.getElementById('save-btn');
-      
-      saveBtn.disabled = true;
-      saveBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> <span>保存中...</span>';
-
-      try {
-        if (id) {
-          await updateDoc(doc(db, 'news', id), payload);
-          alert("更新しました。");
-        } else {
-          await addDoc(collection(db, 'news'), payload);
-          alert("投稿しました。");
-        }
-        resetForm();
-      } catch(e) {
-        alert("保存エラー: " + e.message);
-      } finally {
-        saveBtn.disabled = false;
-        saveBtn.innerHTML = '<i class="fa-solid fa-paper-plane"></i> <span>投稿する</span>';
-      }
-    });

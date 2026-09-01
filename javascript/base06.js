@@ -8,14 +8,13 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebas
     } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
     const firebaseConfig = {
-  apiKey: "AIzaSyCDWj4xWfU42x2NG1tOSlXcBC-f2vhC3lA",
-  authDomain: "soeiday.firebaseapp.com",
-  projectId: "soeiday",
-  storageBucket: "soeiday.firebasestorage.app",
-  messagingSenderId: "122257503471",
-  appId: "1:122257503471:web:8014972f2bc10f84ea971a",
-  measurementId: "G-EX7FJGF5R0"
-};
+      apiKey: "AIzaSyCDWj4xWfU42x2NG1tOSlXcBC-f2vhC3lA",
+      authDomain: "soeiday.firebaseapp.com",
+      projectId: "soeiday",
+      storageBucket: "soeiday.firebasestorage.app",
+      messagingSenderId: "122257503471",
+      appId: "1:122257503471:web:8014972f2bc10f84ea971a"
+    };
 
     const app = initializeApp(firebaseConfig);
     const auth = getAuth(app);
@@ -49,9 +48,21 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebas
     };
 
     
-    onAuthStateChanged(auth, (user) => {
+    const hideLoading = () => {
       els.loading.classList.add('opacity-0');
-      setTimeout(() => els.loading.classList.add('hidden'), 300);
+      
+      setTimeout(() => {
+        els.loading.classList.add('hidden');
+        els.loading.style.display = 'none'; 
+      }, 300);
+    };
+
+    
+    setTimeout(hideLoading, 5000);
+
+    
+    onAuthStateChanged(auth, (user) => {
+      hideLoading();
 
       if (user) {
         els.login.classList.add('hidden');

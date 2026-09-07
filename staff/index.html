@@ -20,6 +20,20 @@
   <link rel="stylesheet" href="https://www.soei-fes.com/css/base02.css">
 
   <link rel="stylesheet" href="https://www.soei-fes.com/css/base09.css">
+  <style>
+    /* Credit readability adjustments: spacing only for dense member lists. */
+    .credit-dense-list > div {
+      flex: 0 1 calc(50% - 1rem);
+      min-width: 15rem;
+    }
+
+    @media (max-width: 767px) {
+      .credit-dense-list > div {
+        flex-basis: 100%;
+        min-width: 0;
+      }
+    }
+  </style>
 </head>
 <body class="font-serif bg-brand-bgLight text-slate-800 dark:bg-brand-bgDark dark:text-slate-200 antialiased transition-colors duration-300">
   
@@ -166,7 +180,7 @@
             </div>
             <div class="flex flex-col md:flex-row md:justify-center gap-2 md:gap-16 items-center md:items-start">
               <div class="md:w-1/3 text-center md:text-right text-sm credit-role text-slate-600 dark:text-slate-400 font-medium mt-1">スタッフ</div>
-              <div class="md:w-1/2 flex flex-wrap justify-center md:justify-start gap-x-8 gap-y-4">
+              <div class="md:w-1/2 flex flex-wrap justify-center md:justify-start gap-x-8 gap-y-4 credit-dense-list">
                 <div class="flex items-baseline gap-2">
                   <span class="text-[11px] md:text-xs text-slate-400 dark:text-slate-500 font-sans font-bold tracking-wider">高校2年</span>
                   <span class="text-lg md:text-xl font-bold credit-name text-slate-800 dark:text-slate-100">鈴木 薫子</span>
@@ -218,7 +232,7 @@
             </div>
             <div class="flex flex-col md:flex-row md:justify-center gap-2 md:gap-16 items-center md:items-start">
               <div class="md:w-1/3 text-center md:text-right text-sm credit-role text-slate-600 dark:text-slate-400 font-medium mt-1">スタッフ</div>
-              <div class="md:w-1/2 flex flex-wrap justify-center md:justify-start gap-x-8 gap-y-4">
+              <div class="md:w-1/2 flex flex-wrap justify-center md:justify-start gap-x-8 gap-y-4 credit-dense-list">
                 
                 <div class="flex items-baseline gap-2">
                   <span class="text-[11px] md:text-xs text-slate-400 dark:text-slate-500 font-sans font-bold tracking-wider">高校2年</span>
@@ -267,7 +281,7 @@
             </div>
             <div class="flex flex-col md:flex-row md:justify-center gap-2 md:gap-16 items-center md:items-start">
               <div class="md:w-1/3 text-center md:text-right text-sm credit-role text-slate-600 dark:text-slate-400 font-medium mt-1">スタッフ</div>
-              <div class="md:w-1/2 flex flex-wrap justify-center md:justify-start gap-x-8 gap-y-4">
+              <div class="md:w-1/2 flex flex-wrap justify-center md:justify-start gap-x-8 gap-y-4 credit-dense-list">
                 <div class="flex items-baseline gap-2">
                   <span class="text-[11px] md:text-xs text-slate-400 dark:text-slate-500 font-sans font-bold tracking-wider">高校3年</span>
                   <span class="text-lg md:text-xl font-bold credit-name text-slate-800 dark:text-slate-100">阿部 泰知</span>
@@ -416,7 +430,7 @@
             </div>
             <div class="flex flex-col md:flex-row md:justify-center gap-2 md:gap-16 items-center md:items-start">
               <div class="md:w-1/3 text-center md:text-right text-sm credit-role text-slate-600 dark:text-slate-400 font-medium mt-1">スタッフ</div>
-              <div class="md:w-1/2 flex flex-wrap justify-center md:justify-start gap-x-8 gap-y-4">
+              <div class="md:w-1/2 flex flex-wrap justify-center md:justify-start gap-x-8 gap-y-4 credit-dense-list">
                 <div class="flex items-baseline gap-2">
                   <span class="text-[11px] md:text-xs text-slate-400 dark:text-slate-500 font-sans font-bold tracking-wider">高校3年</span>
                   <span class="text-lg md:text-xl font-bold credit-name text-slate-800 dark:text-slate-100">大槻 隆成</span>
@@ -459,7 +473,7 @@
           
             <div class="flex flex-col md:flex-row md:justify-center gap-2 md:gap-16 items-center md:items-start">
               <div class="md:w-1/3 text-center md:text-right text-sm credit-role text-slate-600 dark:text-slate-400 font-medium mt-1">スタッフ</div>
-              <div class="md:w-1/2 flex flex-wrap justify-center md:justify-start gap-x-8 gap-y-4">
+              <div class="md:w-1/2 flex flex-wrap justify-center md:justify-start gap-x-8 gap-y-4 credit-dense-list">
                 
                 <div class="flex items-baseline gap-2">
                   <span class="text-[11px] md:text-xs text-slate-400 dark:text-slate-500 font-sans font-bold tracking-wider">高校2年</span>
@@ -536,7 +550,7 @@
               
             <div class="flex flex-col md:flex-row md:justify-center gap-2 md:gap-16 items-center md:items-start">
               <div class="md:w-1/3 text-center md:text-right text-sm credit-role text-slate-600 dark:text-slate-400 font-medium mt-1">役員</div>
-              <div class="md:w-1/2 flex flex-wrap justify-center md:justify-start gap-x-8 gap-y-4">
+              <div class="md:w-1/2 flex flex-wrap justify-center md:justify-start gap-x-8 gap-y-4 credit-dense-list">
                 
                 <div class="flex items-baseline gap-2">
                   <span class="text-[11px] md:text-xs text-slate-400 dark:text-slate-500 font-sans font-bold tracking-wider">高校2年</span>
@@ -614,6 +628,7 @@
             </div>
           </div>
         </div>
+      </div>
 
     
       <div class="mb-40">

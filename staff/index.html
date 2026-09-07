@@ -22,15 +22,19 @@
   <link rel="stylesheet" href="https://www.soei-fes.com/css/base09.css">
   <style>
     /* Credit readability adjustments: spacing only for dense member lists. */
+    .credit-dense-list {
+      display: grid !important;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      column-gap: 2rem;
+      row-gap: 1rem;
+    }
     .credit-dense-list > div {
-      flex: 0 1 calc(50% - 1rem);
-      min-width: 15rem;
+      min-width: 0;
     }
 
     @media (max-width: 767px) {
-      .credit-dense-list > div {
-        flex-basis: 100%;
-        min-width: 0;
+      .credit-dense-list {
+        grid-template-columns: 1fr;
       }
     }
   </style>
@@ -45,7 +49,7 @@
 }
 .student-council-deputy {
   display: grid !important;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   column-gap: 2rem;
   row-gap: 1rem;
 }

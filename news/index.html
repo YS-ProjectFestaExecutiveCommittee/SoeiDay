@@ -36,7 +36,6 @@
     .section-anchor { scroll-margin-top:90px; }
 
     .is-hidden { display:none !important; }
-    .detail-hero-title { text-shadow:0 2px 10px rgba(0,0,0,.45); }
     .article-panel { background:rgba(255,255,255,.94); border:1px solid rgba(148,163,184,.18); box-shadow:0 20px 45px rgba(15,23,42,.08); }
     .dark .article-panel { background:rgba(30,41,59,.94); border-color:rgba(255,255,255,.06); }
     .article-body { color:rgb(51 65 85); line-height:2; font-size:1rem; letter-spacing:.02em; overflow-wrap:anywhere; }
@@ -72,7 +71,8 @@
   </section>
 
   <main>
-    <section class="py-20 md:py-24 relative bg-brand-bgLight dark:bg-brand-bgDark bg-pattern-dots transition-colors duration-300">
+    <div id="news-list-view">
+      <section class="py-20 md:py-24 relative bg-brand-bgLight dark:bg-brand-bgDark bg-pattern-dots transition-colors duration-300">
       <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
         <div class="flex flex-wrap gap-3 mb-14 font-sans">
           <a href="#news-releases" class="inline-flex items-center gap-2 border border-brand-lime dark:border-brand-limeDark px-5 py-3 text-xs tracking-[0.14em] text-slate-900 dark:text-white hover:bg-brand-lime/10 dark:hover:bg-brand-limeDark/10 transition">ニュースリリース <i class="fa-solid fa-arrow-down text-[10px]"></i></a>
@@ -109,22 +109,10 @@
           <a href="https://www.soei-fes.com/concept/" class="inline-flex items-center gap-3 border border-slate-900 dark:border-white px-8 py-4 tracking-widest text-sm hover:bg-slate-900 hover:text-white dark:hover:bg-white dark:hover:text-slate-900 transition-colors duration-300 text-slate-900 dark:text-white"><i class="fa-solid fa-link"></i>コンセプト・実行委員会より</a>
         </div>
       </div>
-    </section>
-
+      </section>
+    </div>
 
     <section id="news-detail-view" class="is-hidden">
-      <section class="relative w-full h-[300px] md:h-[390px] overflow-hidden flex bg-slate-900">
-        <div class="absolute inset-0 bg-cover bg-center opacity-60" style="background-image:url('https://yokohamasoei.sakura.ne.jp/wp/wp-content/uploads/2022/09/IMG_0529-scaled.jpg?auto=format&fit=crop&w=1920&q=80');filter:grayscale(10%);"></div>
-        <div class="absolute inset-0 bg-gradient-to-t from-slate-900 via-slate-900/65 to-transparent"></div>
-        <div class="relative w-full max-w-7xl mx-auto h-full flex items-end pb-12 px-6 sm:px-12 z-10">
-          <div>
-            <p id="detail-hero-category" class="text-xs md:text-sm font-sans tracking-[0.28em] text-brand-orange dark:text-brand-orangeDark mb-4">NEWS &amp; UPDATES</p>
-            <h1 id="detail-hero-title" class="detail-hero-title text-3xl md:text-5xl font-bold tracking-[0.10em] text-white mb-3">ニュースを読み込んでいます</h1>
-            <p id="detail-hero-subtitle" class="text-slate-300 tracking-widest font-light text-sm md:text-base">NEWS RELEASE</p>
-          </div>
-        </div>
-      </section>
-
       <section class="py-16 md:py-24 bg-brand-bgLight dark:bg-brand-bgDark bg-pattern-dots transition-colors duration-300">
         <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
           <article id="article-panel" class="article-panel p-7 sm:p-10 md:p-12">
@@ -144,7 +132,7 @@
             </div>
             <div class="mt-12 pt-8 border-t border-slate-200 dark:border-white/10 flex flex-col sm:flex-row gap-4 sm:items-center sm:justify-between">
               <p id="article-author" class="text-xs text-slate-500 dark:text-slate-400 font-sans tracking-[0.1em]"></p>
-              <a href="/news/" id="back-to-news" class="inline-flex items-center justify-center gap-3 border border-slate-900 dark:border-white px-7 py-3 tracking-widest text-sm hover:bg-slate-900 hover:text-white dark:hover:bg-white dark:hover:text-slate-900 transition text-slate-900 dark:text-white"><i class="fa-solid fa-arrow-left"></i>ニュース一覧へ</a>
+              <a href="https://www.soei-fes.com/" id="back-to-news" class="inline-flex items-center justify-center gap-3 border border-slate-900 dark:border-white px-7 py-3 tracking-widest text-sm hover:bg-slate-900 hover:text-white dark:hover:bg-white dark:hover:text-slate-900 transition text-slate-900 dark:text-white"><i class="fa-solid fa-house"></i>ホームへ戻る</a>
             </div>
           </article>
         </div>
@@ -179,8 +167,6 @@
     const newsReleaseList = document.getElementById("news-release-list");
     const topicList = document.getElementById("topic-list");
 
-    const detailHeroTitle = document.getElementById("detail-hero-title");
-    const detailHeroSubtitle = document.getElementById("detail-hero-subtitle");
     const detailNumber = document.getElementById("detail-number");
     const articleTitle = document.getElementById("article-title");
     const articleMeta = document.getElementById("article-meta");
@@ -395,8 +381,6 @@
     async function loadDetail(number) {
       resetDetail();
       showDetailView();
-      detailHeroTitle.textContent = "ニュースを読み込んでいます";
-      detailHeroSubtitle.textContent = "NEWS";
       articleTitle.textContent = "読み込み中…";
 
       if (!number) {
@@ -413,8 +397,6 @@
       const date = formatDate(item.createdAt);
 
       document.title = `${title} | 創英祭 2026`;
-      detailHeroTitle.textContent = title;
-      detailHeroSubtitle.textContent = meta.label;
       articleTitle.textContent = title;
       detailNumber.textContent = `NEWS #${Number(item.number)}`;
 
@@ -460,8 +442,6 @@
         console.error(error);
         showDetailView();
         document.title = "記事が見つかりません | 創英祭 2026";
-        detailHeroTitle.textContent = "記事が見つかりません";
-        detailHeroSubtitle.textContent = "NEWS";
         detailNumber.textContent = "";
         articleTitle.textContent = "この記事は存在しないか、公開を終了しています。";
         articleContent.textContent = "ニュース一覧に戻って、別の記事をお選びください。";

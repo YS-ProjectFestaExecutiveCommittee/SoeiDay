@@ -4,8 +4,8 @@
     <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <link rel="icon" href="https://www.soei-fes.com/image/Favicon01.ico" />
-        <title>お知らせ | 創英祭 2026</title>
+        <link rel="icon" href="https://www.soei-fes.com/image/Favicon01.ico">
+        <title>ニュース・お知らせ | 創英祭 2026</title>
         <script src="https://cdn.tailwindcss.com"></script>
         <script src="https://www.soei-fes.com/javascript/base03.js" defer></script>
         <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -16,83 +16,175 @@
         <script src="https://www.soei-fes.com/javascript/load-components.js" defer></script>
         <link rel="stylesheet" href="https://www.soei-fes.com/css/base01.css">
         <link rel="stylesheet" href="https://www.soei-fes.com/css/base04.css">
-        <link rel="stylesheet" href="https://www.soei-fes.com/css/base16.css">
+        <style>
+            .news-hero-title {
+                text-shadow: 0 2px 10px rgba(0, 0, 0, 0.45);
+            }
+
+            .news-list {
+                min-height: 140px;
+            }
+
+            .news-card {
+                position: relative;
+                display: block;
+                padding: 1.5rem 0;
+                border-bottom: 1px solid rgba(148, 163, 184, 0.28);
+            }
+
+            .news-card:first-child {
+                border-top: 1px solid rgba(148, 163, 184, 0.28);
+            }
+
+            .news-card__meta {
+                display: flex;
+                flex-wrap: wrap;
+                align-items: center;
+                gap: 0.6rem 0.9rem;
+                margin-bottom: 0.65rem;
+            }
+
+            .news-card__date {
+                font-family: ui-sans-serif, system-ui, sans-serif;
+                font-size: 0.75rem;
+                letter-spacing: 0.12em;
+                color: rgb(100 116 139);
+            }
+
+            .news-card__badge {
+                display: inline-flex;
+                align-items: center;
+                min-height: 24px;
+                padding: 0.1rem 0.65rem;
+                border: 1px solid currentColor;
+                border-radius: 999px;
+                font-family: ui-sans-serif, system-ui, sans-serif;
+                font-size: 0.7rem;
+                font-weight: 700;
+                letter-spacing: 0.08em;
+            }
+
+            .news-card__title {
+                font-size: 1.08rem;
+                line-height: 1.8;
+                font-weight: 700;
+                letter-spacing: 0.08em;
+                color: rgb(15 23 42);
+            }
+
+            .dark .news-card__title {
+                color: rgb(248 250 252);
+            }
+
+            .news-card__content {
+                margin-top: 0.55rem;
+                white-space: pre-wrap;
+                line-height: 1.95;
+                font-size: 0.93rem;
+                color: rgb(71 85 105);
+                font-weight: 400;
+                letter-spacing: 0.03em;
+            }
+
+            .dark .news-card__content {
+                color: rgb(203 213 225);
+            }
+
+            .empty-state {
+                padding: 3rem 1rem;
+                text-align: center;
+                border: 1px dashed rgba(148, 163, 184, 0.4);
+                color: rgb(100 116 139);
+                font-size: 0.9rem;
+                letter-spacing: 0.08em;
+            }
+
+            .loading-state {
+                padding: 3rem 1rem;
+                text-align: center;
+                color: rgb(100 116 139);
+                font-size: 0.9rem;
+                letter-spacing: 0.08em;
+            }
+
+            .section-anchor {
+                scroll-margin-top: 90px;
+            }
+
+            @media (max-width: 640px) {
+                .news-card {
+                    padding: 1.25rem 0;
+                }
+
+                .news-card__title {
+                    font-size: 1rem;
+                }
+
+                .news-card__content {
+                    font-size: 0.88rem;
+                }
+            }
+        </style>
     </head>
 
     <body class="font-serif bg-brand-bgLight text-slate-900 dark:bg-brand-bgDark dark:text-slate-100 antialiased transition-colors duration-300">
         <div id="header-placeholder"></div>
-        <section class="relative w-full h-[350px] md:h-[450px] overflow-hidden flex bg-slate-900">
-            <div class="absolute inset-0 bg-cover bg-center opacity-60 news-hero-bg" style="filter: grayscale(10%);"></div>
+        <section class="relative w-full h-[330px] md:h-[430px] overflow-hidden flex bg-slate-900">
+            <div class="absolute inset-0 bg-cover bg-center opacity-60" style="background-image: url('https://yokohamasoei.sakura.ne.jp/wp/wp-content/uploads/2026/01/1-1536x1152.jpg?auto=format&fit=crop&w=1920&q=80'); filter: grayscale(10%);"></div>
             <div class="absolute inset-0 bg-gradient-to-t from-slate-900 via-slate-900/60 to-transparent"></div>
-            <div class="relative w-full max-w-7xl mx-auto h-full flex items-end pb-16 px-6 sm:px-12 z-10">
+            <div class="relative w-full max-w-7xl mx-auto h-full flex items-end pb-14 px-6 sm:px-12 z-10">
                 <div>
-                    <h1 class="text-4xl md:text-5xl font-bold tracking-widest text-white mb-4" style="filter: drop-shadow(0 2px 4px rgba(0,0,0,0.5));"> お知らせ<span class="text-brand-orange ml-1">.</span>
-                    </h1>
-                    <p class="text-slate-300 tracking-widest font-light text-sm md:text-base">News & Updates</p>
+                    <p class="text-xs md:text-sm font-sans tracking-[0.28em] text-brand-orange dark:text-brand-orangeDark mb-4"> NEWS & UPDATES </p>
+                    <h1 class="news-hero-title text-4xl md:text-5xl font-bold tracking-[0.12em] text-white mb-3"> ニュース・お知らせ </h1>
+                    <p class="text-slate-300 tracking-widest font-light text-sm md:text-base"> 創英祭 2026 からのお知らせ </p>
                 </div>
             </div>
         </section>
         <main>
-            <section class="py-20 relative bg-brand-bgLight dark:bg-brand-bgDark bg-pattern-dots transition-colors duration-300">
+            <section class="py-20 md:py-24 relative bg-brand-bgLight dark:bg-brand-bgDark bg-pattern-dots transition-colors duration-300">
                 <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-                    <div class="flex flex-col gap-3 mb-10 border-b-2 border-brand-orange dark:border-brand-orangeDark pb-4">
-                        <div class="flex items-end gap-4">
-                            <h2 class="text-3xl md:text-4xl font-bold tracking-widest text-slate-900 dark:text-white">最新のお知らせ</h2>
-                            <span class="text-xs text-slate-500 dark:text-slate-400 font-sans tracking-wider mb-1">Latest News</span>
+                    <div class="flex flex-wrap gap-3 mb-14 font-sans">
+                        <a href="#news-releases" class="inline-flex items-center gap-2 border border-brand-lime dark:border-brand-limeDark px-5 py-3 text-xs tracking-[0.14em] text-slate-900 dark:text-white hover:bg-brand-lime/10 dark:hover:bg-brand-limeDark/10 transition"> ニュースリリース <i class="fa-solid fa-arrow-down text-[10px]"></i>
+                        </a>
+                        <a href="#topics" class="inline-flex items-center gap-2 border border-brand-orange dark:border-brand-orangeDark px-5 py-3 text-xs tracking-[0.14em] text-slate-900 dark:text-white hover:bg-brand-orange/10 dark:hover:bg-brand-orangeDark/10 transition"> トピック <i class="fa-solid fa-arrow-down text-[10px]"></i>
+                        </a>
+                    </div>
+                    <section id="news-releases" class="section-anchor mb-20">
+                        <div class="flex items-end gap-4 mb-7 border-b-2 border-brand-lime dark:border-brand-limeDark pb-3">
+                            <div>
+                                <h2 class="text-2xl md:text-3xl font-bold tracking-widest text-slate-900 dark:text-white"> ニュースリリース </h2>
+                                <p class="text-xs text-slate-500 dark:text-slate-400 font-sans tracking-[0.16em] mt-2"> NEWS RELEASES </p>
+                            </div>
                         </div>
-                        <p class="text-sm text-slate-500 dark:text-slate-400 mt-1 tracking-widest font-light"> 創英祭 2026 に関する最新情報を掲載します。 </p>
-                    </div>
-                    <div class="bg-white/80 dark:bg-slate-800/70 border border-gray-200 dark:border-slate-700 p-4 md:p-5 mb-10 shadow-sm">
-                        <div class="grid grid-cols-1 lg:grid-cols-[1fr_220px] gap-3">
-                            <label class="relative block">
-                                <span class="sr-only">お知らせを検索</span>
-                                <i class="fa-solid fa-magnifying-glass absolute left-4 top-1/2 -translate-y-1/2 text-slate-400"></i>
-                                <input id="search-input" type="search" placeholder="タイトル・本文を検索" class="news-filter-input w-full bg-transparent border border-gray-300 dark:border-slate-600 pl-11 pr-4 py-3 text-sm tracking-wide text-slate-900 dark:text-white placeholder:text-slate-400">
-                            </label>
-                            <label class="relative block">
-                                <span class="sr-only">カテゴリ</span>
-                                <select id="category-filter" class="news-filter-select w-full bg-transparent border border-gray-300 dark:border-slate-600 px-4 py-3 text-sm tracking-wide text-slate-900 dark:text-white">
-                                    <option value="all">すべてのカテゴリ</option>
-                                    <option value="運営">運営</option>
-                                    <option value="ステージ">ステージ</option>
-                                    <option value="展示・出店">展示・出店</option>
-                                    <option value="来場案内">来場案内</option>
-                                    <option value="その他">その他</option>
-                                </select>
-                            </label>
+                        <div id="news-release-list" class="news-list">
+                            <div class="loading-state">
+                                <i class="fa-solid fa-spinner fa-spin mr-2"></i> 最新情報を読み込んでいます
+                            </div>
                         </div>
-                    </div>
-                    <div id="status" class="text-center py-8 text-slate-400 font-light tracking-wider">
-                        <i class="fa-solid fa-spinner fa-spin mr-3"></i> 最新情報を読み込んでいます
-                    </div>
-                    <div id="release-section" class="hidden mb-20">
-                        <div class="flex items-end gap-4 mb-8 border-b-2 border-brand-orange dark:border-brand-orangeDark pb-3">
-                            <h3 class="text-2xl md:text-3xl font-bold tracking-widest text-slate-900 dark:text-white">ニュースリリース</h3>
-                            <span class="text-xs text-slate-500 dark:text-slate-400 font-sans tracking-wider mb-1">News Release</span>
+                    </section>
+                    <section id="topics" class="section-anchor">
+                        <div class="flex items-end gap-4 mb-7 border-b-2 border-brand-orange dark:border-brand-orangeDark pb-3">
+                            <div>
+                                <h2 class="text-2xl md:text-3xl font-bold tracking-widest text-slate-900 dark:text-white"> トピック </h2>
+                                <p class="text-xs text-slate-500 dark:text-slate-400 font-sans tracking-[0.16em] mt-2"> TOPICS </p>
+                            </div>
                         </div>
-                        <div id="release-list" class="space-y-5"></div>
-                    </div>
-                    <div id="topic-section" class="hidden">
-                        <div class="flex items-end gap-4 mb-8 border-b-2 border-brand-lime dark:border-brand-limeDark pb-3">
-                            <h3 class="text-2xl md:text-3xl font-bold tracking-widest text-slate-900 dark:text-white">トピック</h3>
-                            <span class="text-xs text-slate-500 dark:text-slate-400 font-sans tracking-wider mb-1">Topics</span>
+                        <div id="topic-list" class="news-list">
+                            <div class="loading-state">
+                                <i class="fa-solid fa-spinner fa-spin mr-2"></i> 最新情報を読み込んでいます
+                            </div>
                         </div>
-                        <div id="topic-list" class="space-y-5"></div>
-                    </div>
-                    <div id="empty-state" class="hidden py-16 text-center border border-dashed border-gray-300 dark:border-slate-700 bg-white/60 dark:bg-slate-800/40">
-                        <i class="fa-regular fa-folder-open text-3xl text-slate-300 dark:text-slate-600 mb-4"></i>
-                        <p class="text-slate-500 dark:text-slate-400 tracking-wider">条件に一致するお知らせはありません。</p>
-                    </div>
+                    </section>
                 </div>
             </section>
-            <section class="py-20 bg-brand-surfaceLight dark:bg-brand-surfaceDark slant-top transition-colors duration-300">
+            <section class="py-20 bg-brand-surfaceLight dark:bg-brand-surfaceDark transition-colors duration-300">
                 <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 text-center relative z-10">
-                    <p class="text-sm text-slate-500 dark:text-slate-400 tracking-widest font-light mb-8">Contents</p>
-                    <div class="flex flex-wrap justify-center gap-4 md:gap-6">
-                        <a href="https://www.soei-fes.com/" class="inline-flex items-center gap-3 border border-slate-900 dark:border-white px-7 py-3.5 tracking-widest text-sm hover:bg-slate-900 hover:text-white dark:hover:bg-white dark:hover:text-slate-900 transition-colors duration-300">
-                            <i class="fa-solid fa-house"></i> トップページ </a>
-                        <a href="https://www.soei-fes.com/concept/" class="inline-flex items-center gap-3 border border-slate-900 dark:border-white px-7 py-3.5 tracking-widest text-sm hover:bg-slate-900 hover:text-white dark:hover:bg-white dark:hover:text-slate-900 transition-colors duration-300">
-                            <i class="fa-solid fa-link"></i> コンセプト </a>
+                    <p class="text-sm text-slate-500 dark:text-slate-400 tracking-widest font-light mb-8"> Contents </p>
+                    <div class="flex flex-wrap justify-center gap-6">
+                        <a href="https://www.soei-fes.com/" class="inline-flex items-center gap-3 border border-slate-900 dark:border-white px-8 py-4 tracking-widest text-sm hover:bg-slate-900 hover:text-white dark:hover:bg-white dark:hover:text-slate-900 transition-colors duration-300 text-slate-900 dark:text-white">
+                            <i class="fa-solid fa-house"></i> トップページへ戻る </a>
+                        <a href="https://www.soei-fes.com/concept/" class="inline-flex items-center gap-3 border border-slate-900 dark:border-white px-8 py-4 tracking-widest text-sm hover:bg-slate-900 hover:text-white dark:hover:bg-white dark:hover:text-slate-900 transition-colors duration-300 text-slate-900 dark:text-white">
+                            <i class="fa-solid fa-link"></i> コンセプト・実行委員会より </a>
                     </div>
                 </div>
             </section>
@@ -101,7 +193,126 @@
         <script src="https://www.soei-fes.com/javascript/base02.js"></script>
         <script src="https://www.soei-fes.com/javascript/base04.js"></script>
         <script src="https://www.soei-fes.com/javascript/base08.js"></script>
-        <script type="module" src="https://www.soei-fes.com/javascript/base19.js"></script>
+        <script type="module">
+            import { initializeApp } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-app.js";
+            import {
+              getFirestore,
+              collection,
+              getDocs,
+              limit,
+              query,
+              where
+            } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-firestore.js";
+            const firebaseConfig = {
+  apiKey: "AIzaSyA5uU-q3FEcElflECG6dc4AckxxX7iKj-s",
+  authDomain: "soeiday-b3b5f.firebaseapp.com",
+  projectId: "soeiday-b3b5f",
+  storageBucket: "soeiday-b3b5f.firebasestorage.app",
+  messagingSenderId: "911210293928",
+  appId: "1:911210293928:web:8ce217bfe7d5f4d837f09d",
+  measurementId: "G-1H9MSJMVQP"
+};
+
+            const app = initializeApp(firebaseConfig);
+            const db = getFirestore(app);
+            const newsReleaseList = document.getElementById("news-release-list");
+            const topicList = document.getElementById("topic-list");
+            const categoryMeta = {
+              news_release: {
+                label: "ニュースリリース",
+                className: "text-brand-lime dark:text-brand-limeDark"
+              },
+              topic: {
+                label: "トピック",
+                className: "text-brand-orange dark:text-brand-orangeDark"
+              }
+            };
+            function formatDate(value) {
+              if (!value) return "";
+              const date = typeof value.toDate === "function"
+                ? value.toDate()
+                : new Date(value);
+              if (Number.isNaN(date.getTime())) return "";
+              return new Intl.DateTimeFormat("ja-JP", {
+                year: "numeric",
+                month: "2-digit",
+                day: "2-digit"
+              }).format(date);
+            }
+            function getMillis(value) {
+              if (!value) return 0;
+              if (typeof value.toMillis === "function") return value.toMillis();
+              const date = new Date(value);
+              return Number.isNaN(date.getTime()) ? 0 : date.getTime();
+            }
+            function createNewsCard(item) {
+              const article = document.createElement("article");
+              article.className = "news-card";
+              const meta = document.createElement("div");
+              meta.className = "news-card__meta";
+              const date = document.createElement("time");
+              date.className = "news-card__date";
+              date.textContent = formatDate(item.createdAt);
+              if (item.createdAt && typeof item.createdAt.toDate === "function") {
+                date.dateTime = item.createdAt.toDate().toISOString();
+              }
+              const badge = document.createElement("span");
+              const metaInfo = categoryMeta[item.type] || categoryMeta.topic;
+              badge.className = `news-card__badge ${metaInfo.className}`;
+              badge.textContent = metaInfo.label;
+              meta.appendChild(date);
+              meta.appendChild(badge);
+              const title = document.createElement("h3");
+              title.className = "news-card__title";
+              title.textContent = item.title || "無題の投稿";
+              const content = document.createElement("p");
+              content.className = "news-card__content";
+              content.textContent = item.content || "";
+              article.appendChild(meta);
+              article.appendChild(title);
+              if (item.content) {
+                article.appendChild(content);
+              }
+              return article;
+            }
+            function renderList(container, items, emptyMessage) {
+              container.innerHTML = "";
+              if (!items.length) {
+                const empty = document.createElement("div");
+                empty.className = "empty-state";
+                empty.textContent = emptyMessage;
+                container.appendChild(empty);
+                return;
+              }
+              items.forEach((item) => {
+                container.appendChild(createNewsCard(item));
+              });
+            }
+            async function loadNews() {
+              try {
+                const q = query(
+                  collection(db, "news"),
+                  where("published", "==", true),
+                  limit(100)
+                );
+                const snapshot = await getDocs(q);
+                const items = snapshot.docs.map((doc) => ({
+                  id: doc.id,
+                  ...doc.data()
+                })).sort((a, b) => getMillis(b.createdAt) - getMillis(a.createdAt));
+                const releases = items.filter((item) => item.type === "news_release");
+                const topics = items.filter((item) => item.type === "topic");
+                renderList(newsReleaseList, releases, "現在公開されているニュースリリースはありません。");
+                renderList(topicList, topics, "現在公開されているトピックはありません。");
+              } catch (error) {
+                console.error("ニュースの取得に失敗しました:", error);
+                const errorMessage = "ニュースを読み込めませんでした。Firebaseの設定とFirestoreルールを確認してください。";
+                newsReleaseList.innerHTML = `<div class="empty-state">${errorMessage}</div>`;
+                topicList.innerHTML = `<div class="empty-state">${errorMessage}</div>`;
+              }
+            }
+            loadNews();
+        </script>
     </body>
 
 </html>

@@ -4,633 +4,403 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="icon" href="https://www.soei-fes.com/image/Favicon01.ico" />
-  <title>管理画面 | 創英祭 2026</title>
-  
+  <title>お知らせ投稿 | 創英祭 2026</title>
+
   <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://www.soei-fes.com/javascript/base03.js" defer></script>
+
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  
-  <link rel="stylesheet" href="https://www.soei-fes.com/css/base03.css">
 
-  <link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
-  <script src="https://cdn.quilljs.com/1.3.6/quill.min.js"></script>
+  <script src="https://www.soei-fes.com/javascript/base01.js"></script>
+  <script src="https://www.soei-fes.com/javascript/load-components.js" defer></script>
+  <link rel="stylesheet" href="https://www.soei-fes.com/css/base01.css">
+  <link rel="stylesheet" href="https://www.soei-fes.com/css/base04.css">
 
-  
   <style>
-    body { font-family: 'Shippori Mincho', serif; }
-    .font-sans { font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; }
-    
-    
-    .ql-toolbar.ql-snow {
-      border-color: #d1d5db;
-      border-top-left-radius: 0.375rem;
-      border-top-right-radius: 0.375rem;
-      background-color: #f8fafc;
-      padding: 0.75rem;
+    .post-hero-bg {
+      background-image: url('https://yokohamasoei.sakura.ne.jp/wp/wp-content/uploads/2022/09/IMG_0529-scaled.jpg?auto=format&fit=crop&w=1920&q=80');
     }
-    .ql-container.ql-snow {
-      border-color: #d1d5db;
-      border-bottom-left-radius: 0.375rem;
-      border-bottom-right-radius: 0.375rem;
-      background-color: #ffffff;
-      min-height: 300px;
-      font-family: ui-sans-serif, system-ui, -apple-system, sans-serif;
-      font-size: 1rem;
+    .form-control {
+      width: 100%;
+      background: transparent;
+      border: 1px solid rgb(203 213 225);
+      padding: .9rem 1rem;
+      color: rgb(15 23 42);
+      transition: border-color .2s ease, box-shadow .2s ease;
     }
-    .ql-editor {
-      min-height: 300px;
-      line-height: 1.7;
+    .dark .form-control {
+      border-color: rgb(71 85 105);
+      color: white;
     }
-    .ql-editor img {
-      max-width: 100%;
-      height: auto;
-      border-radius: 0.375rem;
+    .form-control:focus {
+      outline: none;
+      border-color: #b5cc2c;
+      box-shadow: 0 0 0 3px rgba(181, 204, 44, .18);
+    }
+    textarea.form-control {
+      resize: vertical;
+      min-height: 280px;
+    }
+    .auth-tab[aria-selected="true"] {
+      background: rgb(15 23 42);
+      color: white;
+    }
+    .dark .auth-tab[aria-selected="true"] {
+      background: white;
+      color: rgb(15 23 42);
+    }
+    .auth-tab[aria-selected="false"] {
+      color: rgb(100 116 139);
+    }
+    .post-notice {
+      border-left: 3px solid #b5cc2c;
     }
   </style>
 </head>
-<body class="bg-slate-50 text-slate-900 antialiased min-h-screen flex flex-col">
 
-  <header class="bg-slate-900 text-white p-4 shadow-md flex justify-between items-center z-10 relative">
-    <div class="flex items-center gap-3">
-      <h1 class="text-xl font-bold tracking-widest font-serif">創英祭 管理システム</h1>
-      <span class="text-xs bg-brand-orange text-white px-2 py-1 rounded-sm tracking-widest bg-orange-500 font-sans">関係者専用</span>
-    </div>
-    <div id="header-user-info" class="hidden text-sm font-sans flex items-center gap-4">
-      <span class="hidden sm:inline">ログイン中: <strong id="current-user-display" class="text-brand-lime text-lime-400"></strong></span>
-      <button id="logout-btn" class="text-slate-300 hover:text-white transition">
-        <i class="fa-solid fa-right-from-bracket"></i> ログアウト
-      </button>
-    </div>
-  </header>
+<body class="font-serif bg-brand-bgLight text-slate-900 dark:bg-brand-bgDark dark:text-slate-100 antialiased transition-colors duration-300">
+  <div id="header-placeholder"></div>
 
-  <div id="loading-overlay" class="fixed inset-0 bg-white/90 z-50 flex items-center justify-center backdrop-blur-sm transition-opacity duration-300">
-    <div class="text-center">
-      <i class="fa-solid fa-circle-notch fa-spin text-4xl text-slate-900 mb-4"></i>
-      <p class="tracking-widest text-slate-600 font-sans">システムを準備しています...</p>
-    </div>
-  </div>
-
-  <section id="login-section" class="flex-grow items-center justify-center p-4 relative" style="display: none;">
-    <div class="absolute inset-0 bg-slate-900 overflow-hidden z-0">
-      <div class="absolute inset-0 bg-[url('https://yokohamasoei.sakura.ne.jp/wp/wp-content/uploads/2019/07/DSC_8659.jpg?auto=format&fit=crop&w=1920&q=80')] bg-cover bg-center opacity-20 filter grayscale"></div>
-    </div>
-    
-    <div class="bg-white p-8 md:p-12 w-full max-w-md shadow-2xl relative z-10 border-t-4 border-orange-500">
-      <h2 class="text-3xl font-bold mb-2 text-center tracking-widest font-serif">ログイン</h2>
-      <p class="text-center text-slate-500 text-sm mb-8 font-sans">専用のIDとパスワードを入力してください</p>
-      
-      <form id="login-form" class="space-y-6 font-sans">
-        <div>
-          <label class="block text-sm font-bold text-slate-700 mb-2">メールアドレス</label>
-          <input type="email" id="login-email" required class="w-full px-4 py-3 border border-gray-300 rounded focus:outline-none focus:border-orange-500 focus:ring-1 focus:ring-orange-500 transition" placeholder="admin@example.com">
-        </div>
-        <div>
-          <label class="block text-sm font-bold text-slate-700 mb-2">パスワード</label>
-          <input type="password" id="login-password" required class="w-full px-4 py-3 border border-gray-300 rounded focus:outline-none focus:border-orange-500 focus:ring-1 focus:ring-orange-500 transition" placeholder="••••••••">
-        </div>
-        <button type="submit" class="w-full bg-slate-900 hover:bg-slate-800 text-white font-bold py-4 px-4 rounded tracking-widest transition duration-300 flex justify-center items-center gap-2">
-          <i class="fa-solid fa-lock"></i> ログインする
-        </button>
-      </form>
-
-      <div class="mt-8 pt-6 border-t border-gray-200 font-sans">
-        <button id="google-login-btn" class="w-full bg-white border border-gray-300 text-slate-700 hover:bg-gray-50 font-bold py-3 px-4 rounded transition-colors flex items-center justify-center gap-2 shadow-sm">
-          <img src="https://www.svgrepo.com/show/475656/google-color.svg" alt="Google" class="w-5 h-5">
-          連携済みGoogleアカウントでログイン
-        </button>
-        <p class="mt-4 text-xs text-red-500 text-center leading-relaxed">
-          ※ 新規のアカウント作成はできません。<br>Googleアカウントでのログインは、マイページにて @soei.ed.jp アカウントを連携した場合のみ可能です。
-        </p>
+  <section class="relative w-full h-[350px] md:h-[450px] overflow-hidden flex bg-slate-900">
+    <div class="absolute inset-0 bg-cover bg-center opacity-55 post-hero-bg"></div>
+    <div class="absolute inset-0 bg-gradient-to-t from-slate-900 via-slate-900/65 to-transparent"></div>
+    <div class="relative w-full max-w-7xl mx-auto h-full flex items-end pb-16 px-6 sm:px-12 z-10">
+      <div>
+        <h1 class="text-4xl md:text-5xl font-bold tracking-widest text-white mb-4" style="filter: drop-shadow(0 2px 4px rgba(0,0,0,0.5));">
+          お知らせ投稿<span class="text-brand-lime ml-1">.</span>
+        </h1>
+        <p class="text-slate-300 tracking-widest font-light text-sm md:text-base">Post News</p>
       </div>
     </div>
   </section>
 
-  <section id="dashboard-section" class="flex-grow bg-slate-50" style="display: none;">
-    <div class="max-w-6xl mx-auto p-4 sm:p-6 lg:p-8">
-      
-      
-      <div class="flex border-b border-gray-300 mb-8 font-sans overflow-x-auto whitespace-nowrap">
-        <button id="tab-btn-news" class="py-3 px-6 text-center font-medium border-b-2 border-slate-900 text-slate-900 transition bg-white/50">
-          <i class="fa-regular fa-newspaper mr-2"></i> ニュース投稿・管理
-        </button>
-        <button id="tab-btn-mypage" class="py-3 px-6 text-center font-medium border-b-2 border-transparent text-slate-500 hover:text-slate-700 transition">
-          <i class="fa-solid fa-user-gear mr-2"></i> マイページ・設定
-        </button>
-      </div>
-
-      <div id="tab-content-news" class="space-y-8">
-        
-        
-        <div class="flex justify-between items-center mb-6 border-l-4 border-lime-500 pl-3">
-            <h3 id="form-title" class="text-2xl font-bold font-serif">新規お知らせ作成</h3>
-            <button id="cancel-edit-btn" class="hidden text-sm px-4 py-1.5 bg-gray-100 text-gray-600 hover:bg-gray-200 rounded transition-colors font-sans">
-              <i class="fa-solid fa-xmark mr-1"></i> 編集キャンセル
-            </button>
+  <main>
+    <section class="py-20 relative bg-brand-bgLight dark:bg-brand-bgDark bg-pattern-dots transition-colors duration-300">
+      <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+        <div class="flex flex-col md:flex-row md:items-end justify-between gap-5 mb-10 border-b-2 border-brand-lime dark:border-brand-limeDark pb-4">
+          <div>
+            <h2 class="text-3xl md:text-4xl font-bold tracking-widest text-slate-900 dark:text-white">投稿ページ</h2>
+            <p class="text-sm text-slate-500 dark:text-slate-400 mt-2 tracking-widest font-light">Authentication & Post</p>
           </div>
-          
-          <form id="editor-form" class="space-y-6 font-sans">
-            <input type="hidden" id="edit-id">
-            
-            <div>
-              <label class="block text-sm font-bold text-slate-700 mb-2">タイトル <span class="text-red-500">*</span></label>
-              <input type="text" id="news-title" required class="w-full px-4 py-2 border border-gray-300 rounded focus:outline-none focus:border-lime-500 focus:ring-1 focus:ring-lime-500">
-            </div>
-            
-            <div class="flex flex-col sm:flex-row gap-6">
-              <div class="flex-1">
-                <label class="block text-sm font-bold text-slate-700 mb-2">日付 <span class="text-red-500">*</span></label>
-                <input type="date" id="news-date" required class="w-full px-4 py-2 border border-gray-300 rounded focus:outline-none focus:border-lime-500 focus:ring-1 focus:ring-lime-500">
+          <a href="../" class="inline-flex items-center gap-2 text-brand-lime dark:text-brand-limeDark tracking-wider text-sm hover:opacity-70">
+            <i class="fa-solid fa-arrow-left"></i> お知らせ一覧へ
+          </a>
+        </div>
+
+        <div id="auth-panel" class="bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 shadow-lg">
+          <div class="p-6 md:p-8 border-b border-gray-200 dark:border-slate-700">
+            <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+              <div>
+                <p class="text-xs text-brand-orange dark:text-brand-orangeDark font-bold tracking-widest mb-2">MEMBER LOGIN</p>
+                <h3 id="auth-title" class="text-xl md:text-2xl font-bold tracking-widest text-slate-900 dark:text-white">投稿するにはログインしてください</h3>
               </div>
-              <div class="flex-1">
-                <label class="block text-sm font-bold text-slate-700 mb-2">カテゴリ <span class="text-red-500">*</span></label>
-                <select id="news-category" class="w-full px-4 py-2 border border-gray-300 rounded focus:outline-none focus:border-lime-500 focus:ring-1 focus:ring-lime-500 bg-white">
-                  <option value="news">ニュースリリース</option>
-                  <option value="topic">トピック</option>
+              <div id="user-state" class="hidden text-right">
+                <p class="text-xs text-slate-500 dark:text-slate-400 tracking-wide mb-1">ログイン中</p>
+                <p id="user-email" class="text-sm text-slate-700 dark:text-slate-200 break-all"></p>
+              </div>
+            </div>
+          </div>
+
+          <div id="logged-out-view" class="p-6 md:p-8">
+            <div class="flex border-b border-gray-200 dark:border-slate-700 mb-7" role="tablist" aria-label="認証方法">
+              <button id="login-tab" type="button" class="auth-tab flex-1 py-3 text-sm tracking-widest transition" role="tab" aria-selected="true">ログイン</button>
+              <button id="signup-tab" type="button" class="auth-tab flex-1 py-3 text-sm tracking-widest transition" role="tab" aria-selected="false">新規登録</button>
+            </div>
+
+            <form id="auth-form" class="space-y-5" novalidate>
+              <div>
+                <label for="email" class="block text-sm font-bold tracking-widest mb-2 text-slate-900 dark:text-white">メールアドレス</label>
+                <input id="email" name="email" type="email" autocomplete="email" required class="form-control" placeholder="example@example.com">
+              </div>
+              <div>
+                <label for="password" class="block text-sm font-bold tracking-widest mb-2 text-slate-900 dark:text-white">パスワード</label>
+                <input id="password" name="password" type="password" autocomplete="current-password" minlength="6" required class="form-control" placeholder="6文字以上">
+              </div>
+              <button id="auth-submit" type="submit" class="w-full inline-flex items-center justify-center gap-3 bg-slate-900 text-white dark:bg-white dark:text-slate-900 py-4 px-6 tracking-widest font-bold hover:opacity-80 transition disabled:opacity-50 disabled:cursor-not-allowed">
+                <i class="fa-solid fa-right-to-bracket"></i>
+                <span>ログイン</span>
+              </button>
+            </form>
+
+            <p id="auth-message" class="hidden mt-5 text-sm leading-relaxed" role="status"></p>
+            <p class="text-xs text-slate-500 dark:text-slate-400 leading-relaxed tracking-wide mt-6">
+              Firebase Authentication のメールアドレス・パスワード方式を利用します。アカウント登録後は、このページからログインして投稿できます。
+            </p>
+          </div>
+
+          <div id="logged-in-view" class="hidden p-6 md:p-8">
+            <div class="post-notice bg-brand-lime/5 dark:bg-brand-limeDark/5 px-5 py-4 mb-8">
+              <p class="text-sm text-slate-700 dark:text-slate-300 leading-relaxed tracking-wide">
+                認証済みです。下のフォームからお知らせを投稿できます。投稿内容は公開ページに表示されます。
+              </p>
+            </div>
+
+            <form id="post-form" class="space-y-7" novalidate>
+              <div>
+                <label for="category" class="block text-sm font-bold tracking-widest mb-2 text-slate-900 dark:text-white">カテゴリ</label>
+                <select id="category" class="form-control" required>
+                  <option value="運営">運営</option>
+                  <option value="ステージ">ステージ</option>
+                  <option value="展示・出店">展示・出店</option>
+                  <option value="来場案内">来場案内</option>
+                  <option value="その他">その他</option>
                 </select>
               </div>
-            </div>
 
-            <div>
-              <label class="block text-sm font-bold text-slate-700 mb-2">サムネイル画像 (任意)</label>
-              <input type="file" id="news-image-file" accept="image/*" class="w-full px-4 py-2 border border-gray-300 rounded focus:outline-none focus:border-lime-500 focus:ring-1 focus:ring-lime-500 bg-white text-sm">
-              <input type="hidden" id="news-image-base64">
-              <div id="image-preview-container" class="mt-3 hidden bg-gray-50 p-4 border border-gray-200 rounded text-center inline-block">
-                <img id="image-preview" src="" alt="プレビュー" class="max-h-48 mx-auto rounded shadow-sm">
-                <button type="button" id="remove-image-btn" class="mt-3 text-sm text-red-600 hover:text-red-800 bg-white border border-red-200 px-3 py-1 rounded transition shadow-sm">
-                  <i class="fa-solid fa-trash mr-1"></i> 画像を削除
+              <div>
+                <label for="title" class="block text-sm font-bold tracking-widest mb-2 text-slate-900 dark:text-white">タイトル</label>
+                <input id="title" type="text" maxlength="80" required class="form-control" placeholder="例：ステージ企画のタイムテーブルを公開しました">
+                <p class="text-xs text-slate-400 mt-2 tracking-wide">80文字以内</p>
+              </div>
+
+              <div>
+                <label for="body" class="block text-sm font-bold tracking-widest mb-2 text-slate-900 dark:text-white">本文</label>
+                <textarea id="body" maxlength="10000" required class="form-control" placeholder="お知らせ本文を入力してください。改行もそのまま表示されます。"></textarea>
+                <p class="text-xs text-slate-400 mt-2 tracking-wide">10,000文字以内</p>
+              </div>
+
+              <div class="flex flex-col sm:flex-row gap-3 sm:justify-end">
+                <button id="signout-button" type="button" class="inline-flex items-center justify-center gap-2 border border-slate-300 dark:border-slate-600 px-6 py-3 tracking-widest text-sm hover:bg-slate-100 dark:hover:bg-slate-700 transition">
+                  <i class="fa-solid fa-arrow-right-from-bracket"></i>
+                  ログアウト
+                </button>
+                <button id="post-submit" type="submit" class="inline-flex items-center justify-center gap-3 bg-brand-orange text-white py-3 px-8 tracking-widest font-bold hover:opacity-80 transition disabled:opacity-50 disabled:cursor-not-allowed">
+                  <i class="fa-solid fa-paper-plane"></i>
+                  投稿する
                 </button>
               </div>
-            </div>
+            </form>
 
-            <div>
-              <label class="block text-sm font-bold text-slate-700 mb-2">本文 <span class="text-red-500">*</span></label>
-              <div id="quill-editor" class="bg-white rounded-b border-gray-300"></div>
-            </div>
-            
-            <div>
-              <label class="block text-sm font-bold text-slate-700 mb-2">YouTube 埋め込みコード (任意)</label>
-              <input type="text" id="news-video" class="w-full px-4 py-2 border border-gray-300 rounded focus:outline-none focus:border-lime-500 focus:ring-1 focus:ring-lime-500 text-sm font-mono" placeholder='<iframe width="..." src="..."></iframe>'>
-              <p class="text-xs text-slate-500 mt-1">※「共有」→「埋め込む」からコピーしたコード</p>
-            </div>
-            
-            <div class="flex justify-end mt-8 pt-4 border-t border-gray-100">
-              <button type="submit" id="save-btn" class="bg-lime-600 hover:bg-lime-700 text-white font-bold py-3 px-8 rounded tracking-widest transition duration-300 flex items-center gap-2">
-                <i class="fa-solid fa-paper-plane"></i> <span>投稿する</span>
-              </button>
-            </div>
-          </form>
-        </div>
-        
-        <div class="bg-white p-6 md:p-8 shadow-md border border-gray-100">
-          <h3 class="text-xl font-bold mb-6 tracking-widest font-serif border-l-4 border-slate-900 pl-3">投稿済み一覧</h3>
-          <div class="overflow-x-auto font-sans">
-            <table class="w-full text-left border-collapse min-w-[600px]">
-              <thead>
-                <tr class="bg-slate-100 text-slate-600 text-sm">
-                  <th class="p-3 border-b border-gray-200 w-32">日付</th>
-                  <th class="p-3 border-b border-gray-200 w-32">カテゴリ</th>
-                  <th class="p-3 border-b border-gray-200">タイトル</th>
-                  <th class="p-3 border-b border-gray-200 text-center w-36">操作</th>
-                </tr>
-              </thead>
-              <tbody id="news-list-table">
-                <tr><td colspan="4" class="p-8 text-center text-slate-400">読み込み中...</td></tr>
-              </tbody>
-            </table>
+            <p id="post-message" class="hidden mt-6 text-sm leading-relaxed" role="status"></p>
           </div>
         </div>
       </div>
+    </section>
 
-      <div id="tab-content-mypage" class="space-y-8 hidden">
-        <div class="bg-orange-50 border-l-4 border-orange-500 p-4 mb-6">
-          <p class="text-sm text-orange-800 font-sans leading-relaxed">
-            <strong>【アカウント管理について】</strong><br>
-            セキュリティ保護のため、新規アカウントの作成はシステム管理者のみに制限されています。ご自身のアカウントと @soei.ed.jp の Google アカウントを連携することで、次回から Google ログインが利用可能になります。
-          </p>
-        </div>
-
-        <div class="bg-white p-6 md:p-8 shadow-md border border-gray-100">
-          <h3 class="text-2xl font-bold mb-6 border-l-4 border-orange-500 pl-3 font-serif">マイページ・設定</h3>
-          
-          <div class="mb-8 font-sans">
-            <p class="text-sm font-bold text-slate-700 mb-2">現在のログインアドレス</p>
-            <p id="mypage-email" class="text-lg text-slate-900 bg-gray-50 px-4 py-3 border border-gray-200 rounded inline-block">...</p>
-          </div>
-
-          <div class="border-t border-gray-200 pt-8 font-sans">
-            <h4 class="text-lg font-bold text-slate-800 mb-4">Googleアカウント連携</h4>
-            <div id="link-status" class="mb-6"></div>
-            <button id="link-google-btn" class="bg-white border-2 border-gray-200 hover:border-blue-500 text-slate-700 font-bold py-3 px-6 rounded transition-all flex items-center justify-center gap-3 shadow-sm">
-              <img src="https://www.svgrepo.com/show/475656/google-color.svg" alt="Google" class="w-5 h-5">
-              <span>Googleアカウントを連携する</span>
-            </button>
-          </div>
+    <section class="py-20 bg-brand-surfaceLight dark:bg-brand-surfaceDark slant-top transition-colors duration-300">
+      <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 text-center relative z-10">
+        <p class="text-sm text-slate-500 dark:text-slate-400 tracking-widest font-light mb-8">Contents</p>
+        <div class="flex flex-wrap justify-center gap-4 md:gap-6">
+          <a href="https://www.soei-fes.com/" class="inline-flex items-center gap-3 border border-slate-900 dark:border-white px-7 py-3.5 tracking-widest text-sm hover:bg-slate-900 hover:text-white dark:hover:bg-white dark:hover:text-slate-900 transition-colors duration-300">
+            <i class="fa-solid fa-house"></i> トップページ
+          </a>
+          <a href="../" class="inline-flex items-center gap-3 border border-slate-900 dark:border-white px-7 py-3.5 tracking-widest text-sm hover:bg-slate-900 hover:text-white dark:hover:bg-white dark:hover:text-slate-900 transition-colors duration-300">
+            <i class="fa-regular fa-newspaper"></i> お知らせ
+          </a>
+          <a href="https://www.soei-fes.com/concept/" class="inline-flex items-center gap-3 border border-slate-900 dark:border-white px-7 py-3.5 tracking-widest text-sm hover:bg-slate-900 hover:text-white dark:hover:bg-white dark:hover:text-slate-900 transition-colors duration-300">
+            <i class="fa-solid fa-link"></i> コンセプト
+          </a>
         </div>
       </div>
+    </section>
+  </main>
 
-    </div>
-  </section>
+  <div id="footer-placeholder"></div>
 
-  
-  
-  
-  
-  
+  <script src="https://www.soei-fes.com/javascript/base02.js"></script>
+  <script src="https://www.soei-fes.com/javascript/base04.js"></script>
+  <script src="https://www.soei-fes.com/javascript/base08.js"></script>
+
   <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-    import { 
-      getAuth, signInWithEmailAndPassword, signInWithPopup, GoogleAuthProvider, 
-      getAdditionalUserInfo, deleteUser, onAuthStateChanged, signOut, linkWithPopup, unlink
-    } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-    import { 
-      getFirestore, collection, addDoc, updateDoc, deleteDoc, doc, onSnapshot
-    } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+    import { initializeApp } from 'https://www.gstatic.com/firebasejs/12.19.0/firebase-app.js';
+    import {
+      getAuth,
+      onAuthStateChanged,
+      createUserWithEmailAndPassword,
+      signInWithEmailAndPassword,
+      signOut
+    } from 'https://www.gstatic.com/firebasejs/12.19.0/firebase-auth.js';
+    import {
+      getFirestore,
+      collection,
+      addDoc,
+      serverTimestamp
+    } from 'https://www.gstatic.com/firebasejs/12.19.0/firebase-firestore.js';
+    import { firebaseConfig } from 'https://www.soei-fes.com/javascript/firebase-config.js';
 
-    const firebaseConfig = {
-      apiKey: "AIzaSyCDWj4xWfU42x2NG1tOSlXcBC-f2vhC3lA",
-      authDomain: "soeiday.firebaseapp.com",
-      projectId: "soeiday",
-      storageBucket: "soeiday.firebasestorage.app",
-      messagingSenderId: "122257503471",
-      appId: "1:122257503471:web:8014972f2bc10f84ea971a"
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+
+    const loginTab = document.getElementById('login-tab');
+    const signupTab = document.getElementById('signup-tab');
+    const authTitle = document.getElementById('auth-title');
+    const authForm = document.getElementById('auth-form');
+    const authSubmit = document.getElementById('auth-submit');
+    const authSubmitLabel = authSubmit.querySelector('span');
+    const authMessage = document.getElementById('auth-message');
+    const loggedOutView = document.getElementById('logged-out-view');
+    const loggedInView = document.getElementById('logged-in-view');
+    const userState = document.getElementById('user-state');
+    const userEmail = document.getElementById('user-email');
+    const signoutButton = document.getElementById('signout-button');
+    const postForm = document.getElementById('post-form');
+    const postSubmit = document.getElementById('post-submit');
+    const postMessage = document.getElementById('post-message');
+    const category = document.getElementById('category');
+    const title = document.getElementById('title');
+    const body = document.getElementById('body');
+
+    let authMode = 'login';
+
+    const firebaseErrorMessage = (error) => {
+      switch (error.code) {
+        case 'auth/invalid-email': return 'メールアドレスの形式を確認してください。';
+        case 'auth/invalid-credential': return 'メールアドレスまたはパスワードが正しくありません。';
+        case 'auth/email-already-in-use': return 'このメールアドレスはすでに登録されています。ログインをお試しください。';
+        case 'auth/weak-password': return 'パスワードは6文字以上で設定してください。';
+        case 'auth/too-many-requests': return '試行回数が多いため、一時的に制限されています。時間を置いて再度お試しください。';
+        default: return `認証に失敗しました。(${error.code || 'unknown'})`;
+      }
     };
 
-    
-    let app, auth, db, quill;
-    try {
-      app = initializeApp(firebaseConfig);
-      auth = getAuth(app);
-      db = getFirestore(app);
-    } catch (error) {
-      console.error("Firebase initialization error:", error);
-      alert("システムの初期化に失敗しました。ページを再読み込みしてください。");
-      
+    const setMessage = (element, text, tone = 'normal') => {
+      element.textContent = text;
+      element.className = 'mt-5 text-sm leading-relaxed';
+      if (tone === 'success') {
+        element.classList.add('text-brand-lime', 'dark:text-brand-limeDark');
+      } else if (tone === 'error') {
+        element.classList.add('text-red-600', 'dark:text-red-300');
+      } else {
+        element.classList.add('text-slate-500', 'dark:text-slate-400');
+      }
+    };
+
+    function switchAuthMode(mode) {
+      authMode = mode;
+      const isLogin = mode === 'login';
+      loginTab.setAttribute('aria-selected', String(isLogin));
+      signupTab.setAttribute('aria-selected', String(!isLogin));
+      authTitle.textContent = isLogin ? '投稿するにはログインしてください' : '投稿用アカウントを作成';
+      authSubmitLabel.textContent = isLogin ? 'ログイン' : 'アカウントを作成';
+      authSubmit.querySelector('i').className = isLogin ? 'fa-solid fa-right-to-bracket' : 'fa-solid fa-user-plus';
+      document.getElementById('password').setAttribute('autocomplete', isLogin ? 'current-password' : 'new-password');
+      authMessage.classList.add('hidden');
     }
 
-    let currentNewsData = [];
-    let unsubscribeNews = null;
+    loginTab.addEventListener('click', () => switchAuthMode('login'));
+    signupTab.addEventListener('click', () => switchAuthMode('signup'));
 
-    
-    let els = {};
-    const initDOM = () => {
-      els = {
-        loading: document.getElementById('loading-overlay'),
-        login: document.getElementById('login-section'),
-        dashboard: document.getElementById('dashboard-section'),
-        headerUser: document.getElementById('header-user-info'),
-        userDisplay: document.getElementById('current-user-display'),
-        mypageEmail: document.getElementById('mypage-email')
-      };
-      
-      
-      try {
-        quill = new Quill('#quill-editor', {
-          theme: 'snow',
-          modules: {
-            toolbar: [
-              [{ 'header': [2, 3, false] }],
-              ['bold', 'italic', 'underline', 'strike'],
-              [{ 'color': [] }, { 'background': [] }],
-              [{ 'list': 'ordered'}, { 'list': 'bullet' }],
-              ['link', 'image', 'clean']
-            ]
-          }
-        });
-      } catch (error) {
-        console.error("Quill initialization error:", error);
-      }
-    };
+    authForm.addEventListener('submit', async (event) => {
+      event.preventDefault();
+      authMessage.classList.add('hidden');
 
-    
-    const showLogin = () => {
-      if (!els.login) return;
-      els.dashboard.style.display = 'none';
-      els.headerUser.style.display = 'none';
-      els.headerUser.classList.remove('flex');
-      els.login.style.display = 'flex';
-      if (unsubscribeNews) unsubscribeNews();
-      document.getElementById('login-form').reset();
-    };
+      const email = document.getElementById('email').value.trim();
+      const password = document.getElementById('password').value;
 
-    const showDashboard = (user) => {
-      if (!els.dashboard) return;
-      els.login.style.display = 'none';
-      els.dashboard.style.display = 'block';
-      els.headerUser.style.display = 'flex';
-      els.headerUser.classList.remove('hidden');
-      
-      els.userDisplay.textContent = user.email;
-      els.mypageEmail.textContent = user.email;
-      checkLinkStatus(user);
-      fetchNews();
-    };
-
-    
-    const hideLoading = () => {
-      if (!els.loading) return; 
-      els.loading.classList.add('opacity-0');
-      setTimeout(() => {
-        els.loading.classList.add('hidden');
-        els.loading.style.display = 'none'; 
-      }, 300);
-    };
-
-    
-    document.addEventListener('DOMContentLoaded', () => {
-      initDOM();
-
-      
-      const loadingTimeout = setTimeout(hideLoading, 5000);
-
-      if (auth) {
-        
-        onAuthStateChanged(auth, (user) => {
-          clearTimeout(loadingTimeout); 
-
-          if (user) {
-            
-            const creationTime = new Date(user.metadata.creationTime).getTime();
-            const lastSignInTime = new Date(user.metadata.lastSignInTime).getTime();
-            if (Math.abs(lastSignInTime - creationTime) < 5000 && user.providerData.some(p => p.providerId === 'google.com')) {
-                
-                return;
-            }
-            
-            hideLoading();
-            showDashboard(user);
-          } else {
-            hideLoading();
-            showLogin();
-          }
-        }, (error) => {
-          console.error("Auth state change error:", error);
-          hideLoading(); 
-          showLogin();
-        });
-      } else {
-         hideLoading(); 
-         showLogin();
-      }
-
-      
-      document.getElementById('login-form').addEventListener('submit', async (e) => {
-        e.preventDefault();
-        const email = document.getElementById('login-email').value;
-        const password = document.getElementById('login-password').value;
-        try {
-          await signInWithEmailAndPassword(auth, email, password);
-        } catch (error) {
-          console.error("Login error:", error);
-          alert("ログインに失敗しました。メールアドレスまたはパスワードが間違っています。");
-        }
-      });
-
-      document.getElementById('google-login-btn').addEventListener('click', async () => {
-        if (!auth) return;
-
-        
-        if (els.loading) {
-            els.loading.style.display = 'flex';
-            els.loading.classList.remove('opacity-0', 'hidden');
-        }
-
-        const provider = new GoogleAuthProvider();
-        provider.setCustomParameters({ hd: 'soei.ed.jp' }); 
-        try {
-          const result = await signInWithPopup(auth, provider);
-          const details = getAdditionalUserInfo(result);
-          if (details.isNewUser) {
-            await deleteUser(result.user);
-            await signOut(auth);
-            alert("【エラー】新規アカウントの作成は許可されていません。\nまずは発行されたメールアドレスでログインし、マイページからGoogleアカウントを連携してください。");
-            showLogin();
-          }
-        } catch (error) {
-          console.error("Google Login error:", error);
-          if(error.code !== 'auth/popup-closed-by-user'){
-             alert("Googleログインに失敗しました。\n未連携のアカウントの可能性があります。");
-          }
-        } finally {
-          hideLoading();
-        }
-      });
-
-      document.getElementById('logout-btn').addEventListener('click', () => {
-        if(auth) signOut(auth);
-      });
-
-      
-      const switchTab = (tabName) => {
-        const tabs = { news: document.getElementById('tab-content-news'), mypage: document.getElementById('tab-content-mypage') };
-        const btns = { news: document.getElementById('tab-btn-news'), mypage: document.getElementById('tab-btn-mypage') };
-        
-        Object.keys(tabs).forEach(key => {
-          if (key === tabName) {
-            tabs[key].classList.remove('hidden');
-            btns[key].className = "py-3 px-6 text-center font-medium border-b-2 border-slate-900 text-slate-900 transition bg-white/50";
-          } else {
-            tabs[key].classList.add('hidden');
-            btns[key].className = "py-3 px-6 text-center font-medium border-b-2 border-transparent text-slate-500 hover:text-slate-700 transition";
-          }
-        });
-      };
-      document.getElementById('tab-btn-news').addEventListener('click', () => switchTab('news'));
-      document.getElementById('tab-btn-mypage').addEventListener('click', () => switchTab('mypage'));
-      document.getElementById('cancel-edit-btn').addEventListener('click', resetForm);
-
-      document.getElementById('news-image-file').addEventListener('change', function(e) {
-        const file = e.target.files[0];
-        if (!file) {
-          clearImagePreview();
-          return;
-        }
-        const reader = new FileReader();
-        reader.onload = function(event) {
-          const base64String = event.target.result;
-          document.getElementById('news-image-base64').value = base64String;
-          document.getElementById('image-preview').src = base64String;
-          document.getElementById('image-preview-container').classList.remove('hidden');
-        };
-        reader.readAsDataURL(file);
-      });
-      document.getElementById('remove-image-btn').addEventListener('click', clearImagePreview);
-
-      document.getElementById('editor-form').addEventListener('submit', async (e) => {
-        e.preventDefault();
-        if (!db || !quill) return;
-        
-        const payload = {
-          title: document.getElementById('news-title').value,
-          date: document.getElementById('news-date').value,
-          type: document.getElementById('news-category').value,
-          content: quill.root.innerHTML,
-          image: document.getElementById('news-image-base64').value,
-          video: document.getElementById('news-video').value
-        };
-        const id = document.getElementById('edit-id').value;
-        const saveBtn = document.getElementById('save-btn');
-        
-        saveBtn.disabled = true;
-        saveBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> <span>保存中...</span>';
-
-        try {
-          if (id) {
-            await updateDoc(doc(db, 'news', id), payload);
-            alert("更新しました。");
-          } else {
-            await addDoc(collection(db, 'news'), payload);
-            alert("投稿しました。");
-          }
-          resetForm();
-        } catch(e) {
-          console.error("Save error:", e);
-          alert("保存エラー: " + e.message);
-        } finally {
-          saveBtn.disabled = false;
-          saveBtn.innerHTML = '<i class="fa-solid fa-paper-plane"></i> <span>投稿する</span>';
-        }
-      });
-    });
-
-    
-    const checkLinkStatus = (user) => {
-      const isLinked = user.providerData.some(p => p.providerId === 'google.com');
-      const statusEl = document.getElementById('link-status');
-      const btn = document.getElementById('link-google-btn');
-      
-      if (isLinked) {
-        statusEl.innerHTML = `<span class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-green-100 text-green-800 text-sm font-bold"><i class="fa-solid fa-check-circle"></i> 連携済み</span>`;
-        btn.innerHTML = `<span>Googleアカウントの連携を解除</span>`;
-        btn.onclick = async () => {
-          if(confirm("Googleアカウントの連携を解除しますか？")) {
-            try {
-              await unlink(user, GoogleAuthProvider.PROVIDER_ID);
-              alert("連携を解除しました。");
-              checkLinkStatus(auth.currentUser);
-            } catch(e) { 
-              console.error("Unlink error:", e);
-              alert("解除に失敗しました: " + e.message); 
-            }
-          }
-        };
-      } else {
-        statusEl.innerHTML = `<span class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-gray-200 text-gray-700 text-sm font-bold"><i class="fa-solid fa-circle-info"></i> 未連携</span>`;
-        btn.innerHTML = `<img src="https://www.svgrepo.com/show/475656/google-color.svg" class="w-5 h-5"><span>Googleアカウントを連携する</span>`;
-        btn.onclick = async () => {
-          const provider = new GoogleAuthProvider();
-          try {
-            const result = await linkWithPopup(user, provider);
-            if (!result.user.email.endsWith('@soei.ed.jp')) {
-              await unlink(user, GoogleAuthProvider.PROVIDER_ID);
-              alert("エラー: @soei.ed.jp ドメインのGoogleアカウントのみ連携可能です。");
-              return;
-            }
-            alert("Googleアカウントの連携が完了しました。次回からGoogleでログイン可能です。");
-            checkLinkStatus(auth.currentUser);
-          } catch(e) {
-             console.error("Link error:", e);
-             if(e.code !== 'auth/popup-closed-by-user') alert("連携に失敗しました: " + e.message);
-          }
-        };
-      }
-    };
-
-    
-    const fetchNews = () => {
-      if (!db) return;
-      const newsRef = collection(db, 'news');
-      unsubscribeNews = onSnapshot(newsRef, (snapshot) => {
-        const data = [];
-        snapshot.forEach(doc => data.push({ id: doc.id, ...doc.data() }));
-        data.sort((a, b) => new Date(b.date || '1970').getTime() - new Date(a.date || '1970').getTime());
-        currentNewsData = data;
-        renderList(data);
-      }, (error) => {
-        console.error("Fetch news error:", error);
-        document.getElementById('news-list-table').innerHTML = `<tr><td colspan="4" class="p-8 text-center text-red-500">データ取得エラー: ${error.message}</td></tr>`;
-      });
-    };
-
-    const renderList = (data) => {
-      const tbody = document.getElementById('news-list-table');
-      if (data.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="4" class="p-8 text-center text-gray-500">記事がありません。</td></tr>';
+      if (!email || !password) {
+        authMessage.classList.remove('hidden');
+        setMessage(authMessage, 'メールアドレスとパスワードを入力してください。', 'error');
         return;
       }
-      tbody.innerHTML = data.map(item => `
-        <tr class="hover:bg-slate-50 transition border-b border-gray-100">
-          <td class="p-3 text-sm text-slate-600">${item.date || '----.--.--'}</td>
-          <td class="p-3">
-            <span class="px-2 py-1 text-xs rounded-sm ${item.type === 'topic' ? 'bg-blue-100 text-blue-700' : 'bg-gray-100 text-gray-700'} tracking-wider">
-              ${item.type === 'topic' ? 'トピック' : 'リリース'}
-            </span>
-          </td>
-          <td class="p-3 font-medium text-slate-800">${item.title || '無題'}</td>
-          <td class="p-3 text-center">
-            <div class="flex justify-center gap-2">
-              <button onclick="editDoc('${item.id}')" class="px-3 py-1 bg-white border border-gray-300 text-slate-600 hover:bg-gray-100 rounded text-sm transition shadow-sm">編集</button>
-              <button onclick="deleteDocHandler('${item.id}')" class="px-3 py-1 bg-red-50 border border-red-200 text-red-600 hover:bg-red-100 rounded text-sm transition shadow-sm">削除</button>
-            </div>
-          </td>
-        </tr>
-      `).join('');
-    };
-
-    const clearImagePreview = () => {
-      document.getElementById('news-image-file').value = '';
-      document.getElementById('news-image-base64').value = '';
-      document.getElementById('image-preview').src = '';
-      document.getElementById('image-preview-container').classList.add('hidden');
-    };
-    
-    const resetForm = () => {
-      document.getElementById('editor-form').reset();
-      document.getElementById('edit-id').value = '';
-      if(quill) quill.root.innerHTML = '';
-      document.getElementById('form-title').textContent = '新規お知らせ作成';
-      document.getElementById('cancel-edit-btn').classList.add('hidden');
-      clearImagePreview();
-    };
-    window.editDoc = (id) => {
-      const item = currentNewsData.find(d => d.id === id);
-      if(!item) return;
-      document.getElementById('edit-id').value = item.id;
-      document.getElementById('news-title').value = item.title || '';
-      document.getElementById('news-date').value = item.date || '';
-      document.getElementById('news-category').value = item.type || 'news';
-      
-      const imgData = item.image || '';
-      document.getElementById('news-image-base64').value = imgData;
-      if (imgData) {
-        document.getElementById('image-preview').src = imgData;
-        document.getElementById('image-preview-container').classList.remove('hidden');
-      } else {
-        clearImagePreview();
+      if (password.length < 6) {
+        authMessage.classList.remove('hidden');
+        setMessage(authMessage, 'パスワードは6文字以上で入力してください。', 'error');
+        return;
       }
-      
-      document.getElementById('news-video').value = item.video || '';
-      if(quill) quill.root.innerHTML = item.content || '';
-      
-      document.getElementById('form-title').textContent = 'お知らせの編集';
-      document.getElementById('cancel-edit-btn').classList.remove('hidden');
-      
-      
-      document.getElementById('form-title').scrollIntoView({ behavior: 'smooth', block: 'start' });
-    };
 
-    window.deleteDocHandler = async (id) => {
-      if(confirm('本当にこの記事を削除しますか？')) {
-        try {
-          if(db) await deleteDoc(doc(db, 'news', id));
-        } catch(e) { 
-          console.error("Delete error:", e);
-          alert("削除エラー: " + e.message); 
+      authSubmit.disabled = true;
+      authSubmitLabel.textContent = '処理中…';
+
+      try {
+        if (authMode === 'login') {
+          await signInWithEmailAndPassword(auth, email, password);
+        } else {
+          await createUserWithEmailAndPassword(auth, email, password);
         }
+        authForm.reset();
+      } catch (error) {
+        console.error(error);
+        authMessage.classList.remove('hidden');
+        setMessage(authMessage, firebaseErrorMessage(error), 'error');
+      } finally {
+        authSubmit.disabled = false;
+        authSubmitLabel.textContent = authMode === 'login' ? 'ログイン' : 'アカウントを作成';
       }
-    };
+    });
 
+    onAuthStateChanged(auth, (user) => {
+      if (user) {
+        loggedOutView.classList.add('hidden');
+        loggedInView.classList.remove('hidden');
+        userState.classList.remove('hidden');
+        userEmail.textContent = user.email || '';
+      } else {
+        loggedOutView.classList.remove('hidden');
+        loggedInView.classList.add('hidden');
+        userState.classList.add('hidden');
+        userEmail.textContent = '';
+      }
+    });
+
+    signoutButton.addEventListener('click', async () => {
+      try {
+        await signOut(auth);
+        postForm.reset();
+        setMessage(postMessage, 'ログアウトしました。', 'normal');
+      } catch (error) {
+        console.error(error);
+        setMessage(postMessage, 'ログアウトに失敗しました。', 'error');
+      }
+    });
+
+    postForm.addEventListener('submit', async (event) => {
+      event.preventDefault();
+      postMessage.classList.add('hidden');
+
+      const user = auth.currentUser;
+      if (!user) {
+        postMessage.classList.remove('hidden');
+        setMessage(postMessage, '投稿にはログインが必要です。', 'error');
+        return;
+      }
+
+      const titleValue = title.value.trim();
+      const bodyValue = body.value.trim();
+      const categoryValue = category.value;
+      const allowedCategories = ['運営', 'ステージ', '展示・出店', '来場案内', 'その他'];
+
+      if (!allowedCategories.includes(categoryValue)) {
+        postMessage.classList.remove('hidden');
+        setMessage(postMessage, 'カテゴリを選択してください。', 'error');
+        return;
+      }
+      if (!titleValue || !bodyValue) {
+        postMessage.classList.remove('hidden');
+        setMessage(postMessage, 'タイトルと本文を入力してください。', 'error');
+        return;
+      }
+      if (titleValue.length > 80 || bodyValue.length > 10000) {
+        postMessage.classList.remove('hidden');
+        setMessage(postMessage, '文字数制限を超えています。', 'error');
+        return;
+      }
+
+      postSubmit.disabled = true;
+      postSubmit.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> 投稿中…';
+
+      try {
+        await addDoc(collection(db, 'news'), {
+          category: categoryValue,
+          title: titleValue,
+          body: bodyValue,
+          createdAt: serverTimestamp()
+        });
+        postForm.reset();
+        postMessage.classList.remove('hidden');
+        setMessage(postMessage, '投稿しました。お知らせ一覧に反映されます。', 'success');
+      } catch (error) {
+        console.error(error);
+        postMessage.classList.remove('hidden');
+        setMessage(postMessage, `投稿に失敗しました。Firebase / Firestore の設定を確認してください。(${error.code || 'unknown'})`, 'error');
+      } finally {
+        postSubmit.disabled = false;
+        postSubmit.innerHTML = '<i class="fa-solid fa-paper-plane"></i> 投稿する';
+      }
+    });
   </script>
 </body>
 </html>

@@ -22,10 +22,20 @@
 
   <style>
     .schedule-shell { overflow-x:auto; }
-    .schedule-table { min-width:820px; }
+    .schedule-table { min-width:820px; display:flex; }
     .schedule-time-column { width:72px; flex:0 0 72px; }
-    .schedule-grid-column { position:relative; flex:1 1 auto; min-height:0; }
-    .schedule-grid-lines { position:absolute; inset:0; }
+    .schedule-grid-column { flex:1 1 auto; min-width:0; }
+    .schedule-column-header { height:44px; box-sizing:border-box; }
+    .schedule-time-header { border-bottom:1px solid rgba(148,163,184,.22); background:rgba(248,250,252,.72); }
+    .dark .schedule-time-header { background:rgba(15,23,42,.42); }
+    .schedule-time-body { position:relative; }
+    .schedule-location-header { display:grid; height:44px; border-bottom:1px solid rgba(148,163,184,.22); background:rgba(248,250,252,.72); }
+    .dark .schedule-location-header { background:rgba(15,23,42,.42); }
+    .schedule-location-header-cell { display:flex; align-items:center; justify-content:center; min-width:0; padding:0 .55rem; border-left:1px solid rgba(148,163,184,.18); font-family:ui-sans-serif,system-ui,sans-serif; font-size:.78rem; font-weight:700; letter-spacing:.08em; color:rgb(51 65 85); text-align:center; }
+    .dark .schedule-location-header-cell { color:rgb(226 232 240); }
+    .schedule-grid-body { display:grid; min-width:0; }
+    .schedule-location-column { position:relative; min-width:0; border-left:1px solid rgba(148,163,184,.18); }
+    .schedule-grid-lines { position:absolute; inset:0; pointer-events:none; }
     .schedule-hour-line { position:absolute; left:0; right:0; border-top:1px solid rgba(148,163,184,.22); }
     .schedule-half-line { position:absolute; left:0; right:0; border-top:1px dashed rgba(148,163,184,.13); }
     .schedule-time { position:absolute; left:0; width:100%; transform:translateY(-50%); font-family:ui-sans-serif,system-ui,sans-serif; font-size:.72rem; color:rgb(100 116 139); text-align:right; padding-right:10px; }
@@ -51,6 +61,9 @@
     @media (max-width: 640px) {
       .schedule-table { min-width:640px; }
       .schedule-time-column { width:56px; flex:0 0 56px; }
+      .schedule-column-header { height:40px; }
+      .schedule-location-header { height:40px; }
+      .schedule-location-header-cell { padding:0 .35rem; font-size:.67rem; letter-spacing:.04em; }
       .schedule-time { font-size:.64rem; padding-right:6px; }
       .schedule-event { padding:6px 7px; }
       .schedule-event-title { font-size:.74rem; letter-spacing:.02em; }
@@ -94,9 +107,15 @@
       </div>
 
       <div id="timetable-wrapper" class="hidden schedule-shell bg-white dark:bg-slate-800 shadow-xl rounded-sm">
-        <div class="schedule-table flex">
-          <div id="time-column" class="schedule-time-column relative"></div>
-          <div id="grid-column" class="schedule-grid-column"></div>
+        <div class="schedule-table">
+          <div id="time-column" class="schedule-time-column relative">
+            <div class="schedule-column-header schedule-time-header" aria-hidden="true"></div>
+            <div id="time-body" class="schedule-time-body"></div>
+          </div>
+          <div id="grid-column" class="schedule-grid-column">
+            <div id="location-header" class="schedule-location-header"></div>
+            <div id="grid-body" class="schedule-grid-body"></div>
+          </div>
         </div>
       </div>
 
@@ -174,7 +193,10 @@
       loading: document.getElementById("loading-indicator"),
       wrapper: document.getElementById("timetable-wrapper"),
       timeColumn: document.getElementById("time-column"),
+      timeBody: document.getElementById("time-body"),
       gridColumn: document.getElementById("grid-column"),
+      locationHeader: document.getElementById("location-header"),
+      gridBody: document.getElementById("grid-body"),
       tab1: document.getElementById("tab-day1"),
       tab2: document.getElementById("tab-day2"),
       modal: document.getElementById("event-modal"),
@@ -256,98 +278,131 @@
 
     function renderDay(day) {
       const items = state.items.filter((item) => item.day === day);
-      els.timeColumn.innerHTML = "";
-      els.gridColumn.innerHTML = "";
+
+      els.timeBody.innerHTML = "";
+      els.locationHeader.innerHTML = "";
+      els.gridBody.innerHTML = "";
 
       const start = 9 * 60 + 30;
       const end = 15 * 60;
       const visibleItems = items.filter((item) => item.endMinutes > start && item.startMinutes < end);
 
       if (!visibleItems.length) {
+        const height = 420;
+        els.timeBody.style.height = `${height}px`;
+        els.gridBody.style.height = `${height}px`;
         const empty = document.createElement("div");
         empty.className = "schedule-empty";
         empty.textContent = "この日の9:30〜15:00のスケジュールはまだ登録されていません。";
-        els.gridColumn.appendChild(empty);
+        els.gridBody.style.gridTemplateColumns = "1fr";
+        els.gridBody.appendChild(empty);
         els.wrapper.classList.remove("hidden");
         return;
       }
+
       const totalMinutes = end - start;
       const rowHeight = 52;
       const height = (totalMinutes / 30) * rowHeight;
 
-      els.timeColumn.style.height = `${height}px`;
-      els.gridColumn.style.height = `${height}px`;
+      els.timeBody.style.height = `${height}px`;
+      els.gridBody.style.height = `${height}px`;
 
-      const lines = document.createElement("div");
-      lines.className = "schedule-grid-lines";
-      els.gridColumn.appendChild(lines);
+      const locationMap = new Map();
+      visibleItems.forEach((item) => {
+        const key = String(item.location || "").trim() || "会場未設定";
+        if (!locationMap.has(key)) locationMap.set(key, []);
+        locationMap.get(key).push(item);
+      });
+
+      const locations = Array.from(locationMap.keys());
+      els.locationHeader.style.gridTemplateColumns = `repeat(${locations.length}, minmax(0, 1fr))`;
+      els.gridBody.style.gridTemplateColumns = `repeat(${locations.length}, minmax(0, 1fr))`;
+
+      locations.forEach((location) => {
+        const headerCell = document.createElement("div");
+        headerCell.className = "schedule-location-header-cell";
+        headerCell.textContent = location;
+        headerCell.title = location;
+        els.locationHeader.appendChild(headerCell);
+      });
 
       for (let minute = start; minute <= end; minute += 30) {
         const ratio = (minute - start) / totalMinutes;
-        const line = document.createElement("div");
-        line.className = minute % 60 === 0 ? "schedule-hour-line" : "schedule-half-line";
-        line.style.top = `${ratio * 100}%`;
-        lines.appendChild(line);
-
         const label = document.createElement("div");
         label.className = "schedule-time";
         label.style.top = `${ratio * 100}%`;
         label.textContent = minutesToLabel(minute);
-        els.timeColumn.appendChild(label);
+        els.timeBody.appendChild(label);
       }
 
-      const eventsByLane = [];
-      const minEventHeight = 58;
       const laneGap = 4;
-      visibleItems.sort((a, b) => a.startMinutes - b.startMinutes || a.endMinutes - b.endMinutes);
+      const minEventHeight = 46;
 
-      // 短時間イベントには最低表示高さがあるため、実時間だけで列を判定すると
-      // 「実時間では重ならないが、画面上ではセルが重なる」状態が発生します。
-      // 実際の表示ピクセル範囲で列を分けることで、セル同士の端が重ならないようにします。
-      visibleItems.forEach((item) => {
-        const visibleStart = Math.max(item.startMinutes, start);
-        const visibleEnd = Math.min(item.endMinutes, end);
-        const topPx = ((visibleStart - start) / totalMinutes) * height;
-        const naturalHeightPx = ((visibleEnd - visibleStart) / totalMinutes) * height;
-        const heightPx = Math.min(
-          Math.max(minEventHeight, naturalHeightPx),
-          Math.max(0, height - topPx)
-        );
+      locations.forEach((location) => {
+        const column = document.createElement("div");
+        column.className = "schedule-location-column";
+        column.style.height = `${height}px`;
+        els.gridBody.appendChild(column);
 
-        let lane = 0;
-        while (
-          eventsByLane[lane]?.some(
-            (existing) => existing.__bottomPx + laneGap > topPx
-          )
-        ) {
-          lane += 1;
+        const lines = document.createElement("div");
+        lines.className = "schedule-grid-lines";
+        column.appendChild(lines);
+
+        for (let minute = start; minute <= end; minute += 30) {
+          const ratio = (minute - start) / totalMinutes;
+          const line = document.createElement("div");
+          line.className = minute % 60 === 0 ? "schedule-hour-line" : "schedule-half-line";
+          line.style.top = `${ratio * 100}%`;
+          lines.appendChild(line);
         }
 
-        if (!eventsByLane[lane]) eventsByLane[lane] = [];
-        eventsByLane[lane].push(item);
-        item.__lane = lane;
-        item.__topPx = topPx;
-        item.__heightPx = heightPx;
-        item.__bottomPx = topPx + heightPx;
-      });
+        const events = locationMap.get(location)
+          .slice()
+          .sort((a, b) => a.startMinutes - b.startMinutes || a.endMinutes - b.endMinutes || a.title.localeCompare(b.title, "ja"));
 
-      const laneCount = Math.max(eventsByLane.length, 1);
-      const contentWidth = 100 / laneCount;
+        const lanes = [];
 
-      visibleItems.forEach((item) => {
-        const event = document.createElement("button");
-        event.type = "button";
-        event.className = `schedule-event ${colorClass(item.category)} text-left`;
-        event.style.top = `${item.__topPx}px`;
-        event.style.height = `${item.__heightPx}px`;
-        event.style.left = `calc(${item.__lane * contentWidth}% + 8px)`;
-        event.style.width = `calc(${contentWidth}% - 16px)`;
-        event.innerHTML = `
-          <div class="schedule-event-title">${escapeText(item.title)}</div>
-          <div class="schedule-event-meta">${escapeText(item.startTime)}–${escapeText(item.endTime)}${item.location ? ` ・ ${escapeText(item.location)}` : ""}</div>
-        `;
-        event.addEventListener("click", () => openModal(item));
-        els.gridColumn.appendChild(event);
+        events.forEach((item) => {
+          const visibleStart = Math.max(item.startMinutes, start);
+          const visibleEnd = Math.min(item.endMinutes, end);
+          const topPx = ((visibleStart - start) / totalMinutes) * height;
+          const naturalHeightPx = ((visibleEnd - visibleStart) / totalMinutes) * height;
+          const heightPx = Math.min(
+            Math.max(minEventHeight, naturalHeightPx),
+            Math.max(0, height - topPx)
+          );
+          const bottomPx = topPx + heightPx;
+
+          let lane = 0;
+          while (lanes[lane]?.some((existing) => existing.bottomPx + laneGap > topPx)) {
+            lane += 1;
+          }
+
+          if (!lanes[lane]) lanes[lane] = [];
+          lanes[lane].push({ item, topPx, bottomPx });
+          item.__lane = lane;
+          item.__topPx = topPx;
+          item.__heightPx = heightPx;
+        });
+
+        const laneCount = Math.max(lanes.length, 1);
+        const laneWidth = 100 / laneCount;
+
+        events.forEach((item) => {
+          const event = document.createElement("button");
+          event.type = "button";
+          event.className = `schedule-event ${colorClass(item.category)} text-left`;
+          event.style.top = `${item.__topPx}px`;
+          event.style.height = `${item.__heightPx}px`;
+          event.style.left = `calc(${item.__lane * laneWidth}% + 6px)`;
+          event.style.width = `calc(${laneWidth}% - 12px)`;
+          event.innerHTML = `
+            <div class="schedule-event-title">${escapeText(item.title)}</div>
+            <div class="schedule-event-meta">${escapeText(item.startTime)}–${escapeText(item.endTime)}${item.location ? ` ・ ${escapeText(item.location)}` : ""}</div>
+          `;
+          event.addEventListener("click", () => openModal(item));
+          column.appendChild(event);
+        });
       });
 
       els.wrapper.classList.remove("hidden");

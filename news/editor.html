@@ -44,17 +44,6 @@
       resize: vertical;
       min-height: 280px;
     }
-    .auth-tab[aria-selected="true"] {
-      background: rgb(15 23 42);
-      color: white;
-    }
-    .dark .auth-tab[aria-selected="true"] {
-      background: white;
-      color: rgb(15 23 42);
-    }
-    .auth-tab[aria-selected="false"] {
-      color: rgb(100 116 139);
-    }
     .post-notice {
       border-left: 3px solid #b5cc2c;
     }
@@ -105,19 +94,20 @@
           </div>
 
           <div id="logged-out-view" class="p-6 md:p-8">
-            <div class="flex border-b border-gray-200 dark:border-slate-700 mb-7" role="tablist" aria-label="認証方法">
-              <button id="login-tab" type="button" class="auth-tab flex-1 py-3 text-sm tracking-widest transition" role="tab" aria-selected="true">ログイン</button>
-              <button id="signup-tab" type="button" class="auth-tab flex-1 py-3 text-sm tracking-widest transition" role="tab" aria-selected="false">新規登録</button>
+            <div class="post-notice bg-brand-orange/5 dark:bg-brand-orangeDark/5 px-5 py-4 mb-7">
+              <p class="text-sm text-slate-700 dark:text-slate-300 leading-relaxed tracking-wide">
+                この投稿ページは、Firebase Authentication に事前登録されたユーザーのみ利用できます。新しいアカウントはこのページから作成できません。
+              </p>
             </div>
 
             <form id="auth-form" class="space-y-5" novalidate>
               <div>
-                <label for="email" class="block text-sm font-bold tracking-widest mb-2 text-slate-900 dark:text-white">メールアドレス</label>
+                <label for="email" class="block text-sm font-bold tracking-widest mb-2 text-slate-900 dark:text-white">登録済みメールアドレス</label>
                 <input id="email" name="email" type="email" autocomplete="email" required class="form-control" placeholder="example@example.com">
               </div>
               <div>
                 <label for="password" class="block text-sm font-bold tracking-widest mb-2 text-slate-900 dark:text-white">パスワード</label>
-                <input id="password" name="password" type="password" autocomplete="current-password" minlength="6" required class="form-control" placeholder="6文字以上">
+                <input id="password" name="password" type="password" autocomplete="current-password" minlength="6" required class="form-control" placeholder="登録済みパスワード">
               </div>
               <button id="auth-submit" type="submit" class="w-full inline-flex items-center justify-center gap-3 bg-slate-900 text-white dark:bg-white dark:text-slate-900 py-4 px-6 tracking-widest font-bold hover:opacity-80 transition disabled:opacity-50 disabled:cursor-not-allowed">
                 <i class="fa-solid fa-right-to-bracket"></i>
@@ -127,7 +117,7 @@
 
             <p id="auth-message" class="hidden mt-5 text-sm leading-relaxed" role="status"></p>
             <p class="text-xs text-slate-500 dark:text-slate-400 leading-relaxed tracking-wide mt-6">
-              Firebase Authentication のメールアドレス・パスワード方式を利用します。アカウント登録後は、このページからログインして投稿できます。
+              ユーザーの登録・削除は Firebase Console の Authentication から管理してください。
             </p>
           </div>
 
@@ -139,6 +129,15 @@
             </div>
 
             <form id="post-form" class="space-y-7" novalidate>
+              <div>
+                <label for="type" class="block text-sm font-bold tracking-widest mb-2 text-slate-900 dark:text-white">表示区分</label>
+                <select id="type" class="form-control" required>
+                  <option value="release">ニュースリリース</option>
+                  <option value="topic">トピック</option>
+                </select>
+                <p class="text-xs text-slate-400 mt-2 tracking-wide">公開ページでは、この区分ごとに分けて表示されます。</p>
+              </div>
+
               <div>
                 <label for="category" class="block text-sm font-bold tracking-widest mb-2 text-slate-900 dark:text-white">カテゴリ</label>
                 <select id="category" class="form-control" required>
@@ -209,7 +208,6 @@
     import {
       getAuth,
       onAuthStateChanged,
-      createUserWithEmailAndPassword,
       signInWithEmailAndPassword,
       signOut
     } from 'https://www.gstatic.com/firebasejs/12.19.0/firebase-auth.js';
@@ -225,8 +223,6 @@
     const auth = getAuth(app);
     const db = getFirestore(app);
 
-    const loginTab = document.getElementById('login-tab');
-    const signupTab = document.getElementById('signup-tab');
     const authTitle = document.getElementById('auth-title');
     const authForm = document.getElementById('auth-form');
     const authSubmit = document.getElementById('auth-submit');
@@ -240,18 +236,16 @@
     const postForm = document.getElementById('post-form');
     const postSubmit = document.getElementById('post-submit');
     const postMessage = document.getElementById('post-message');
+    const type = document.getElementById('type');
     const category = document.getElementById('category');
     const title = document.getElementById('title');
     const body = document.getElementById('body');
 
-    let authMode = 'login';
-
     const firebaseErrorMessage = (error) => {
       switch (error.code) {
         case 'auth/invalid-email': return 'メールアドレスの形式を確認してください。';
-        case 'auth/invalid-credential': return 'メールアドレスまたはパスワードが正しくありません。';
-        case 'auth/email-already-in-use': return 'このメールアドレスはすでに登録されています。ログインをお試しください。';
-        case 'auth/weak-password': return 'パスワードは6文字以上で設定してください。';
+        case 'auth/invalid-credential': return '登録済みのメールアドレスまたはパスワードが正しくありません。';
+        case 'auth/user-disabled': return 'このアカウントは無効化されています。';
         case 'auth/too-many-requests': return '試行回数が多いため、一時的に制限されています。時間を置いて再度お試しください。';
         default: return `認証に失敗しました。(${error.code || 'unknown'})`;
       }
@@ -269,21 +263,6 @@
       }
     };
 
-    function switchAuthMode(mode) {
-      authMode = mode;
-      const isLogin = mode === 'login';
-      loginTab.setAttribute('aria-selected', String(isLogin));
-      signupTab.setAttribute('aria-selected', String(!isLogin));
-      authTitle.textContent = isLogin ? '投稿するにはログインしてください' : '投稿用アカウントを作成';
-      authSubmitLabel.textContent = isLogin ? 'ログイン' : 'アカウントを作成';
-      authSubmit.querySelector('i').className = isLogin ? 'fa-solid fa-right-to-bracket' : 'fa-solid fa-user-plus';
-      document.getElementById('password').setAttribute('autocomplete', isLogin ? 'current-password' : 'new-password');
-      authMessage.classList.add('hidden');
-    }
-
-    loginTab.addEventListener('click', () => switchAuthMode('login'));
-    signupTab.addEventListener('click', () => switchAuthMode('signup'));
-
     authForm.addEventListener('submit', async (event) => {
       event.preventDefault();
       authMessage.classList.add('hidden');
@@ -293,7 +272,7 @@
 
       if (!email || !password) {
         authMessage.classList.remove('hidden');
-        setMessage(authMessage, 'メールアドレスとパスワードを入力してください。', 'error');
+        setMessage(authMessage, '登録済みメールアドレスとパスワードを入力してください。', 'error');
         return;
       }
       if (password.length < 6) {
@@ -303,14 +282,10 @@
       }
 
       authSubmit.disabled = true;
-      authSubmitLabel.textContent = '処理中…';
+      authSubmitLabel.textContent = 'ログイン中…';
 
       try {
-        if (authMode === 'login') {
-          await signInWithEmailAndPassword(auth, email, password);
-        } else {
-          await createUserWithEmailAndPassword(auth, email, password);
-        }
+        await signInWithEmailAndPassword(auth, email, password);
         authForm.reset();
       } catch (error) {
         console.error(error);
@@ -318,7 +293,7 @@
         setMessage(authMessage, firebaseErrorMessage(error), 'error');
       } finally {
         authSubmit.disabled = false;
-        authSubmitLabel.textContent = authMode === 'login' ? 'ログイン' : 'アカウントを作成';
+        authSubmitLabel.textContent = 'ログイン';
       }
     });
 
@@ -358,10 +333,18 @@
         return;
       }
 
+      const typeValue = type.value;
       const titleValue = title.value.trim();
       const bodyValue = body.value.trim();
       const categoryValue = category.value;
+      const allowedTypes = ['release', 'topic'];
       const allowedCategories = ['運営', 'ステージ', '展示・出店', '来場案内', 'その他'];
+
+      if (!allowedTypes.includes(typeValue)) {
+        postMessage.classList.remove('hidden');
+        setMessage(postMessage, '表示区分を選択してください。', 'error');
+        return;
+      }
 
       if (!allowedCategories.includes(categoryValue)) {
         postMessage.classList.remove('hidden');
@@ -384,6 +367,7 @@
 
       try {
         await addDoc(collection(db, 'news'), {
+          type: typeValue,
           category: categoryValue,
           title: titleValue,
           body: bodyValue,

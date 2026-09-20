@@ -297,29 +297,49 @@
       }
 
       const eventsByLane = [];
+      const minEventHeight = 58;
+      const laneGap = 4;
       visibleItems.sort((a, b) => a.startMinutes - b.startMinutes || a.endMinutes - b.endMinutes);
 
+      // 短時間イベントには最低表示高さがあるため、実時間だけで列を判定すると
+      // 「実時間では重ならないが、画面上ではセルが重なる」状態が発生します。
+      // 実際の表示ピクセル範囲で列を分けることで、セル同士の端が重ならないようにします。
       visibleItems.forEach((item) => {
+        const visibleStart = Math.max(item.startMinutes, start);
+        const visibleEnd = Math.min(item.endMinutes, end);
+        const topPx = ((visibleStart - start) / totalMinutes) * height;
+        const naturalHeightPx = ((visibleEnd - visibleStart) / totalMinutes) * height;
+        const heightPx = Math.min(
+          Math.max(minEventHeight, naturalHeightPx),
+          Math.max(0, height - topPx)
+        );
+
         let lane = 0;
-        while (eventsByLane[lane]?.some((existing) => existing.endMinutes > item.startMinutes)) lane += 1;
+        while (
+          eventsByLane[lane]?.some(
+            (existing) => existing.__bottomPx + laneGap > topPx
+          )
+        ) {
+          lane += 1;
+        }
+
         if (!eventsByLane[lane]) eventsByLane[lane] = [];
         eventsByLane[lane].push(item);
         item.__lane = lane;
+        item.__topPx = topPx;
+        item.__heightPx = heightPx;
+        item.__bottomPx = topPx + heightPx;
       });
 
       const laneCount = Math.max(eventsByLane.length, 1);
       const contentWidth = 100 / laneCount;
 
       visibleItems.forEach((item) => {
-        const visibleStart = Math.max(item.startMinutes, start);
-        const visibleEnd = Math.min(item.endMinutes, end);
-        const top = ((visibleStart - start) / totalMinutes) * 100;
-        const heightPct = ((visibleEnd - visibleStart) / totalMinutes) * 100;
         const event = document.createElement("button");
         event.type = "button";
         event.className = `schedule-event ${colorClass(item.category)} text-left`;
-        event.style.top = `${top}%`;
-        event.style.height = `max(58px, ${heightPct}%)`;
+        event.style.top = `${item.__topPx}px`;
+        event.style.height = `${item.__heightPx}px`;
         event.style.left = `calc(${item.__lane * contentWidth}% + 8px)`;
         event.style.width = `calc(${contentWidth}% - 16px)`;
         event.innerHTML = `

@@ -22,22 +22,22 @@
 
   <style>
     .schedule-shell { overflow-x:auto; }
-    .schedule-table { min-width:980px; }
-    .schedule-time-column { width:88px; flex:0 0 88px; }
+    .schedule-table { min-width:820px; }
+    .schedule-time-column { width:72px; flex:0 0 72px; }
     .schedule-grid-column { position:relative; flex:1 1 auto; min-height:720px; }
     .schedule-grid-lines { position:absolute; inset:0; }
     .schedule-hour-line { position:absolute; left:0; right:0; border-top:1px solid rgba(148,163,184,.22); }
     .schedule-half-line { position:absolute; left:0; right:0; border-top:1px dashed rgba(148,163,184,.13); }
     .schedule-time { position:absolute; left:0; width:100%; transform:translateY(-50%); font-family:ui-sans-serif,system-ui,sans-serif; font-size:.72rem; color:rgb(100 116 139); text-align:right; padding-right:10px; }
-    .schedule-event { position:absolute; border:1px solid rgba(148,163,184,.28); padding:10px 12px; border-radius:2px; cursor:pointer; overflow:hidden; box-shadow:0 8px 20px rgba(15,23,42,.08); transition:transform .2s ease, box-shadow .2s ease; }
+    .schedule-event { position:absolute; border:1px solid rgba(148,163,184,.28); padding:8px 9px; border-radius:2px; cursor:pointer; overflow:hidden; box-shadow:0 8px 20px rgba(15,23,42,.08); transition:transform .2s ease, box-shadow .2s ease; }
     .schedule-event:hover { transform:translateY(-1px); box-shadow:0 12px 24px rgba(15,23,42,.13); }
     .schedule-event-lime { background:rgba(132,204,22,.10); border-color:rgba(132,204,22,.45); }
     .schedule-event-orange { background:rgba(249,115,22,.10); border-color:rgba(249,115,22,.45); }
     .dark .schedule-event-lime { background:rgba(132,204,22,.12); }
     .dark .schedule-event-orange { background:rgba(249,115,22,.12); }
-    .schedule-event-title { font-weight:700; letter-spacing:.06em; line-height:1.45; font-size:.9rem; }
-    .schedule-event-meta { margin-top:.25rem; font-family:ui-sans-serif,system-ui,sans-serif; font-size:.68rem; color:rgb(100 116 139); line-height:1.5; }
-    .schedule-event-desc { margin-top:.35rem; font-size:.73rem; line-height:1.55; color:rgb(71 85 105); }
+    .schedule-event-title { font-weight:700; letter-spacing:.04em; line-height:1.4; font-size:.84rem; }
+    .schedule-event-meta { margin-top:.2rem; font-family:ui-sans-serif,system-ui,sans-serif; font-size:.63rem; color:rgb(100 116 139); line-height:1.45; }
+    .schedule-event-desc { margin-top:.3rem; font-size:.7rem; line-height:1.5; color:rgb(71 85 105); }
     .dark .schedule-event-desc { color:rgb(203 213 225); }
     .schedule-legend { display:flex; flex-wrap:wrap; gap:.65rem 1rem; }
     .schedule-legend span { display:inline-flex; align-items:center; gap:.4rem; font-family:ui-sans-serif,system-ui,sans-serif; font-size:.72rem; color:rgb(100 116 139); }
@@ -47,6 +47,15 @@
     .modal-visible { opacity:1; pointer-events:auto; }
     .modal-panel-hidden { transform:scale(.97); }
     .modal-panel-visible { transform:scale(1); }
+
+    @media (max-width: 640px) {
+      .schedule-table { min-width:640px; }
+      .schedule-time-column { width:56px; flex:0 0 56px; }
+      .schedule-time { font-size:.64rem; padding-right:6px; }
+      .schedule-event { padding:6px 7px; }
+      .schedule-event-title { font-size:.74rem; letter-spacing:.02em; }
+      .schedule-event-meta { font-size:.56rem; line-height:1.35; }
+    }
   </style>
 </head>
 
@@ -250,19 +259,18 @@
       els.timeColumn.innerHTML = "";
       els.gridColumn.innerHTML = "";
 
-      if (!items.length) {
+      const start = 9 * 60 + 30;
+      const end = 15 * 60;
+      const visibleItems = items.filter((item) => item.endMinutes > start && item.startMinutes < end);
+
+      if (!visibleItems.length) {
         const empty = document.createElement("div");
         empty.className = "schedule-empty";
-        empty.textContent = "この日のスケジュールはまだ登録されていません。";
+        empty.textContent = "この日の9:30〜15:00のスケジュールはまだ登録されていません。";
         els.gridColumn.appendChild(empty);
         els.wrapper.classList.remove("hidden");
         return;
       }
-
-      const minStart = Math.floor(Math.min(...items.map((x) => x.startMinutes)) / 30) * 30;
-      const maxEnd = Math.ceil(Math.max(...items.map((x) => x.endMinutes)) / 30) * 30;
-      const start = Math.min(minStart, 8 * 60);
-      const end = Math.max(maxEnd, 18 * 60);
       const totalMinutes = end - start;
       const rowHeight = 52;
       const height = (totalMinutes / 30) * rowHeight;
@@ -289,9 +297,9 @@
       }
 
       const eventsByLane = [];
-      items.sort((a, b) => a.startMinutes - b.startMinutes || a.endMinutes - b.endMinutes);
+      visibleItems.sort((a, b) => a.startMinutes - b.startMinutes || a.endMinutes - b.endMinutes);
 
-      items.forEach((item) => {
+      visibleItems.forEach((item) => {
         let lane = 0;
         while (eventsByLane[lane]?.some((existing) => existing.endMinutes > item.startMinutes)) lane += 1;
         if (!eventsByLane[lane]) eventsByLane[lane] = [];
@@ -302,9 +310,11 @@
       const laneCount = Math.max(eventsByLane.length, 1);
       const contentWidth = 100 / laneCount;
 
-      items.forEach((item) => {
-        const top = ((item.startMinutes - start) / totalMinutes) * 100;
-        const heightPct = ((item.endMinutes - item.startMinutes) / totalMinutes) * 100;
+      visibleItems.forEach((item) => {
+        const visibleStart = Math.max(item.startMinutes, start);
+        const visibleEnd = Math.min(item.endMinutes, end);
+        const top = ((visibleStart - start) / totalMinutes) * 100;
+        const heightPct = ((visibleEnd - visibleStart) / totalMinutes) * 100;
         const event = document.createElement("button");
         event.type = "button";
         event.className = `schedule-event ${colorClass(item.category)} text-left`;

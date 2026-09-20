@@ -7,7 +7,7 @@ import { initializeApp } from 'https://www.gstatic.com/firebasejs/12.19.0/fireba
       orderBy,
       limit
     } from 'https://www.gstatic.com/firebasejs/12.19.0/firebase-firestore.js';
-    import { firebaseConfig } from '../firebase-config.js';
+    import { firebaseConfig } from 'https://www.soei-fes.com/javascript/firebase-config.js';
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
     const status = document.getElementById('status');

@@ -1,0 +1,402 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="robots" content="noindex,nofollow">
+  <link rel="icon" href="https://www.soei-fes.com/image/Favicon01.ico">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="https://www.soei-fes.com/css/base01.css">
+  <link rel="stylesheet" href="https://www.soei-fes.com/css/base04.css">
+  <link rel="stylesheet" href="https://www.soei-fes.com/css/news-page.css">
+  <title>お知らせ投稿 | 創英祭 2026</title>
+</head>
+
+<body>
+  <header class="site-header">
+    <div class="site-header-inner">
+      <a class="site-brand" href="https://www.soei-fes.com/" aria-label="創英祭 2026 ホーム">
+        <img class="site-brand-mark" src="https://www.soei-fes.com/image/Favicon01.ico" alt="創英祭">
+        <span>
+          <span class="site-brand-title">創英祭 <span style="font-size:.7em;letter-spacing:.08em;">2026</span></span>
+          <span class="site-brand-sub">Yokohama Soei Fes</span>
+        </span>
+      </a>
+
+      <nav class="site-nav" aria-label="メインナビゲーション">
+        <a href="https://www.soei-fes.com/">ホーム</a>
+        <a href="/news/" aria-current="page">お知らせ</a>
+        <a href="https://www.soei-fes.com/concept/">コンセプト</a>
+        <a href="https://www.soei-fes.com/schedule/">スケジュール</a>
+        <a href="https://www.soei-fes.com/map/">マップ</a>
+        <a href="https://www.soei-fes.com/booth/">出店案内</a>
+        <button id="theme-toggle" class="theme-toggle" type="button" aria-label="ダークモードを切り替える" data-theme-toggle>
+          <i id="themeToggleDarkIcon" data-theme-icon="dark" class="fa-solid fa-moon" aria-hidden="true"></i>
+          <i id="themeToggleLightIcon" data-theme-icon="light" class="fa-solid fa-sun hidden" aria-hidden="true"></i>
+        </button>
+      </nav>
+    </div>
+  </header>
+
+  <section class="page-hero" aria-labelledby="page-title">
+    <div class="page-hero-image" style="background-image:url('https://yokohamasoei.sakura.ne.jp/wp/wp-content/uploads/2022/09/IMG_0529-scaled.jpg?auto=format&fit=crop&w=1920&q=80');"></div>
+    <div class="page-hero-overlay"></div>
+    <div class="page-hero-inner">
+      <h1 id="page-title">お知らせ投稿<span>.</span></h1>
+      <p>Post News</p>
+    </div>
+  </section>
+
+  <main>
+    <section class="content-section dots">
+      <div class="auth-shell">
+        <div class="section-heading">
+          <h2>投稿ページ</h2>
+          <small>Authentication &amp; Post</small>
+        </div>
+        <p class="section-lead">Firebase Authentication に事前登録されたユーザーのみ利用できます。</p>
+
+        <div class="auth-card">
+          <div class="auth-head">
+            <p class="auth-kicker">MEMBER LOGIN</p>
+            <h2 id="auth-title">投稿するにはログインしてください</h2>
+          </div>
+
+          <div id="logged-out-view" class="auth-body">
+            <form id="auth-form" novalidate autocomplete="on">
+              <div class="form-row">
+                <label class="form-label" for="email">メールアドレス</label>
+                <input id="email" class="field" type="email" inputmode="email" autocomplete="username" required placeholder="登録済みのメールアドレス">
+              </div>
+
+              <div class="form-row">
+                <label class="form-label" for="password">パスワード</label>
+                <input id="password" class="field" type="password" autocomplete="current-password" minlength="6" required placeholder="登録済みパスワード">
+              </div>
+
+              <button id="auth-submit" class="btn btn-dark" type="submit">
+                <i class="fa-solid fa-right-to-bracket" aria-hidden="true"></i>
+                <span>ログイン</span>
+              </button>
+
+              <p id="auth-message" class="message hidden" role="status" aria-live="polite"></p>
+
+              <p class="form-help">このページから新しいメールアドレスを登録する機能はありません。</p>
+            </form>
+          </div>
+
+          <div id="logged-in-view" class="auth-body hidden">
+            <div class="auth-user">
+              ログイン中：<strong id="user-email"></strong>
+            </div>
+
+            <form id="post-form" novalidate>
+              <div class="form-row">
+                <label class="form-label" for="type">表示区分</label>
+                <select id="type" class="field" required>
+                  <option value="release">ニュースリリース</option>
+                  <option value="topic">トピック</option>
+                </select>
+                <p class="form-help">公開ページ上で「ニュースリリース」または「トピック」に振り分けられます。</p>
+              </div>
+
+              <div class="form-row">
+                <label class="form-label" for="category">カテゴリ</label>
+                <select id="category" class="field" required>
+                  <option value="運営">運営</option>
+                  <option value="ステージ">ステージ</option>
+                  <option value="展示・出店">展示・出店</option>
+                  <option value="来場案内">来場案内</option>
+                  <option value="その他">その他</option>
+                </select>
+              </div>
+
+              <div class="form-row">
+                <label class="form-label" for="title">タイトル</label>
+                <input id="title" class="field" type="text" maxlength="80" required placeholder="お知らせのタイトル">
+                <p class="form-help">80文字以内</p>
+              </div>
+
+              <div class="form-row">
+                <label class="form-label" for="body">本文</label>
+                <textarea id="body" class="field textarea" maxlength="10000" required placeholder="お知らせ本文を入力してください。改行もそのまま表示されます。"></textarea>
+                <p class="form-help">10,000文字以内</p>
+              </div>
+
+              <div class="form-actions">
+                <button id="signout-button" class="btn btn-light" type="button">
+                  <i class="fa-solid fa-arrow-right-from-bracket" aria-hidden="true"></i>
+                  ログアウト
+                </button>
+                <button id="post-submit" class="btn btn-orange" type="submit">
+                  <i class="fa-solid fa-paper-plane" aria-hidden="true"></i>
+                  投稿する
+                </button>
+              </div>
+
+              <p id="post-message" class="message hidden" role="status" aria-live="polite"></p>
+            </form>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="utility-band">
+      <p class="utility-label">Contents</p>
+      <div class="utility-links">
+        <a class="utility-link" href="https://www.soei-fes.com/"><i class="fa-solid fa-house" aria-hidden="true"></i>トップページ</a>
+        <a class="utility-link" href="../"><i class="fa-regular fa-newspaper" aria-hidden="true"></i>お知らせ</a>
+        <a class="utility-link" href="https://www.soei-fes.com/concept/"><i class="fa-solid fa-link" aria-hidden="true"></i>コンセプト</a>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="site-footer-inner">
+      <div class="footer-main">
+        <div>
+          <div class="footer-title">創英祭 2026</div>
+          <div class="footer-note">横浜創英中学・高等学校 文化祭</div>
+        </div>
+        <nav class="footer-links" aria-label="フッターナビゲーション">
+          <a href="https://www.soei-fes.com/">トップ</a>
+          <a href="/news/">お知らせ</a>
+          <a href="https://www.soei-fes.com/concept/">コンセプト</a>
+          <a href="https://www.soei-fes.com/schedule/">スケジュール</a>
+          <a href="https://www.soei-fes.com/map/">マップ</a>
+          <a href="https://www.soei-fes.com/booth/">出店案内</a>
+        </nav>
+      </div>
+      <div class="footer-bottom">&copy; 2026 Yokohama Soei Festival Executive Committee.</div>
+    </div>
+  </footer>
+
+  <script src="https://www.soei-fes.com/javascript/page-theme.js"></script>
+
+  <script type="module">
+    import { initializeApp } from 'https://www.gstatic.com/firebasejs/12.19.0/firebase-app.js';
+    import {
+      getAuth,
+      onAuthStateChanged,
+      setPersistence,
+      browserSessionPersistence,
+      signInWithEmailAndPassword,
+      signOut
+    } from 'https://www.gstatic.com/firebasejs/12.19.0/firebase-auth.js';
+    import {
+      getFirestore,
+      collection,
+      addDoc,
+      serverTimestamp
+    } from 'https://www.gstatic.com/firebasejs/12.19.0/firebase-firestore.js';
+    import { firebaseConfig } from 'https://www.soei-fes.com/javascript/firebase-config.js';
+
+    const loggedOutView = document.getElementById('logged-out-view');
+    const loggedInView = document.getElementById('logged-in-view');
+    const authForm = document.getElementById('auth-form');
+    const authSubmit = document.getElementById('auth-submit');
+    const authSubmitLabel = authSubmit.querySelector('span');
+    const authMessage = document.getElementById('auth-message');
+    const userEmail = document.getElementById('user-email');
+    const signoutButton = document.getElementById('signout-button');
+    const postForm = document.getElementById('post-form');
+    const postSubmit = document.getElementById('post-submit');
+    const postMessage = document.getElementById('post-message');
+    const type = document.getElementById('type');
+    const category = document.getElementById('category');
+    const title = document.getElementById('title');
+    const body = document.getElementById('body');
+
+    let auth = null;
+    let db = null;
+
+    function configIsValid(config) {
+      return Boolean(
+        config &&
+        config.apiKey &&
+        config.authDomain &&
+        config.projectId &&
+        config.appId &&
+        !String(config.apiKey).startsWith('YOUR_') &&
+        !String(config.authDomain).includes('YOUR_PROJECT_ID') &&
+        !String(config.projectId).startsWith('YOUR_') &&
+        !String(config.appId).startsWith('YOUR_')
+      );
+    }
+
+    function showMessage(element, text, tone) {
+      element.textContent = text;
+      element.className = `message ${tone || 'normal'}`;
+    }
+
+    function firebaseErrorMessage(error) {
+      switch (error?.code) {
+        case 'auth/invalid-email':
+          return 'メールアドレスの形式を確認してください。';
+        case 'auth/invalid-credential':
+        case 'auth/wrong-password':
+        case 'auth/user-not-found':
+          return '登録済みのメールアドレスまたはパスワードが正しくありません。';
+        case 'auth/user-disabled':
+          return 'このアカウントは無効化されています。Firebase Console の Users を確認してください。';
+        case 'auth/operation-not-allowed':
+          return 'Firebase Authentication の「メール/パスワード」が有効になっていません。';
+        case 'auth/unauthorized-domain':
+          return 'Firebase Authentication の承認済みドメインに、このサイトのドメインを追加してください。';
+        case 'auth/too-many-requests':
+          return '試行回数が多いため一時的に制限されています。時間を置いて再度お試しください。';
+        case 'auth/network-request-failed':
+          return 'ネットワーク接続を確認してください。';
+        default:
+          return `認証に失敗しました。${error?.code ? ` (${error.code})` : ''}`;
+      }
+    }
+
+    function setLoggedInView(user) {
+      if (user) {
+        loggedOutView.classList.add('hidden');
+        loggedInView.classList.remove('hidden');
+        userEmail.textContent = user.email || '';
+      } else {
+        loggedOutView.classList.remove('hidden');
+        loggedInView.classList.add('hidden');
+        userEmail.textContent = '';
+      }
+    }
+
+    async function bootFirebase() {
+      if (!configIsValid(firebaseConfig)) {
+        showMessage(authMessage, 'Firebase設定が未完了です。「/javascript/firebase-config.js」にFirebase ConsoleのWebアプリ設定を入力してください。', 'error');
+        authSubmit.disabled = true;
+        return;
+      }
+
+      try {
+        const app = initializeApp(firebaseConfig);
+        auth = getAuth(app);
+        db = getFirestore(app);
+
+        await setPersistence(auth, browserSessionPersistence);
+
+        onAuthStateChanged(auth, setLoggedInView);
+      } catch (error) {
+        console.error('Firebase initialization failed:', error);
+        authSubmit.disabled = true;
+        showMessage(authMessage, 'Firebaseの初期化に失敗しました。firebase-config.js とドメイン設定を確認してください。', 'error');
+      }
+    }
+
+    authForm.addEventListener('submit', async (event) => {
+      event.preventDefault();
+      authMessage.classList.add('hidden');
+
+      if (!auth) {
+        showMessage(authMessage, 'Firebaseが初期化されていません。', 'error');
+        return;
+      }
+
+      const email = document.getElementById('email').value.trim();
+      const password = document.getElementById('password').value;
+
+      if (!email || !password) {
+        showMessage(authMessage, '登録済みメールアドレスとパスワードを入力してください。', 'error');
+        return;
+      }
+
+      authSubmit.disabled = true;
+      authSubmitLabel.textContent = 'ログイン中…';
+
+      try {
+        await signInWithEmailAndPassword(auth, email, password);
+        authForm.reset();
+      } catch (error) {
+        console.error('Login failed:', error);
+        showMessage(authMessage, firebaseErrorMessage(error), 'error');
+      } finally {
+        authSubmit.disabled = false;
+        authSubmitLabel.textContent = 'ログイン';
+      }
+    });
+
+    signoutButton.addEventListener('click', async () => {
+      if (!auth) return;
+
+      try {
+        await signOut(auth);
+        postForm.reset();
+        postMessage.className = 'message normal';
+        postMessage.textContent = 'ログアウトしました。';
+      } catch (error) {
+        console.error('Logout failed:', error);
+        showMessage(postMessage, 'ログアウトに失敗しました。', 'error');
+      }
+    });
+
+    postForm.addEventListener('submit', async (event) => {
+      event.preventDefault();
+      postMessage.classList.add('hidden');
+
+      const user = auth?.currentUser;
+      if (!user || !db) {
+        showMessage(postMessage, '投稿にはログインが必要です。', 'error');
+        return;
+      }
+
+      const typeValue = type.value;
+      const categoryValue = category.value;
+      const titleValue = title.value.trim();
+      const bodyValue = body.value.trim();
+
+      const allowedTypes = ['release', 'topic'];
+      const allowedCategories = ['運営', 'ステージ', '展示・出店', '来場案内', 'その他'];
+
+      if (!allowedTypes.includes(typeValue)) {
+        showMessage(postMessage, '表示区分を選択してください。', 'error');
+        return;
+      }
+      if (!allowedCategories.includes(categoryValue)) {
+        showMessage(postMessage, 'カテゴリを選択してください。', 'error');
+        return;
+      }
+      if (!titleValue || !bodyValue) {
+        showMessage(postMessage, 'タイトルと本文を入力してください。', 'error');
+        return;
+      }
+      if (titleValue.length > 80 || bodyValue.length > 10000) {
+        showMessage(postMessage, '文字数制限を超えています。', 'error');
+        return;
+      }
+
+      postSubmit.disabled = true;
+      postSubmit.innerHTML = '<i class="fa-solid fa-spinner fa-spin" aria-hidden="true"></i> 投稿中…';
+
+      try {
+        await addDoc(collection(db, 'news'), {
+          type: typeValue,
+          category: categoryValue,
+          title: titleValue,
+          body: bodyValue,
+          createdAt: serverTimestamp()
+        });
+
+        postForm.reset();
+        showMessage(postMessage, '投稿しました。公開ページに反映されます。', 'success');
+      } catch (error) {
+        console.error('Post failed:', error);
+        const text = error?.code === 'permission-denied'
+          ? '投稿権限がありません。Firebase Authentication のログイン状態と Firestore Security Rules を確認してください。'
+          : '投稿に失敗しました。Firestore Database と Security Rules を確認してください。';
+        showMessage(postMessage, text, 'error');
+      } finally {
+        postSubmit.disabled = false;
+        postSubmit.innerHTML = '<i class="fa-solid fa-paper-plane" aria-hidden="true"></i> 投稿する';
+      }
+    });
+
+    bootFirebase();
+  </script>
+</body>
+</html>

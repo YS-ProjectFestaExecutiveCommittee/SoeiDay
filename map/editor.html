@@ -3,258 +3,218 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link rel="icon" href="https://www.soei-fes.com/image/Favicon01.ico" />
-  <title>会場マップ管理 | 創英祭 2026</title>
-  
+  <meta name="robots" content="noindex,nofollow,noarchive">
+  <link rel="icon" href="https://www.soei-fes.com/image/Favicon01.ico">
+  <title>会場マップ投稿 | 創英祭 2026</title>
+
   <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://www.soei-fes.com/javascript/base03.js" defer></script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  
-  <link rel="stylesheet" href="https://www.soei-fes.com/css/base13.css">
+  <script src="https://www.soei-fes.com/javascript/base01.js"></script>
+  <script src="https://www.soei-fes.com/javascript/load-components.js" defer></script>
+  <link rel="stylesheet" href="https://www.soei-fes.com/css/base01.css">
+  <link rel="stylesheet" href="https://www.soei-fes.com/css/base04.css">
+
+  <script src="https://www.soei-fes.com/blueprint/h1.js" defer></script>
+  <script src="https://www.soei-fes.com/blueprint/h2.js" defer></script>
+  <script src="https://www.soei-fes.com/blueprint/h3.js" defer></script>
+  <script src="https://www.soei-fes.com/blueprint/s1.js" defer></script>
+  <script src="https://www.soei-fes.com/blueprint/s2.js" defer></script>
+  <script src="https://www.soei-fes.com/blueprint/s3.js" defer></script>
+
+  <style>
+    .post-hero-title { text-shadow:0 2px 10px rgba(0,0,0,.45); }
+    .panel { background:rgba(255,255,255,.94); border:1px solid rgba(148,163,184,.18); box-shadow:0 20px 45px rgba(15,23,42,.08); }
+    .dark .panel { background:rgba(30,41,59,.94); border-color:rgba(255,255,255,.06); }
+    .field-label { display:block; margin-bottom:.55rem; font-size:.78rem; font-family:ui-sans-serif,system-ui,sans-serif; font-weight:700; letter-spacing:.12em; color:rgb(51 65 85); }
+    .dark .field-label { color:rgb(226 232 240); }
+    .field { width:100%; border:1px solid rgba(148,163,184,.45); border-radius:2px; background:rgba(248,250,252,.95); color:rgb(15 23 42); padding:.8rem .9rem; outline:none; transition:border-color .2s ease,box-shadow .2s ease,background-color .2s ease; font-family:ui-sans-serif,system-ui,sans-serif; }
+    .dark .field { background:rgba(15,23,42,.75); color:rgb(248,250,252); border-color:rgba(148,163,184,.3); }
+    .field:focus { border-color:rgb(132 204 22); box-shadow:0 0 0 3px rgba(132,204,22,.12); }
+    .field-textarea { min-height:180px; resize:vertical; line-height:1.85; }
+    .status-message { min-height:1.6rem; font-size:.86rem; line-height:1.7; }
+    .is-hidden { display:none !important; }
+    .map-editor-shell { min-height:480px; }
+    .map-editor-pin { position:absolute; transform:translate(-50%,-50%); z-index:20; }
+    .room-list-button.active { border-color:rgb(132 204 22); background:rgba(132,204,22,.08); }
+  </style>
 </head>
-<body class="bg-slate-50 text-slate-900 antialiased min-h-screen flex flex-col font-serif">
 
-  <header class="bg-slate-900 text-white p-4 shadow-md flex justify-between items-center z-10 relative">
-    <div class="flex items-center gap-3">
-      <h1 class="text-xl font-bold tracking-widest">創英祭 マップ管理</h1>
-      <span class="text-xs bg-orange-500 text-white px-2 py-1 rounded-sm tracking-widest">関係者専用</span>
-    </div>
-    <div id="header-user-info" class="hidden text-sm font-sans flex items-center gap-4">
-      <span>ログイン中: <strong id="current-user-display" class="text-lime-400"></strong></span>
-      <button onclick="logout()" class="text-slate-300 hover:text-white transition">
-        <i class="fa-solid fa-right-from-bracket"></i> ログアウト
-      </button>
-    </div>
-  </header>
+<body class="font-serif bg-brand-bgLight text-slate-900 dark:bg-brand-bgDark dark:text-slate-100 antialiased transition-colors duration-300">
 
-  <div id="loading-overlay" class="fixed inset-0 bg-white/80 z-50 flex items-center justify-center backdrop-blur-sm hidden">
-    <div class="text-center">
-      <i class="fa-solid fa-circle-notch fa-spin text-4xl text-slate-900 mb-4"></i>
-      <p class="tracking-widest text-slate-600 font-sans">システムを準備しています...</p>
-    </div>
-  </div>
+  <div id="header-placeholder"></div>
 
-  
-  <section id="login-section" class="flex-grow flex items-center justify-center p-4 relative fade-in">
-    <div class="absolute inset-0 bg-slate-900 overflow-hidden z-0">
-      <div class="absolute inset-0 bg-[url('https://yokohamasoei.sakura.ne.jp/wp/wp-content/uploads/2019/07/DSC_8659.jpg?auto=format&fit=crop&w=1920&q=80')] bg-cover bg-center opacity-20 filter grayscale"></div>
-    </div>
-    
-    <div class="bg-white p-8 md:p-12 w-full max-w-md shadow-2xl relative z-10 border-t-4 border-orange-500">
-      <h2 class="text-3xl font-bold mb-2 text-center tracking-widest">ログイン</h2>
-      <p class="text-center text-slate-500 text-sm mb-8 font-sans">専用のIDとパスワードを入力してください</p>
-      
-      <div id="login-error" class="hidden bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-6 text-sm font-sans"></div>
-
-      <div class="space-y-6 font-sans">
-        <div>
-          <label class="block text-sm font-bold text-slate-700 mb-2">ログインID</label>
-          <input type="text" id="login-id" class="w-full px-4 py-3 border border-gray-300 rounded focus:outline-none focus:border-orange-500 focus:ring-1 focus:ring-orange-500 transition" placeholder="admin">
-        </div>
-        <div>
-          <label class="block text-sm font-bold text-slate-700 mb-2">パスワード</label>
-          <input type="password" id="login-password" class="w-full px-4 py-3 border border-gray-300 rounded focus:outline-none focus:border-orange-500 focus:ring-1 focus:ring-orange-500 transition" placeholder="••••••••">
-        </div>
-        <button onclick="attemptLogin()" class="w-full bg-slate-900 hover:bg-slate-800 text-white font-bold py-4 px-4 rounded tracking-widest transition duration-300 flex justify-center items-center gap-2">
-          <i class="fa-solid fa-lock"></i> ログインする
-        </button>
+  <section class="relative w-full h-[300px] md:h-[390px] overflow-hidden flex bg-slate-900">
+    <div class="absolute inset-0 bg-cover bg-center opacity-55" style="background-image:url('https://www.soei.ed.jp/oclp_j/assets/img/sec01_thumb.jpg?auto=format&fit=crop&w=1920&q=80');filter:grayscale(15%);"></div>
+    <div class="absolute inset-0 bg-gradient-to-t from-slate-900 via-slate-900/65 to-transparent"></div>
+    <div class="relative w-full max-w-7xl mx-auto h-full flex items-end pb-12 px-6 sm:px-12 z-10">
+      <div>
+        <p class="text-xs md:text-sm font-sans tracking-[0.28em] text-brand-orange dark:text-brand-orangeDark mb-4">MAP ADMINISTRATION</p>
+        <h1 class="post-hero-title text-4xl md:text-5xl font-bold tracking-[0.12em] text-white mb-3">会場マップ投稿</h1>
+        <p class="text-slate-300 tracking-widest font-light text-sm md:text-base">Firebase認証ユーザー専用</p>
       </div>
     </div>
   </section>
 
-  
-  <section id="dashboard-section" class="flex-grow hidden bg-slate-50 fade-in w-full max-w-full overflow-x-hidden">
-    <div class="max-w-7xl mx-auto p-4 sm:p-6 lg:p-8">
-      
-      
-      <div class="flex border-b border-gray-300 mb-6 font-sans">
-        <button onclick="switchTab('map')" id="tab-btn-map" class="py-3 px-6 text-center font-medium border-b-2 border-slate-900 text-slate-900 bg-white/50 transition">
-          <i class="fa-solid fa-map-location-dot mr-2"></i> マップ部屋情報管理
-        </button>
-        <button onclick="switchTab('users')" id="tab-btn-users" class="py-3 px-6 text-center font-medium border-b-2 border-transparent text-slate-500 hover:text-slate-700 transition">
-          <i class="fa-solid fa-users-gear mr-2"></i> アカウント管理
-        </button>
-      </div>
+  <main class="py-20 md:py-24 bg-brand-surfaceLight dark:bg-brand-surfaceDark slant-top transition-colors duration-300">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
 
-      
-      <div id="tab-content-map" class="block">
-        
-        <div class="mb-6 flex flex-wrap justify-center gap-2 sm:gap-3">
-          <button onclick="switchFloor('h1')" id="btn-h1" class="floor-btn active-floor px-4 py-2 text-sm border bg-slate-900 text-white border-transparent rounded-sm transition">本館 1F</button>
-          <button onclick="switchFloor('h2')" id="btn-h2" class="floor-btn px-4 py-2 text-sm border border-gray-300 text-slate-700 hover:border-orange-500 rounded-sm transition">本館 2F</button>
-          <button onclick="switchFloor('h3')" id="btn-h3" class="floor-btn px-4 py-2 text-sm border border-gray-300 text-slate-700 hover:border-orange-500 rounded-sm transition">本館 3F / 新館 B1F</button>
-          <button onclick="switchFloor('s1')" id="btn-s1" class="floor-btn px-4 py-2 text-sm border border-gray-300 text-slate-700 hover:border-orange-500 rounded-sm transition">本館 4F / 新館 1F / 体育館</button>
-          <button onclick="switchFloor('s2')" id="btn-s2" class="floor-btn px-4 py-2 text-sm border border-gray-300 text-slate-700 hover:border-orange-500 rounded-sm transition">新館 2F</button>
-          <button onclick="switchFloor('s3')" id="btn-s3" class="floor-btn px-4 py-2 text-sm border border-gray-300 text-slate-700 hover:border-orange-500 rounded-sm transition">新館 3F</button>
+      <section id="login-panel" class="panel p-7 sm:p-10 md:p-12 max-w-3xl mx-auto">
+        <div class="mb-9 border-b border-slate-200 dark:border-white/10 pb-5">
+          <p class="text-xs font-sans font-bold tracking-[0.18em] text-brand-orange dark:text-brand-orangeDark mb-3">AUTHENTICATION</p>
+          <h2 class="text-2xl md:text-3xl font-bold tracking-widest text-slate-900 dark:text-white">ログイン</h2>
+          <p class="text-sm text-slate-600 dark:text-slate-300 mt-4 leading-relaxed">Firebase Authenticationに事前登録されたユーザーのみ利用できます。<br>このページから新しいメールアドレスを登録する機能はありません。</p>
         </div>
 
-        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start relative">
-          
-          
-          <div class="lg:col-span-2 bg-white p-4 shadow-md border border-gray-100 rounded-sm min-w-0">
-            <div class="flex items-center justify-between mb-3 border-b border-gray-100 pb-2">
-              <h2 id="current-floor-title" class="font-bold tracking-widest text-slate-900 flex items-center gap-2">
-                <i class="fa-solid fa-map text-orange-500"></i>
-                <span>本館 1F フロアマップ</span>
-              </h2>
-              <span class="text-xs text-slate-500 font-sans bg-orange-50 px-2 py-1 rounded border border-orange-100">
-                <i class="fa-solid fa-hand-pointer mr-1"></i> マップをクリックして位置指定
-              </span>
+        <form id="login-form" class="space-y-6" novalidate>
+          <div>
+            <label class="field-label" for="login-email">メールアドレス</label>
+            <input id="login-email" class="field" type="email" autocomplete="username" inputmode="email" required placeholder="example@example.com">
+          </div>
+          <div>
+            <label class="field-label" for="login-password">パスワード</label>
+            <input id="login-password" class="field" type="password" autocomplete="current-password" required placeholder="パスワード">
+          </div>
+          <div class="flex flex-col sm:flex-row gap-3">
+            <button id="login-button" type="submit" class="inline-flex items-center justify-center gap-3 px-7 py-3.5 border border-slate-900 dark:border-white bg-slate-900 dark:bg-white text-white dark:text-slate-900 hover:opacity-85 transition tracking-widest text-sm font-sans"><i class="fa-solid fa-right-to-bracket"></i>ログイン</button>
+            <button id="reset-button" type="button" class="inline-flex items-center justify-center gap-3 px-7 py-3.5 border border-slate-300 dark:border-slate-600 text-slate-800 dark:text-slate-200 hover:bg-white/60 dark:hover:bg-slate-900/50 transition tracking-widest text-sm font-sans"><i class="fa-regular fa-envelope"></i>パスワード再設定</button>
+          </div>
+          <p id="login-message" class="status-message text-slate-500 dark:text-slate-400" aria-live="polite"></p>
+        </form>
+      </section>
+
+      <section id="post-panel" class="is-hidden mt-0">
+        <div class="grid grid-cols-1 xl:grid-cols-3 gap-8 items-start">
+
+          <div class="xl:col-span-2 panel p-6 md:p-8">
+            <div class="flex flex-col md:flex-row md:items-end md:justify-between gap-5 mb-7 border-b border-slate-200 dark:border-white/10 pb-5">
+              <div>
+                <p class="text-xs font-sans font-bold tracking-[0.18em] text-brand-lime dark:text-brand-limeDark mb-3">MAP EDITOR</p>
+                <h2 class="text-2xl md:text-3xl font-bold tracking-widest text-slate-900 dark:text-white">会場データを編集</h2>
+                <p id="current-user" class="text-xs text-slate-500 dark:text-slate-400 font-sans mt-3"></p>
+              </div>
+              <button id="logout-button" type="button" class="self-start md:self-auto inline-flex items-center justify-center gap-2 px-5 py-2.5 border border-slate-300 dark:border-slate-600 text-slate-800 dark:text-slate-200 hover:bg-white/60 dark:hover:bg-slate-900/50 transition tracking-widest text-xs font-sans"><i class="fa-solid fa-arrow-right-from-bracket"></i>ログアウト</button>
             </div>
 
-            <div id="map-viewport" class="map-canvas-container flex items-center justify-center border border-gray-200">
-              <div id="blueprint-render-target" class="w-full h-full relative flex items-center justify-center min-w-0">
-                <div class="text-center text-slate-400 font-light text-sm">マップ読み込み中...</div>
+            <div class="mb-6 flex flex-wrap justify-center gap-2 sm:gap-3 border-b border-gray-200 dark:border-white/10 pb-5">
+              <button type="button" data-floor="h1" class="admin-floor-btn active-floor px-4 py-2.5 text-xs sm:text-sm tracking-widest border rounded-sm font-medium">本館 1F</button>
+              <button type="button" data-floor="h2" class="admin-floor-btn px-4 py-2.5 text-xs sm:text-sm tracking-widest border border-gray-300 dark:border-slate-700 rounded-sm font-medium">本館 2F</button>
+              <button type="button" data-floor="h3" class="admin-floor-btn px-4 py-2.5 text-xs sm:text-sm tracking-widest border border-gray-300 dark:border-slate-700 rounded-sm font-medium">本館 3F / 新館 B1F</button>
+              <button type="button" data-floor="s1" class="admin-floor-btn px-4 py-2.5 text-xs sm:text-sm tracking-widest border border-gray-300 dark:border-slate-700 rounded-sm font-medium">本館 4F / 新館 1F / 体育館</button>
+              <button type="button" data-floor="s2" class="admin-floor-btn px-4 py-2.5 text-xs sm:text-sm tracking-widest border border-gray-300 dark:border-slate-700 rounded-sm font-medium">新館 2F</button>
+              <button type="button" data-floor="s3" class="admin-floor-btn px-4 py-2.5 text-xs sm:text-sm tracking-widest border border-gray-300 dark:border-slate-700 rounded-sm font-medium">新館 3F</button>
+            </div>
+
+            <div id="admin-map-viewport" class="map-editor-shell flex items-center justify-center border border-gray-200 dark:border-slate-700 p-4 overflow-hidden">
+              <div id="admin-blueprint-target" class="w-full h-full relative min-h-[420px] flex items-center justify-center">
+                <div class="text-center text-slate-400 font-light py-16"><i class="fa-solid fa-spinner fa-spin text-2xl mb-3 block"></i>マップを読み込んでいます...</div>
               </div>
             </div>
+            <p class="text-xs text-slate-500 dark:text-slate-400 mt-3 font-sans leading-relaxed"><i class="fa-solid fa-location-crosshairs mr-1"></i>マップ上をクリックすると、新規／編集中ブースの位置（X・Y）を設定できます。既存ピンをクリックすると、そのブースを編集します。</p>
           </div>
 
-          
-          <div class="lg:col-span-1 bg-white p-6 shadow-md border border-gray-100 sticky top-6 rounded-sm z-10 w-full max-w-full">
-            <h3 id="form-title" class="text-lg font-bold mb-4 border-l-4 border-orange-500 pl-3 tracking-widest">
-              新規追加 (クリックで位置指定)
-            </h3>
-            
-            <div class="space-y-4 font-sans">
-              <div>
-                <label class="block text-xs font-bold text-slate-700 mb-1">部屋ID <span class="text-xs font-normal text-slate-400">(自動生成)</span></label>
-                <input type="text" id="room-id" readonly class="w-full px-3 py-1.5 border border-gray-300 rounded bg-gray-100 text-slate-500 text-xs font-mono">
-              </div>
-              
-              <input type="hidden" id="room-floor" value="h1">
-
-              <div>
-                <label class="block text-xs font-bold text-slate-700 mb-1">部屋名 / 教室名</label>
-                <input type="text" id="room-name" placeholder="例: 101教室" class="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:border-orange-500 text-sm">
+          <aside class="space-y-8 xl:sticky xl:top-6">
+            <section class="panel p-6">
+              <div class="flex items-center justify-between mb-5 border-b border-gray-100 dark:border-white/10 pb-3">
+                <h3 class="text-lg font-bold tracking-widest text-slate-900 dark:text-white">ブース情報</h3>
+                <span id="editing-status" class="text-xs px-2.5 py-1 bg-gray-100 dark:bg-slate-700 text-slate-500 dark:text-slate-300 rounded">新規投稿</span>
               </div>
 
-              <div>
-                <label class="block text-xs font-bold text-slate-700 mb-1">企画タイトル <span class="text-red-500">*</span></label>
-                <input type="text" id="room-title" placeholder="例: 3年A組 縁日屋台" class="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:border-orange-500 text-sm">
-              </div>
-
-              <div>
-                <label class="block text-xs font-bold text-slate-700 mb-1">カテゴリ <span class="text-red-500">*</span></label>
-                <select id="room-category" class="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:border-orange-500 bg-white text-sm">
-                  <option value="food">模擬店・飲食</option>
-                  <option value="exhibition">展示・体験</option>
-                  <option value="stage">ステージ・公演</option>
-                  <option value="other">本部・休憩所・その他</option>
-                </select>
-              </div>
-
-              <div>
-                <label class="block text-xs font-bold text-slate-700 mb-1">詳細説明</label>
-                <textarea id="room-desc" rows="3" class="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:border-orange-500 text-sm" placeholder="企画の詳しい説明"></textarea>
-              </div>
-
-              <div>
-                <label class="block text-xs font-bold text-slate-700 mb-1">タグ (カンマ区切り)</label>
-                <input type="text" id="room-tags" placeholder="例: 体験, 景品あり" class="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:border-orange-500 text-sm">
-              </div>
-
-              <div class="flex gap-2">
-                <div class="flex-1">
-                  <label class="block text-xs font-bold text-slate-700 mb-1">X座標 <span class="text-red-500">*</span></label>
-                  <input type="text" id="room-posx" readonly class="w-full px-3 py-1.5 border border-gray-300 rounded bg-orange-50 text-orange-700 text-sm" placeholder="タップして取得">
+              <form id="room-form" class="space-y-5" novalidate>
+                <div>
+                  <label class="field-label" for="room-id">管理ID</label>
+                  <input id="room-id" class="field font-mono" type="text" maxlength="40" pattern="[A-Za-z0-9_-]+" required placeholder="例：h1-101">
+                  <p class="text-[11px] text-slate-500 dark:text-slate-400 mt-1.5 font-sans">既存データと同じIDなら上書き保存します。</p>
                 </div>
-                <div class="flex-1">
-                  <label class="block text-xs font-bold text-slate-700 mb-1">Y座標 <span class="text-red-500">*</span></label>
-                  <input type="text" id="room-posy" readonly class="w-full px-3 py-1.5 border border-gray-300 rounded bg-orange-50 text-orange-700 text-sm" placeholder="タップして取得">
+
+                <div>
+                  <label class="field-label" for="room-floor">フロア</label>
+                  <select id="room-floor" class="field" required>
+                    <option value="h1">本館 1F</option>
+                    <option value="h2">本館 2F</option>
+                    <option value="h3">本館 3F / 新館 B1F</option>
+                    <option value="s1">本館 4F / 新館 1F / 体育館</option>
+                    <option value="s2">新館 2F</option>
+                    <option value="s3">新館 3F</option>
+                  </select>
                 </div>
+
+                <div>
+                  <label class="field-label" for="room-name">場所名・部屋名</label>
+                  <input id="room-name" class="field" type="text" maxlength="80" required placeholder="例：101教室">
+                </div>
+
+                <div>
+                  <label class="field-label" for="room-title">ブース名</label>
+                  <input id="room-title" class="field" type="text" maxlength="120" required placeholder="例：3年A組 縁日屋台">
+                </div>
+
+                <div>
+                  <label class="field-label" for="room-category">カテゴリ</label>
+                  <select id="room-category" class="field" required>
+                    <option value="food">模擬店・飲食</option>
+                    <option value="exhibition">展示・体験</option>
+                    <option value="stage">ステージ・公演</option>
+                    <option value="other">本部・休憩所・その他</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label class="field-label" for="room-description">詳細</label>
+                  <textarea id="room-description" class="field field-textarea" maxlength="5000" placeholder="ブースの説明を入力してください"></textarea>
+                </div>
+
+                <div>
+                  <label class="field-label" for="room-tags">タグ</label>
+                  <input id="room-tags" class="field" type="text" maxlength="300" placeholder="展示, 体験, 販売">
+                  <p class="text-[11px] text-slate-500 dark:text-slate-400 mt-1.5 font-sans">カンマ区切りで入力します。</p>
+                </div>
+
+                <div class="grid grid-cols-2 gap-4">
+                  <div>
+                    <label class="field-label" for="room-pos-x">X位置（%）</label>
+                    <input id="room-pos-x" class="field font-mono" type="text" inputmode="decimal" required placeholder="50%">
+                  </div>
+                  <div>
+                    <label class="field-label" for="room-pos-y">Y位置（%）</label>
+                    <input id="room-pos-y" class="field font-mono" type="text" inputmode="decimal" required placeholder="50%">
+                  </div>
+                </div>
+
+                <div class="pt-3 border-t border-slate-200 dark:border-white/10">
+                  <div class="flex flex-col sm:flex-row gap-3">
+                    <button id="save-button" type="submit" class="flex-1 inline-flex items-center justify-center gap-3 px-6 py-3.5 border border-slate-900 dark:border-white bg-slate-900 dark:bg-white text-white dark:text-slate-900 hover:opacity-85 transition tracking-widest text-sm font-sans"><i class="fa-solid fa-floppy-disk"></i>保存する</button>
+                    <button id="new-button" type="button" class="inline-flex items-center justify-center gap-2 px-5 py-3.5 border border-slate-300 dark:border-slate-600 text-slate-800 dark:text-slate-200 hover:bg-white/60 dark:hover:bg-slate-900/50 transition tracking-widest text-sm font-sans"><i class="fa-solid fa-plus"></i>新規</button>
+                  </div>
+                  <button id="delete-button" type="button" class="is-hidden mt-3 w-full inline-flex items-center justify-center gap-2 px-5 py-3 border border-red-300 dark:border-red-800 text-red-700 dark:text-red-300 hover:bg-red-50 dark:hover:bg-red-950/30 transition tracking-widest text-sm font-sans"><i class="fa-regular fa-trash-can"></i>このブースを削除</button>
+                </div>
+
+                <p id="post-message" class="status-message" aria-live="polite"></p>
+              </form>
+            </section>
+
+            <section class="panel p-6">
+              <div class="flex items-center justify-between mb-5 border-b border-gray-100 dark:border-white/10 pb-3">
+                <h3 class="text-lg font-bold tracking-widest text-slate-900 dark:text-white">現在のブース</h3>
+                <span id="room-count" class="text-xs text-slate-400 font-mono">0</span>
               </div>
-
-              <div class="pt-3 flex gap-2">
-                <button onclick="resetForm()" class="flex-1 bg-gray-200 hover:bg-gray-300 text-slate-700 font-bold py-2 px-3 rounded transition text-sm">
-                  キャンセル
-                </button>
-                <button onclick="saveRoom()" class="flex-[2] bg-orange-600 hover:bg-orange-700 text-white font-bold py-2 px-3 rounded transition text-sm flex items-center justify-center gap-2">
-                  <i class="fa-solid fa-floppy-disk"></i> 保存
-                </button>
+              <div id="room-list" class="space-y-2">
+                <div class="text-center py-8 text-slate-400 text-sm">読み込み中...</div>
               </div>
-            </div>
-          </div>
-
-          
-          <div class="lg:col-span-3 bg-white p-6 shadow-md border border-gray-100 mt-2 w-full max-w-full">
-            <h3 class="text-xl font-bold mb-4 tracking-widest">登録済み部屋・ブース一覧</h3>
-            <div class="overflow-x-auto font-sans w-full">
-              <table class="w-full text-left border-collapse min-w-[600px]">
-                <thead>
-                  <tr class="bg-slate-100 text-slate-600 text-xs">
-                    <th class="p-2 border-b border-gray-200">フロア</th>
-                    <th class="p-2 border-b border-gray-200">部屋名</th>
-                    <th class="p-2 border-b border-gray-200">企画タイトル</th>
-                    <th class="p-2 border-b border-gray-200">カテゴリ</th>
-                    <th class="p-2 border-b border-gray-200 text-center w-24">操作</th>
-                  </tr>
-                </thead>
-                <tbody id="rooms-list-table">
-                  <tr><td colspan="5" class="p-8 text-center text-slate-400 text-sm">データを読み込んでいます...</td></tr>
-                </tbody>
-              </table>
-            </div>
-          </div>
-
+            </section>
+          </aside>
         </div>
-      </div>
-
-      
-      <div id="tab-content-users" class="hidden space-y-8">
-        <div class="bg-orange-50 border-l-4 border-orange-500 p-4 mb-6">
-          <p class="text-sm text-orange-800 font-sans">
-            <strong>【セキュリティの注意】</strong><br>
-            新しい管理者アカウントを作成できます。<code>admin</code> はマスターアカウントのため削除できません。
-          </p>
-        </div>
-
-        <div class="bg-white p-6 md:p-8 shadow-md border border-gray-100">
-          <h3 class="text-xl font-bold mb-6 border-l-4 border-orange-500 pl-3">新しいアカウントを作成</h3>
-          
-          <div class="flex flex-col md:flex-row gap-6 font-sans items-end">
-            <div class="flex-1 w-full">
-              <label class="block text-sm font-bold text-slate-700 mb-2">ログインID <span class="text-red-500">*</span></label>
-              <input type="text" id="new-user-id" class="w-full px-4 py-2 border border-gray-300 rounded focus:outline-none focus:border-orange-500">
-            </div>
-            <div class="flex-1 w-full">
-              <label class="block text-sm font-bold text-slate-700 mb-2">パスワード <span class="text-red-500">*</span></label>
-              <input type="password" id="new-user-password" class="w-full px-4 py-2 border border-gray-300 rounded focus:outline-none focus:border-orange-500">
-            </div>
-            <div class="w-full md:w-auto">
-              <button onclick="createUser()" class="w-full md:w-auto bg-orange-600 hover:bg-orange-700 text-white font-bold py-2.5 px-6 rounded transition duration-300 flex items-center justify-center gap-2">
-                <i class="fa-solid fa-user-plus"></i> 追加
-              </button>
-            </div>
-          </div>
-        </div>
-
-        <div class="bg-white p-6 md:p-8 shadow-md border border-gray-100">
-          <h3 class="text-lg font-bold mb-6 tracking-widest">登録済みアカウント一覧</h3>
-          <div class="overflow-x-auto font-sans">
-            <table class="w-full text-left border-collapse min-w-[500px]">
-              <thead>
-                <tr class="bg-slate-100 text-slate-600 text-sm">
-                  <th class="p-3 border-b border-gray-200">ログインID</th>
-                  <th class="p-3 border-b border-gray-200">登録日時</th>
-                  <th class="p-3 border-b border-gray-200 text-center">操作</th>
-                </tr>
-              </thead>
-              <tbody id="users-list-table">
-                <tr><td colspan="3" class="p-8 text-center text-slate-400">読み込み中...</td></tr>
-              </tbody>
-            </table>
-          </div>
-        </div>
-      </div>
-
+      </section>
     </div>
-  </section>
+  </main>
 
-  <div id="toast-container" class="fixed bottom-4 right-4 z-50 flex flex-col gap-2 font-sans pointer-events-none"></div>
+  <div id="footer-placeholder"></div>
 
-  
-  <script type="module" src="https://www.soei-fes.com/javascript/base15.js"></script>
+  <script src="https://www.soei-fes.com/javascript/base02.js"></script>
+  <script src="https://www.soei-fes.com/javascript/base04.js"></script>
+  <script type="module" src="https://www.soei-fes.com/javascript/base22.js"></script>
 </body>
 </html>

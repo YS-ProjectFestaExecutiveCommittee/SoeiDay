@@ -187,13 +187,47 @@ function mapObjectForFloor(floorKey) {
 }
 
 async function fetchRemoteBlueprint(floorKey) {
-  const response = await fetch(`https://ys-projectfestaexecutivecommittee.github.io/SoeiDay/blueprint/${floorKey}.js`, { cache: 'force-cache' });
+  const response = await fetch(`https://www.soei-fes.com/blueprint/${floorKey}.js`, { cache: 'no-store' });
   if (!response.ok) throw new Error(`Blueprint fetch failed: ${response.status}`);
   const text = await response.text();
-  return new Function(`var mapData; ${text.replace(/(const|let)\s+mapData\s*=/g, 'mapData =')} return mapData;`)();
+
+  const match = text.match(/(?:const|let|var)\s+mapData\s*=\s*([\[{])/);
+  if (!match) throw new Error(`mapData declaration not found in ${floorKey}.js`);
+
+  const start = match.index + match[0].lastIndexOf(match[1]);
+  return JSON.parse(extractBalancedJson(text, start));
 }
 
-function renderMapPaths(mapDataObj, floorKey, target) {
+function extractBalancedJson(text, start) {
+  const opening = text[start];
+  const closing = opening === '{' ? '}' : ']';
+  let depth = 0;
+  let inString = false;
+  let escaped = false;
+
+  for (let i = start; i < text.length; i += 1) {
+    const ch = text[i];
+
+    if (inString) {
+      if (escaped) escaped = false;
+      else if (ch === '\\') escaped = true;
+      else if (ch === '"') inString = false;
+      continue;
+    }
+
+    if (ch === '"') { inString = true; continue; }
+    if (ch === opening) depth += 1;
+    if (ch === closing) depth -= 1;
+    if (depth === 0) return text.slice(start, i + 1);
+  }
+
+  throw new Error('Unbalanced JSON data');
+}
+
+function normalizeBlueprintPaths(mapDataObj, floorKey) {
+  if (Array.isArray(mapDataObj)) return mapDataObj;
+  if (!mapDataObj || typeof mapDataObj !== 'object') return null;
+
   const patterns = {
     h1: ['h1', '本館1', '本館 1'],
     h2: ['h2', '本館2', '本館 2'],
@@ -202,15 +236,21 @@ function renderMapPaths(mapDataObj, floorKey, target) {
     s2: ['s2', '新館2', '新館 2'],
     s3: ['s3', '新館3', '新館 3']
   };
+
+  if (Array.isArray(mapDataObj.paths)) return mapDataObj.paths;
+  if (Array.isArray(mapDataObj.elements)) return mapDataObj.elements;
+  if (Array.isArray(mapDataObj.items)) return mapDataObj.items;
+
   const wanted = patterns[floorKey] || [floorKey];
-  let current = null;
-  for (const key of Object.keys(mapDataObj || {})) {
-    if (wanted.some((pattern) => key.toLowerCase().includes(pattern.toLowerCase()))) {
-      current = mapDataObj[key];
-      break;
-    }
+  for (const [key, value] of Object.entries(mapDataObj)) {
+    if (Array.isArray(value) && wanted.some((pattern) => key.toLowerCase().includes(pattern.toLowerCase()))) return value;
   }
-  if (!current && mapDataObj && Object.keys(mapDataObj).length) current = mapDataObj[Object.keys(mapDataObj)[0]];
+
+  return Object.values(mapDataObj).find(Array.isArray) || null;
+}
+
+function renderMapPaths(mapDataObj, floorKey, target) {
+  const current = normalizeBlueprintPaths(mapDataObj, floorKey);
   if (!Array.isArray(current)) return renderFallbackMap(target, floorKey);
 
   let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;

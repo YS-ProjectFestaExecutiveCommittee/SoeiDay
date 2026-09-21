@@ -18,19 +18,25 @@
   <style>
     @media (orientation: portrait) and (max-width: 767px) {
       #home-hero {
-        height: 100svh;
-        min-height: 640px;
+        height: auto !important;
+        min-height: 0 !important;
+        display: block !important;
+        overflow: visible !important;
+        background: rgb(248 250 252) !important;
       }
 
       #home-hero #hero-slideshow {
-        display: block;
-        position: absolute;
-        inset: 0;
-        z-index: 0;
-        background-image: url("https://www.soei-fes.com/image/top.jpg");
-        background-repeat: no-repeat;
-        background-position: center center;
-        background-size: cover;
+        display: block !important;
+        position: relative !important;
+        inset: auto !important;
+        width: 100% !important;
+        height: auto !important;
+        aspect-ratio: 1388 / 2000 !important;
+        background-image: url("https://www.soei-fes.com/image/top.jpg") !important;
+        background-repeat: no-repeat !important;
+        background-position: center center !important;
+        background-size: 100% 100% !important;
+        background-color: #0f172a !important;
       }
 
       #home-hero #hero-slideshow .slide {
@@ -41,29 +47,25 @@
         display: none !important;
       }
 
-      #home-hero::after {
-        content: "";
-        position: absolute;
-        inset: 0;
-        z-index: 1;
-        pointer-events: none;
-        background: linear-gradient(
-          to bottom,
-          rgba(15, 23, 42, 0.04) 0%,
-          rgba(15, 23, 42, 0.08) 48%,
-          rgba(15, 23, 42, 0.58) 100%
-        );
-      }
-
       #home-hero .hero-text-container {
-        position: relative;
-        z-index: 2;
+        position: relative !important;
+        z-index: 2 !important;
+        display: block !important;
+        width: 100% !important;
+        max-width: none !important;
+        height: auto !important;
+        padding: 0 !important;
       }
 
       #home-hero .hero-text-container > div {
-        justify-content: flex-end !important;
+        width: 100% !important;
+        height: auto !important;
+        min-height: 0 !important;
+        justify-content: flex-start !important;
         align-items: center !important;
-        padding: 0 1.25rem 7.5svh !important;
+        padding: 1.75rem 1.25rem 2rem !important;
+        background: rgb(248 250 252) !important;
+        text-align: center !important;
       }
 
       #home-hero .hero-title {
@@ -71,22 +73,77 @@
       }
 
       #home-hero .home-hero-copy {
-        margin-top: 0 !important;
-        padding-top: 0 !important;
-        padding-left: 0 !important;
-        border-top: 0 !important;
-        border-left: 0 !important;
+        width: 100% !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        border: 0 !important;
         align-items: center !important;
         text-align: center !important;
-        filter: drop-shadow(0 2px 8px rgba(0, 0, 0, 0.55)) !important;
+        filter: none !important;
       }
 
       #home-hero .home-hero-copy > p {
+        width: 100% !important;
+        margin-left: auto !important;
+        margin-right: auto !important;
         text-align: center !important;
+        color: rgb(15 23 42) !important;
+        text-shadow: none !important;
+      }
+
+      #home-hero .home-hero-copy > p:first-child {
+        font-size: clamp(1.15rem, 5vw, 1.55rem) !important;
+        letter-spacing: 0.12em !important;
+      }
+
+      #home-hero .home-hero-copy > p:nth-child(2) {
+        margin-top: 0.6rem !important;
+        font-size: clamp(0.78rem, 3.4vw, 0.95rem) !important;
+        letter-spacing: 0.12em !important;
       }
 
       #home-hero .home-hero-copy > a {
-        margin-top: 1.1rem !important;
+        margin-top: 1.15rem !important;
+        display: inline-flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        min-width: 12.5rem !important;
+        padding: 0.8rem 1.5rem !important;
+        border-color: rgb(15 23 42) !important;
+        background: rgb(15 23 42) !important;
+        color: white !important;
+        box-shadow: 0 8px 24px rgba(15, 23, 42, 0.18) !important;
+        backdrop-filter: none !important;
+      }
+
+      #home-hero .home-hero-copy > a:hover {
+        background: rgb(249 115 22) !important;
+        border-color: rgb(249 115 22) !important;
+        color: white !important;
+      }
+
+      .dark #home-hero {
+        background: rgb(15 23 42) !important;
+      }
+
+      .dark #home-hero .hero-text-container > div {
+        background: rgb(15 23 42) !important;
+      }
+
+      .dark #home-hero .home-hero-copy > p {
+        color: rgb(248 250 252) !important;
+      }
+
+      .dark #home-hero .home-hero-copy > a {
+        border-color: white !important;
+        background: white !important;
+        color: rgb(15 23 42) !important;
+      }
+
+      .dark #home-hero .home-hero-copy > a:hover {
+        background: rgb(249 115 22) !important;
+        border-color: rgb(249 115 22) !important;
+        color: white !important;
       }
     }
   </style>
@@ -294,5 +351,39 @@
   <script src="https://www.soei-fes.com/javascript/base04.js"></script>
 
   <script type="module" src="https://www.soei-fes.com/javascript/base07.js"></script>
+
+  <script>
+    (() => {
+      const hero = document.getElementById("home-hero");
+      const header = document.getElementById("header-placeholder");
+      if (!hero || !header) return;
+
+      const syncMobileHeaderOffset = () => {
+        hero.style.marginTop = "0px";
+
+        if (!window.matchMedia("(orientation: portrait) and (max-width: 767px)").matches) {
+          return;
+        }
+
+        const headerRect = header.getBoundingClientRect();
+        const heroRect = hero.getBoundingClientRect();
+
+        if (headerRect.height > 0 && headerRect.bottom > heroRect.top + 1) {
+          hero.style.marginTop = `${headerRect.height}px`;
+        }
+      };
+
+      window.addEventListener("load", syncMobileHeaderOffset, { passive: true });
+      window.addEventListener("resize", syncMobileHeaderOffset, { passive: true });
+      window.addEventListener("orientationchange", syncMobileHeaderOffset, { passive: true });
+      setTimeout(syncMobileHeaderOffset, 150);
+      setTimeout(syncMobileHeaderOffset, 600);
+
+      if ("ResizeObserver" in window) {
+        const observer = new ResizeObserver(syncMobileHeaderOffset);
+        observer.observe(header);
+      }
+    })();
+  </script>
 </body>
 </html>

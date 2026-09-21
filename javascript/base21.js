@@ -58,41 +58,62 @@ function youtubeEmbedUrl(id) {
   return id ? `https://www.youtube.com/embed/${encodeURIComponent(id)}` : '';
 }
 
+function getOrganizerName(booth) {
+  return booth.organizer || booth.group || booth.organization || booth.host || booth.sponsor || '';
+}
+
+function getSearchableText(booth) {
+  return [
+    booth.title,
+    booth.roomName,
+    getOrganizerName(booth),
+    booth.description,
+    Array.isArray(booth.tags) ? booth.tags.join(' ') : booth.tags,
+    booth.category,
+    booth.floor
+  ].filter(Boolean).join(' ').toLocaleLowerCase('ja');
+}
+
 function openBoothDetail(id, updateHash = true) {
   const booth = booths[id];
   if (!booth) return;
   if (updateHash) history.replaceState(null, '', `#${encodeURIComponent(id)}`);
 
   document.getElementById('booth-list-view')?.classList.add('hidden');
+  document.getElementById('booth-search-panel')?.classList.add('is-hidden');
   const detailView = document.getElementById('booth-detail-view');
   detailView.classList.remove('hidden');
 
   const meta = categoryMetaOf(booth.category);
-  const imageHtml = booth.imageData
+  const organizer = getOrganizerName(booth);
+  const imageMarkup = booth.imageData
     ? (booth.boothUrl
-        ? `<a href="${escapeHtml(booth.boothUrl)}" target="_blank" rel="noopener noreferrer" class="block group" aria-label="${escapeHtml(booth.title)}の詳細ページへ"><img src="${escapeHtml(booth.imageData)}" alt="${escapeHtml(booth.title)}" class="w-full max-h-[850px] object-contain bg-slate-100 dark:bg-slate-900 transition-transform duration-500 group-hover:scale-[1.01]"><span class="block text-center text-xs tracking-widest text-brand-orange dark:text-brand-orangeDark py-2 font-sans">画像をタップして専用ページへ <i class="fa-solid fa-arrow-up-right-from-square ml-1"></i></span></a>`
-        : `<img src="${escapeHtml(booth.imageData)}" alt="${escapeHtml(booth.title)}" class="w-full max-h-[850px] object-contain bg-slate-100 dark:bg-slate-900">`)
-    : '';
+        ? `<a href="${escapeHtml(booth.boothUrl)}" target="_blank" rel="noopener noreferrer" class="block group booth-detail-media" aria-label="${escapeHtml(booth.title)}の詳細ページへ"><img src="${escapeHtml(booth.imageData)}" alt="${escapeHtml(booth.title)}" class="bg-slate-100 dark:bg-slate-900 rounded-sm transition-transform duration-500 group-hover:scale-[1.01]"><span class="block text-center text-xs tracking-widest text-brand-orange dark:text-brand-orangeDark py-2 font-sans">画像をタップして専用ページへ <i class="fa-solid fa-arrow-up-right-from-square ml-1"></i></span></a>`
+        : `<div class="booth-detail-media"><img src="${escapeHtml(booth.imageData)}" alt="${escapeHtml(booth.title)}" class="bg-slate-100 dark:bg-slate-900 rounded-sm"></div>`)
+    : `<div class="booth-detail-media flex items-center justify-center bg-slate-100 dark:bg-slate-900 rounded-sm text-slate-400"><i class="fa-solid fa-store text-5xl"></i></div>`;
 
   const tagsHtml = Array.isArray(booth.tags) ? booth.tags.map((tag) => `<span class="px-2.5 py-1 bg-gray-100 dark:bg-slate-700 text-xs text-slate-600 dark:text-slate-300 rounded-sm">#${escapeHtml(tag)}</span>`).join('') : '';
   const videoHtml = booth.youtubeId ? `<div class="mt-8"><div class="aspect-video w-full overflow-hidden bg-black shadow-lg"><iframe src="${youtubeEmbedUrl(booth.youtubeId)}" title="${escapeHtml(booth.title)} YouTube動画" class="w-full h-full border-0" loading="lazy" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe></div></div>` : '';
 
   detailView.innerHTML = `
     <div class="bg-white dark:bg-slate-800 shadow-xl border border-gray-100 dark:border-white/5 rounded-sm overflow-hidden">
-      ${imageHtml ? `<div class="border-b border-gray-100 dark:border-white/10">${imageHtml}</div>` : ''}
-      <div class="p-6 sm:p-10">
-        <div class="flex flex-wrap items-center gap-2 mb-4">
-          <span class="px-3 py-1 ${meta.bg} ${meta.text} text-xs tracking-widest rounded-sm">${meta.label}</span>
-          <span class="text-sm text-slate-500 dark:text-slate-400 tracking-wider"><i class="fa-solid fa-location-dot mr-1"></i>${escapeHtml(booth.roomName)}</span>
-          <span class="text-sm text-slate-500 dark:text-slate-400 tracking-wider"><i class="fa-solid fa-layer-group mr-1"></i>${escapeHtml(FLOOR_TITLES[booth.floor] || booth.floor)}</span>
-        </div>
-        <h2 class="text-3xl md:text-4xl font-bold tracking-widest leading-tight text-slate-900 dark:text-white border-b border-gray-100 dark:border-white/10 pb-5">${escapeHtml(booth.title)}</h2>
-        <div class="mt-7 text-slate-700 dark:text-slate-300 leading-loose tracking-wide whitespace-pre-wrap text-sm sm:text-base">${escapeHtml(booth.description)}</div>
-        ${tagsHtml ? `<div class="flex flex-wrap gap-2 mt-7">${tagsHtml}</div>` : ''}
-        ${videoHtml}
-        <div class="mt-10 pt-6 border-t border-gray-100 dark:border-white/10 flex flex-wrap gap-3">
-          <button type="button" id="back-to-booth-list" class="inline-flex items-center gap-2 border border-slate-900 dark:border-white px-6 py-3 tracking-widest text-sm hover:bg-slate-900 hover:text-white dark:hover:bg-white dark:hover:text-slate-900 transition"><i class="fa-solid fa-arrow-left"></i>一覧へ戻る</button>
-          <a href="/map/#${encodeURIComponent(id)}" class="inline-flex items-center gap-2 border border-slate-300 dark:border-slate-600 px-6 py-3 tracking-widest text-sm hover:border-brand-orange transition"><i class="fa-solid fa-map-location-dot"></i>会場マップで見る</a>
+      <div class="booth-detail-grid gap-8 lg:gap-10 p-5 sm:p-8 lg:p-10">
+        <div class="booth-detail-image-wrap rounded-sm border border-gray-100 dark:border-white/10 p-3 self-start">${imageMarkup}</div>
+        <div class="min-w-0">
+          <div class="flex flex-wrap items-center gap-2 mb-4">
+            <span class="px-3 py-1 ${meta.bg} ${meta.text} text-xs tracking-widest rounded-sm">${meta.label}</span>
+            <span class="text-sm text-slate-500 dark:text-slate-400 tracking-wider"><i class="fa-solid fa-location-dot mr-1"></i>${escapeHtml(booth.roomName)}</span>
+            <span class="text-sm text-slate-500 dark:text-slate-400 tracking-wider"><i class="fa-solid fa-layer-group mr-1"></i>${escapeHtml(FLOOR_TITLES[booth.floor] || booth.floor)}</span>
+          </div>
+          <h2 class="text-3xl md:text-4xl font-bold tracking-widest leading-tight text-slate-900 dark:text-white border-b border-gray-100 dark:border-white/10 pb-5">${escapeHtml(booth.title)}</h2>
+          ${organizer ? `<div class="mt-5 flex items-center gap-2 text-slate-500 dark:text-slate-400"><i class="fa-solid fa-users text-sm"></i><span class="text-sm tracking-widest">${escapeHtml(organizer)}</span></div>` : ''}
+          <div class="mt-7 text-slate-700 dark:text-slate-300 leading-loose tracking-wide whitespace-pre-wrap text-sm sm:text-base">${escapeHtml(booth.description)}</div>
+          ${tagsHtml ? `<div class="flex flex-wrap gap-2 mt-7">${tagsHtml}</div>` : ''}
+          ${videoHtml}
+          <div class="mt-10 pt-6 border-t border-gray-100 dark:border-white/10 flex flex-wrap gap-3">
+            <button type="button" id="back-to-booth-list" class="inline-flex items-center gap-2 border border-slate-900 dark:border-white px-6 py-3 tracking-widest text-sm hover:bg-slate-900 hover:text-white dark:hover:bg-white dark:hover:text-slate-900 transition"><i class="fa-solid fa-arrow-left"></i>一覧へ戻る</button>
+            <a href="/map/#${encodeURIComponent(id)}" class="inline-flex items-center gap-2 border border-slate-300 dark:border-slate-600 px-6 py-3 tracking-widest text-sm hover:border-brand-orange transition"><i class="fa-solid fa-map-location-dot"></i>会場マップで見る</a>
+          </div>
         </div>
       </div>
     </div>
@@ -104,20 +125,27 @@ function openBoothDetail(id, updateHash = true) {
 function showBoothList(clearHash = true) {
   document.getElementById('booth-detail-view')?.classList.add('hidden');
   document.getElementById('booth-list-view')?.classList.remove('hidden');
+  document.getElementById('booth-search-panel')?.classList.remove('is-hidden');
   if (clearHash) history.replaceState(null, '', location.pathname + location.search);
 }
 
-function renderBoothList() {
+function renderBoothList(searchTerm = '') {
   const container = document.getElementById('booths-container');
   if (!container) return;
   const floorOrder = ['h1', 'h2', 'h3', 's1', 's2', 's3'];
-  const entries = Object.entries(booths);
+  const normalizedTerm = String(searchTerm || '').trim().toLocaleLowerCase('ja');
+  const entries = Object.entries(booths).filter(([, booth]) => !normalizedTerm || getSearchableText(booth).includes(normalizedTerm));
+  const summary = document.getElementById('booth-search-summary');
+  const clearButton = document.getElementById('booth-search-clear');
+  if (summary) summary.textContent = normalizedTerm ? `${entries.length}件が見つかりました。` : `${Object.keys(booths).length}件を掲載しています。`;
+  if (clearButton) clearButton.classList.toggle('hidden', !normalizedTerm);
 
   container.innerHTML = floorOrder.map((floorKey) => {
     const floorBooths = entries.filter(([, booth]) => booth.floor === floorKey).sort(([, a], [, b]) => String(a.title).localeCompare(String(b.title), 'ja'));
     if (!floorBooths.length) return '';
     const cards = floorBooths.map(([id, booth]) => {
       const meta = categoryMetaOf(booth.category);
+      const organizer = getOrganizerName(booth);
       const tags = Array.isArray(booth.tags) ? booth.tags.slice(0, 4).map((tag) => `<span class="px-2 py-0.5 bg-gray-100 dark:bg-slate-700 text-[10px] text-slate-600 dark:text-slate-300 rounded">#${escapeHtml(tag)}</span>`).join('') : '';
       return `
         <button type="button" data-booth-id="${escapeHtml(id)}" class="group text-left bg-white dark:bg-slate-800 border border-gray-100 dark:border-white/5 shadow-lg rounded-sm overflow-hidden hover:-translate-y-0.5 transition-transform duration-300">
@@ -128,6 +156,7 @@ function renderBoothList() {
             <div class="p-5">
               <div class="flex flex-wrap items-center gap-2 mb-2"><span class="px-2.5 py-1 ${meta.bg} ${meta.text} text-[10px] tracking-widest rounded-sm">${meta.label}</span><span class="text-xs text-slate-400">${escapeHtml(booth.roomName)}</span></div>
               <h3 class="text-xl font-bold tracking-widest text-slate-900 dark:text-white leading-relaxed">${escapeHtml(booth.title)}</h3>
+              ${organizer ? `<p class="mt-1 text-xs text-slate-500 dark:text-slate-400"><i class="fa-solid fa-users mr-1"></i>${escapeHtml(organizer)}</p>` : ''}
               <p class="mt-3 text-sm leading-relaxed text-slate-600 dark:text-slate-300 font-light">${escapeHtml(summaryText(booth.description))}</p>
               ${tags ? `<div class="flex flex-wrap gap-1.5 mt-4">${tags}</div>` : ''}
               <div class="mt-5 text-brand-orange dark:text-brand-orangeDark text-xs tracking-widest font-sans">詳細を見る <i class="fa-solid fa-arrow-right ml-1 group-hover:translate-x-1 transition-transform"></i></div>
@@ -147,10 +176,22 @@ function renderBoothList() {
   }).join('');
 
   if (!container.innerHTML.trim()) {
-    container.innerHTML = '<div class="text-center py-20 text-slate-400 font-light">現在公開されている出店情報はありません。</div>';
+    container.innerHTML = `<div class="text-center py-20 text-slate-400 font-light">${normalizedTerm ? '検索条件に一致する出店情報がありません。' : '現在公開されている出店情報はありません。'}</div>`;
   }
 
   container.querySelectorAll('[data-booth-id]').forEach((button) => button.addEventListener('click', () => openBoothDetail(button.dataset.boothId)));
+}
+
+function setupBoothSearch() {
+  const input = document.getElementById('booth-search');
+  const clearButton = document.getElementById('booth-search-clear');
+  if (!input) return;
+  input.addEventListener('input', () => renderBoothList(input.value));
+  clearButton?.addEventListener('click', () => {
+    input.value = '';
+    renderBoothList('');
+    input.focus();
+  });
 }
 
 function syncHashDetail() {
@@ -161,7 +202,7 @@ function syncHashDetail() {
 
 function categoryPinHtml(booth) {
   const meta = categoryMetaOf(booth.category);
-  return `<button type="button" class="px-3 py-1.5 ${meta.bg} ${meta.text} font-bold text-[11px] shadow-md rounded-full flex items-center gap-1.5 hover:scale-105 transition-transform whitespace-nowrap"><i class="fa-solid fa-location-dot"></i><span>${escapeHtml(booth.title || booth.roomName || 'ブース')}</span></button>`;
+  return `<button type="button" title="${escapeHtml(booth.title || booth.roomName || 'ブース')}" class="px-3 py-1.5 ${meta.bg} ${meta.text} font-bold text-[11px] shadow-md rounded-full flex items-center gap-1.5 hover:scale-105 transition-transform whitespace-nowrap max-w-[13rem] min-w-0"><i class="fa-solid fa-location-dot shrink-0"></i><span class="min-w-0 max-w-[10.5rem] overflow-hidden text-ellipsis whitespace-nowrap block">${escapeHtml(booth.title || booth.roomName || 'ブース')}</span></button>`;
 }
 
 function renderMapPins() {
@@ -251,6 +292,7 @@ async function loadBooths() {
 
 window.addEventListener('hashchange', syncHashDetail);
 addResizeRepositionListener(() => renderMapPins());
+setupBoothSearch();
 
 loadBooths().catch((error) => {
   console.error(error);

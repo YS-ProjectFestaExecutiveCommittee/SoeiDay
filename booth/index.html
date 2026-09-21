@@ -23,6 +23,28 @@
     .booth-card:hover::after { border-color:rgba(249,115,22,.55); }
     .booth-detail-image-wrap { background:linear-gradient(135deg,rgba(248,250,252,.95),rgba(226,232,240,.55)); }
     .dark .booth-detail-image-wrap { background:linear-gradient(135deg,rgba(15,23,42,.96),rgba(30,41,59,.8)); }
+    .booth-detail-media {
+      aspect-ratio: 210 / 297;
+      width: min(100%, 380px);
+      max-height: 560px;
+      margin-inline: auto;
+    }
+    .booth-detail-media img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+    }
+    @media (min-width: 1024px) {
+      .booth-detail-grid {
+        display: grid;
+        grid-template-columns: minmax(260px, 380px) minmax(0, 1fr);
+        align-items: start;
+      }
+      .booth-detail-media {
+        width: 100%;
+        max-height: 560px;
+      }
+    }
     .is-hidden { display:none !important; }
   </style>
 </head>
@@ -42,10 +64,20 @@
 
   <main class="py-20 relative bg-brand-bgLight dark:bg-brand-bgDark transition-colors duration-300 min-h-screen">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-      <div class="mb-12 flex justify-between items-end border-b border-gray-200 dark:border-slate-700 pb-4">
+      <div class="mb-8 flex flex-col lg:flex-row lg:justify-between lg:items-end gap-6 border-b border-gray-200 dark:border-slate-700 pb-5">
         <div>
           <h2 class="text-2xl font-bold tracking-widest text-slate-900 dark:text-white">模擬店・展示一覧</h2>
           <p class="text-sm text-slate-500 dark:text-slate-400 mt-2 tracking-widest font-light">フロアごとに各団体の企画をご紹介します。</p>
+        </div>
+
+        <div id="booth-search-panel" class="w-full lg:w-[430px]">
+          <label for="booth-search" class="sr-only">出店情報を検索</label>
+          <div class="relative">
+            <i class="fa-solid fa-magnifying-glass absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none"></i>
+            <input id="booth-search" type="search" autocomplete="off" placeholder="ブース名・場所・主催団体・タグなどを検索" class="w-full border border-gray-300 dark:border-slate-600 bg-white dark:bg-slate-800 text-slate-900 dark:text-white pl-11 pr-12 py-3 rounded-sm outline-none focus:border-brand-orange dark:focus:border-brand-orangeDark transition">
+            <button id="booth-search-clear" type="button" class="hidden absolute right-2 top-1/2 -translate-y-1/2 w-8 h-8 text-slate-400 hover:text-slate-900 dark:hover:text-white" aria-label="検索をクリア"><i class="fa-solid fa-xmark"></i></button>
+          </div>
+          <p id="booth-search-summary" class="text-[11px] text-slate-500 dark:text-slate-400 mt-2 font-sans tracking-wider"></p>
         </div>
       </div>
 

@@ -14,11 +14,87 @@
   <script src="https://www.soei-fes.com/javascript/base01.js"></script>
   <script src="https://www.soei-fes.com/javascript/load-components.js" defer></script>
   <link rel="stylesheet" href="https://www.soei-fes.com/css/base01.css">
+
+  <style>
+    @media (orientation: portrait) and (max-width: 767px) {
+      #home-hero {
+        height: 100svh;
+        min-height: 640px;
+      }
+
+      #home-hero #hero-slideshow {
+        display: block;
+        position: absolute;
+        inset: 0;
+        z-index: 0;
+        background-image: url("https://www.soei-fes.com/image/top.jpg");
+        background-repeat: no-repeat;
+        background-position: center center;
+        background-size: cover;
+      }
+
+      #home-hero #hero-slideshow .slide {
+        display: none !important;
+      }
+
+      #home-hero .hero-layers {
+        display: none !important;
+      }
+
+      #home-hero::after {
+        content: "";
+        position: absolute;
+        inset: 0;
+        z-index: 1;
+        pointer-events: none;
+        background: linear-gradient(
+          to bottom,
+          rgba(15, 23, 42, 0.04) 0%,
+          rgba(15, 23, 42, 0.08) 48%,
+          rgba(15, 23, 42, 0.58) 100%
+        );
+      }
+
+      #home-hero .hero-text-container {
+        position: relative;
+        z-index: 2;
+      }
+
+      #home-hero .hero-text-container > div {
+        justify-content: flex-end !important;
+        align-items: center !important;
+        padding: 0 1.25rem 7.5svh !important;
+      }
+
+      #home-hero .hero-title {
+        display: none !important;
+      }
+
+      #home-hero .home-hero-copy {
+        margin-top: 0 !important;
+        padding-top: 0 !important;
+        padding-left: 0 !important;
+        border-top: 0 !important;
+        border-left: 0 !important;
+        align-items: center !important;
+        text-align: center !important;
+        filter: drop-shadow(0 2px 8px rgba(0, 0, 0, 0.55)) !important;
+      }
+
+      #home-hero .home-hero-copy > p {
+        text-align: center !important;
+      }
+
+      #home-hero .home-hero-copy > a {
+        margin-top: 1.1rem !important;
+      }
+    }
+  </style>
 </head>
   
 <body class="font-serif bg-brand-bgLight text-slate-900 dark:bg-brand-bgDark dark:text-slate-100 antialiased transition-colors duration-300">
   <div id="header-placeholder"></div>
-  <section class="relative w-full h-screen min-h-[600px] overflow-hidden flex bg-slate-900">
+  <section id="home-hero" class="relative w-full h-screen min-h-[600px] overflow-hidden flex bg-slate-900">
     <div id="hero-slideshow">
       <div class="slide active" style="background-image: url('https://yokohamasoei.sakura.ne.jp/wp/wp-content/uploads/2019/07/DSC_8659.jpg?auto=format&fit=crop&w=1920&q=80');"></div>
       <div class="slide" style="background-image: url('https://yokohamasoei.sakura.ne.jp/wp/wp-content/uploads/2022/09/IMG_0529-scaled.jpg?auto=format&fit=crop&w=1920&q=80');"></div>
@@ -32,7 +108,7 @@
     <div class="relative w-full max-w-7xl mx-auto h-full flex hero-text-container z-10 px-6">
       <div class="flex flex-col w-full h-full justify-center items-center sm:items-start pl-0 sm:pl-12 md:pl-16 lg:pl-24 md:pt-20 lg:pt-24">
         <h2 class="hero-title">繋</h2>
-        <div class="mt-8 md:mt-12 flex flex-col items-center sm:items-start border-t-2 md:border-t-0 md:border-l-2 md:pl-6 border-white pt-6 md:pt-0 pointer-events-auto text-center sm:text-left" style="filter: drop-shadow(0 2px 8px rgba(0,0,0,0.6));">
+        <div class="home-hero-copy mt-8 md:mt-12 flex flex-col items-center sm:items-start border-t-2 md:border-t-0 md:border-l-2 md:pl-6 border-white pt-6 md:pt-0 pointer-events-auto text-center sm:text-left" style="filter: drop-shadow(0 2px 8px rgba(0,0,0,0.6));">
           <p class="hero-subtitle text-white text-xl md:text-3xl tracking-[0.2em] font-medium">
             2026.10.3 <span class="text-sm">sat</span> - 4 <span class="text-sm">sun</span>
           </p>

@@ -1,6 +1,6 @@
 import { getApp, getApps, initializeApp } from 'https://www.gstatic.com/firebasejs/12.19.0/firebase-app.js';
 import { getFirestore, collection, getDocs, query, where } from 'https://www.gstatic.com/firebasejs/12.19.0/firebase-firestore.js';
-import { FLOOR_TITLES, renderBlueprint, getBlueprintSvg, positionElementFromPercent, addResizeRepositionListener } from './map-blueprint.js';
+import { FLOOR_TITLES, renderBlueprint, getBlueprintSvg, positionElementFromPercent, addResizeRepositionListener } from 'https://www.soei-fes.com/blueprint/unity.js';
 
 const firebaseConfig = {
   apiKey: "AIzaSyA5uU-q3FEcElflECG6dc4AckxxX7iKj-s",

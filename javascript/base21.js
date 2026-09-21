@@ -217,11 +217,67 @@ function showFallbackGrid(blueprintBox, floorKey) {
   renderPins(floorKey, blueprintBox);
 }
 
+function getBlueprintSvg(container) {
+  return container?.querySelector?.('svg') || null;
+}
+
+function percentValue(value) {
+  const raw = String(value ?? '').trim().replace('%', '');
+  const number = Number(raw);
+  return Number.isFinite(number) ? Math.max(0, Math.min(100, number)) : 50;
+}
+
+function positionPinOnBlueprint(pin, layer, svg, posX, posY) {
+  const xPercent = percentValue(posX);
+  const yPercent = percentValue(posY);
+
+  if (!svg || !layer || typeof svg.getScreenCTM !== 'function' || !svg.viewBox?.baseVal) {
+    pin.style.left = `${xPercent}%`;
+    pin.style.top = `${yPercent}%`;
+    return;
+  }
+
+  const viewBox = svg.viewBox.baseVal;
+  const ctm = svg.getScreenCTM();
+  if (!ctm || !viewBox.width || !viewBox.height) {
+    pin.style.left = `${xPercent}%`;
+    pin.style.top = `${yPercent}%`;
+    return;
+  }
+
+  const point = svg.createSVGPoint();
+  point.x = viewBox.x + (viewBox.width * xPercent / 100);
+  point.y = viewBox.y + (viewBox.height * yPercent / 100);
+  const screenPoint = point.matrixTransform(ctm);
+  const layerRect = layer.getBoundingClientRect();
+
+  pin.style.left = `${screenPoint.x - layerRect.left}px`;
+  pin.style.top = `${screenPoint.y - layerRect.top}px`;
+}
+
+function repositionPinsOnBlueprint(container, layerId = 'pins-layer') {
+  const surface = container?.querySelector?.('#map-click-surface') || container;
+  const layer = surface?.querySelector?.(`#${layerId}`) || container?.querySelector?.(`#${layerId}`);
+  const svg = getBlueprintSvg(container);
+  if (!layer) return;
+
+  layer.querySelectorAll('[data-pos-x][data-pos-y]').forEach((pin) => {
+    positionPinOnBlueprint(pin, layer, svg, pin.dataset.posX, pin.dataset.posY);
+  });
+}
+
 function renderPins(floorKey, blueprintBox) {
-  const pinsLayer = blueprintBox.querySelector('#pins-layer');
-  if (!pinsLayer) return;
+  const surface = blueprintBox.querySelector('#map-click-surface') || blueprintBox;
+  let pinsLayer = surface.querySelector('#pins-layer');
+  if (!pinsLayer) {
+    pinsLayer = document.createElement('div');
+    pinsLayer.id = 'pins-layer';
+    pinsLayer.className = 'absolute inset-0 pointer-events-auto';
+    surface.appendChild(pinsLayer);
+  }
   pinsLayer.innerHTML = '';
 
+  const svg = getBlueprintSvg(blueprintBox);
   const presetCoordinates = {
     'h1-101': { top: '35%', left: '25%' },
     'h1-102': { top: '35%', left: '50%' },
@@ -232,14 +288,15 @@ function renderPins(floorKey, blueprintBox) {
 
   Object.entries(roomsState).forEach(([roomId, room]) => {
     if (room.floor !== floorKey) return;
-    const topPos = room.posY || presetCoordinates[roomId]?.top || '50%';
-    const leftPos = room.posX || presetCoordinates[roomId]?.left || '50%';
+    const fallback = presetCoordinates[roomId];
+    const posX = room.posX || fallback?.left || '50%';
+    const posY = room.posY || fallback?.top || '50%';
     const meta = categoryMeta(room.category);
 
     const pin = document.createElement('div');
     pin.className = 'room-pin flex items-center justify-center shadow-lg rounded-full cursor-pointer transition-transform duration-200';
-    pin.style.top = topPos;
-    pin.style.left = leftPos;
+    pin.dataset.posX = posX;
+    pin.dataset.posY = posY;
     pin.innerHTML = `
       <button type="button" class="px-3 py-1.5 ${meta.label === '展示・体験' ? 'bg-brand-lime text-slate-900' : meta.label === 'ステージ・公演' ? 'bg-blue-500 text-white' : meta.label === '本部・休憩所・その他' ? 'bg-slate-500 text-white' : 'bg-brand-orange text-white'} font-bold text-xs shadow-md rounded-full flex items-center gap-1.5 hover:scale-105 transition-transform">
         <i class="fa-solid fa-location-dot"></i>
@@ -249,6 +306,8 @@ function renderPins(floorKey, blueprintBox) {
     pin.querySelector('button').addEventListener('click', () => window.selectRoom(roomId));
     pinsLayer.appendChild(pin);
   });
+
+  requestAnimationFrame(() => repositionPinsOnBlueprint(blueprintBox, 'pins-layer'));
 }
 
 async function renderMap(floorKey) {
@@ -363,6 +422,11 @@ onSnapshot(collection(db, ...MAP_COLLECTION), (snapshot) => {
   if (detail) {
     detail.innerHTML = '<div class="text-center py-12 text-red-500 dark:text-red-400"><i class="fa-solid fa-triangle-exclamation text-3xl mb-3 block"></i><p class="text-sm leading-relaxed">会場データを読み込めませんでした。<br>Firebaseの設定とFirestoreルールを確認してください。</p></div>';
   }
+});
+
+window.addEventListener('resize', () => {
+  const container = document.getElementById('blueprint-render-target');
+  if (container) repositionPinsOnBlueprint(container, 'pins-layer');
 });
 
 window.addEventListener('DOMContentLoaded', () => {

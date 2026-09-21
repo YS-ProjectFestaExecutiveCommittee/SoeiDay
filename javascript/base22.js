@@ -305,37 +305,112 @@ function renderFallbackMap(target, floorKey) {
   renderAdminPins(floorKey);
 }
 
+function getBlueprintSvg(container) {
+  return container?.querySelector?.('svg') || null;
+}
+
+function percentValue(value) {
+  const raw = String(value ?? '').trim().replace('%', '');
+  const number = Number(raw);
+  return Number.isFinite(number) ? Math.max(0, Math.min(100, number)) : 50;
+}
+
+function positionPinOnBlueprint(pin, layer, svg, posX, posY) {
+  const xPercent = percentValue(posX);
+  const yPercent = percentValue(posY);
+
+  if (!svg || !layer || typeof svg.getScreenCTM !== 'function' || !svg.viewBox?.baseVal) {
+    pin.style.left = `${xPercent}%`;
+    pin.style.top = `${yPercent}%`;
+    return;
+  }
+
+  const viewBox = svg.viewBox.baseVal;
+  const ctm = svg.getScreenCTM();
+  if (!ctm || !viewBox.width || !viewBox.height) {
+    pin.style.left = `${xPercent}%`;
+    pin.style.top = `${yPercent}%`;
+    return;
+  }
+
+  const point = svg.createSVGPoint();
+  point.x = viewBox.x + (viewBox.width * xPercent / 100);
+  point.y = viewBox.y + (viewBox.height * yPercent / 100);
+  const screenPoint = point.matrixTransform(ctm);
+  const layerRect = layer.getBoundingClientRect();
+
+  pin.style.left = `${screenPoint.x - layerRect.left}px`;
+  pin.style.top = `${screenPoint.y - layerRect.top}px`;
+}
+
+function repositionAdminPins(container) {
+  const surface = container?.querySelector?.('#map-click-surface') || container;
+  const layer = surface?.querySelector?.('#admin-pins-layer') || container?.querySelector?.('#admin-pins-layer');
+  const svg = getBlueprintSvg(container);
+  if (!layer) return;
+
+  layer.querySelectorAll('[data-pos-x][data-pos-y]').forEach((pin) => {
+    positionPinOnBlueprint(pin, layer, svg, pin.dataset.posX, pin.dataset.posY);
+  });
+}
+
 function bindMapPlacement(clickTarget) {
   if (!clickTarget || clickTarget.dataset.mapClickBound === 'true') return;
   clickTarget.dataset.mapClickBound = 'true';
   clickTarget.addEventListener('click', (event) => {
     if (event.target.closest('button')) return;
+
+    const svg = getBlueprintSvg(clickTarget);
+    if (svg && typeof svg.getScreenCTM === 'function' && svg.viewBox?.baseVal) {
+      const ctm = svg.getScreenCTM();
+      if (ctm) {
+        const point = svg.createSVGPoint();
+        point.x = event.clientX;
+        point.y = event.clientY;
+        const local = point.matrixTransform(ctm.inverse());
+        const viewBox = svg.viewBox.baseVal;
+
+        const xPercent = ((local.x - viewBox.x) / viewBox.width) * 100;
+        const yPercent = ((local.y - viewBox.y) / viewBox.height) * 100;
+
+        if (xPercent < 0 || xPercent > 100 || yPercent < 0 || yPercent > 100) return;
+
+        els.roomPosX.value = `${xPercent.toFixed(2)}%`;
+        els.roomPosY.value = `${yPercent.toFixed(2)}%`;
+        setMessage('配置位置を更新しました。保存すると反映されます。');
+        return;
+      }
+    }
+
     const rect = clickTarget.getBoundingClientRect();
     if (!rect.width || !rect.height) return;
     const x = Math.max(0, Math.min(100, ((event.clientX - rect.left) / rect.width) * 100));
     const y = Math.max(0, Math.min(100, ((event.clientY - rect.top) / rect.height) * 100));
-    els.roomPosX.value = `${x.toFixed(1)}%`;
-    els.roomPosY.value = `${y.toFixed(1)}%`;
+    els.roomPosX.value = `${x.toFixed(2)}%`;
+    els.roomPosY.value = `${y.toFixed(2)}%`;
     setMessage('配置位置を更新しました。保存すると反映されます。');
   });
 }
 
 function renderAdminPins(floorKey) {
-  let layer = document.getElementById('admin-pins-layer');
+  const surface = els.blueprintTarget.querySelector('#map-click-surface') || els.blueprintTarget;
+  let layer = surface.querySelector('#admin-pins-layer');
   if (!layer) {
     layer = document.createElement('div');
     layer.id = 'admin-pins-layer';
     layer.className = 'absolute inset-0 pointer-events-auto';
-    els.blueprintTarget.querySelector('.relative')?.appendChild(layer);
+    surface.appendChild(layer);
   }
-  if (!layer) return;
   layer.innerHTML = '';
+
   Object.entries(rooms).forEach(([id, room]) => {
     if (room.floor !== floorKey) return;
+    const posX = room.posX || '50%';
+    const posY = room.posY || '50%';
     const pin = document.createElement('div');
     pin.className = 'map-editor-pin';
-    pin.style.top = room.posY || '50%';
-    pin.style.left = room.posX || '50%';
+    pin.dataset.posX = posX;
+    pin.dataset.posY = posY;
     pin.innerHTML = `<button type="button" title="${escapeHtml(room.title || id)}" class="px-2.5 py-1.5 ${categoryColor(room.category)} font-bold text-[11px] shadow-md rounded-full flex items-center gap-1.5 hover:scale-105 transition-transform"><i class="fa-solid fa-location-dot"></i><span>${escapeHtml(room.roomName || id)}</span></button>`;
     pin.querySelector('button').addEventListener('click', (event) => {
       event.stopPropagation();
@@ -343,6 +418,8 @@ function renderAdminPins(floorKey) {
     });
     layer.appendChild(pin);
   });
+
+  requestAnimationFrame(() => repositionAdminPins(els.blueprintTarget));
 }
 
 async function renderMap(floorKey) {
@@ -539,4 +616,8 @@ onAuthStateChanged(auth, (user) => {
     els.postPanel.classList.add('is-hidden');
     els.currentUser.textContent = '';
   }
+});
+
+window.addEventListener('resize', () => {
+  repositionAdminPins(els.blueprintTarget);
 });

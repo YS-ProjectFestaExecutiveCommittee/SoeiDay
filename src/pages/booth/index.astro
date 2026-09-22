@@ -1,0 +1,143 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import RemoteImage from "../../components/RemoteImage.astro";
+import "../../style/base01.css";
+import "../../style/base02.css";
+import "../../style/base07.css";
+---
+
+<BaseLayout title="出店案内 | 創英祭 2026" description="創英祭2026の模擬店・展示・催し物をご紹介します。各クラス・団体の出店内容、場所、カテゴリ、詳細をご確認いただけます。">
+	<style>
+	.booth-hero-title {
+		text-shadow: 0 2px 8px rgba(0, 0, 0, 0.48);
+	}
+	.booth-card {
+		position: relative;
+	}
+	.booth-card::after {
+		content: "";
+		position: absolute;
+		inset: 0;
+		border: 1px solid transparent;
+		pointer-events: none;
+		transition: border-color 0.25s;
+	}
+	.booth-card:hover::after {
+		border-color: rgba(249, 115, 22, 0.55);
+	}
+	.booth-detail-image-wrap {
+		background: linear-gradient(135deg, rgba(248, 250, 252, 0.95), rgba(226, 232, 240, 0.55));
+	}
+	.booth-detail-media {
+		aspect-ratio: 210 / 297;
+		width: min(100%, 380px);
+		max-height: 560px;
+		margin-inline: auto;
+	}
+	.booth-detail-media img {
+		width: 100%;
+		height: 100%;
+		object-fit: contain;
+	}
+	@media (min-width: 1024px) {
+		.booth-detail-grid {
+			display: grid;
+			grid-template-columns: minmax(260px, 380px) minmax(0, 1fr);
+			align-items: start;
+		}
+		.booth-detail-media {
+			width: 100%;
+			max-height: 560px;
+		}
+	}
+	.is-hidden {
+		display: none !important;
+	}
+	</style>
+
+	<section class="relative w-full h-[350px] md:h-[450px] overflow-hidden flex bg-slate-900">
+		<RemoteImage src="https://yokohamasoei.sakura.ne.jp/wp/wp-content/uploads/2022/09/IMG_0662-scaled.jpg" alt="" width={1920} height={1080} class="absolute inset-0 w-full h-full object-cover object-center opacity-60" style="filter: grayscale(10%);" />
+		<div class="absolute inset-0 bg-gradient-to-t from-slate-900 via-slate-900/60 to-transparent"></div>
+		<div class="relative w-full max-w-7xl mx-auto h-full flex items-end pb-16 px-6 sm:px-12 z-10">
+			<div>
+				<h1 class="booth-hero-title text-4xl md:text-5xl font-bold tracking-widest text-white mb-4">
+					出店案内<span class="text-brand-lime ml-1">.</span>
+				</h1>
+				<p class="text-slate-300 tracking-widest font-light text-sm md:text-base">Booths & Exhibitions</p>
+			</div>
+		</div>
+	</section>
+
+	<main class="py-20 relative bg-brand-bgLight transition-colors duration-300 min-h-screen">
+		<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+			<div class="mb-8 flex flex-col lg:flex-row lg:justify-between lg:items-end gap-6 border-b border-gray-200 pb-5">
+				<div>
+					<h2 class="text-2xl font-bold tracking-widest text-slate-900">模擬店・展示一覧</h2>
+					<p class="text-sm text-slate-500 mt-2 tracking-widest font-light">フロアごとに各団体の企画をご紹介します。</p>
+				</div>
+
+				<div id="booth-search-panel" class="w-full lg:w-[430px]">
+					<label for="booth-search" class="sr-only">出店情報を検索</label>
+					<div class="relative">
+						<i
+							class="fa-solid fa-magnifying-glass absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none"
+						></i>
+						<input
+							id="booth-search"
+							type="search"
+							autocomplete="off"
+							placeholder="ブース名・場所・主催団体・タグなどを検索"
+							class="w-full border border-gray-300 bg-white text-slate-900 pl-11 pr-12 py-3 rounded-sm outline-none focus:border-brand-orange transition"
+						>
+						<button
+							id="booth-search-clear"
+							type="button"
+							class="hidden absolute right-2 top-1/2 -translate-y-1/2 w-8 h-8 text-slate-400 hover:text-slate-900"
+							aria-label="検索をクリア"
+						>
+							<i class="fa-solid fa-xmark"></i>
+						</button>
+					</div>
+					<p id="booth-search-summary" class="text-[11px] text-slate-500 mt-2 font-sans tracking-wider"></p>
+				</div>
+			</div>
+
+			<div id="map-loading" class="text-center py-20 text-slate-400 font-light tracking-wider">
+				<i class="fa-solid fa-spinner fa-spin mr-3"></i>
+				出店情報を読み込んでいます...
+			</div>
+
+			<div id="booth-list-view">
+				<div id="booths-container" class="space-y-20"></div>
+			</div>
+
+			<div id="booth-detail-view" class="hidden"></div>
+		</div>
+	</main>
+
+	<section class="py-20 bg-brand-surfaceLight slant-top transition-colors duration-300">
+		<div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 text-center relative z-10">
+			<p class="text-sm text-slate-500 tracking-widest font-light mb-8">Contents</p>
+			<div class="flex flex-wrap justify-center gap-6">
+				<a
+					href="https://www.soei-fes.com/"
+					class="inline-flex items-center gap-3 border border-slate-900 px-8 py-4 tracking-widest text-sm hover:bg-slate-900 hover:text-white transition-colors duration-300 text-slate-900"
+					><i class="fa-solid fa-house"></i>トップページへ戻る</a
+				>
+				<a
+					href="https://www.soei-fes.com/schedule/"
+					class="inline-flex items-center gap-3 border border-slate-900 px-8 py-4 tracking-widest text-sm hover:bg-slate-900 hover:text-white transition-colors duration-300 text-slate-900"
+					><i class="fa-regular fa-calendar"></i>スケジュール</a
+				>
+				<a
+					href="https://www.soei-fes.com/map/"
+					class="inline-flex items-center gap-3 border border-slate-900 px-8 py-4 tracking-widest text-sm hover:bg-slate-900 hover:text-white transition-colors duration-300 text-slate-900"
+					><i class="fa-solid fa-map-location-dot"></i>会場マップ</a
+				>
+			</div>
+		</div>
+	</section>
+
+	<script src="../../scripts/site-interactions.ts"></script>
+	<script src="../../scripts/booth-directory.ts"></script>
+</BaseLayout>

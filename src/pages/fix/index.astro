@@ -1,0 +1,107 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import RemoteImage from "../../components/RemoteImage.astro";
+import "../../style/base01.css";
+import "../../style/base02.css";
+import "../../style/base04.css";
+import "../../style/base05.css";
+import "../../style/base17.css";
+---
+
+<BaseLayout title="工事中 | 創英祭 2026">
+	<section class="relative w-full h-[350px] md:h-[450px] overflow-hidden flex bg-slate-900">
+		<RemoteImage src="https://yokohamasoei.sakura.ne.jp/wp/wp-content/uploads/2022/09/KAT_0757-scaled.jpg" alt="" width={1920} height={1080} class="absolute inset-0 w-full h-full object-cover object-center opacity-60" style="filter: grayscale(10%);" />
+		<div class="absolute inset-0 bg-gradient-to-t from-slate-900 via-slate-900/65 to-transparent"></div>
+		<div class="relative w-full max-w-7xl mx-auto h-full flex items-end pb-16 px-6 sm:px-12 z-10">
+			<div>
+				<h1
+					class="text-4xl md:text-5xl font-bold tracking-widest text-white mb-4"
+					style="filter:drop-shadow(0 2px 4px rgba(0,0,0,.5));"
+				>
+					工事中<span class="text-brand-orange ml-1">.</span>
+				</h1>
+				<p class="text-slate-300 tracking-widest font-light text-sm md:text-base">Under Construction</p>
+			</div>
+		</div>
+	</section>
+	<main>
+		<section class="py-24 relative bg-brand-bgLight bg-pattern-dots transition-colors duration-300">
+			<div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+				<div class="construction-panel px-7 py-14 sm:px-12 sm:py-16 text-center">
+					<div class="construction-mark" aria-hidden="true">
+						<i class="fa-solid fa-screwdriver-wrench"></i>
+					</div>
+					<p class="text-xs sm:text-sm font-sans font-bold tracking-[0.25em] text-brand-orange mb-4">
+						UNDER CONSTRUCTION
+					</p>
+					<h2 class="text-3xl md:text-4xl font-bold tracking-[0.12em] text-slate-900">ただいま準備中です</h2>
+					<p class="mt-8 text-base md:text-lg leading-loose tracking-wide text-slate-700 font-light">
+						このページは現在準備を進めています。<br>
+						公開まで、もうしばらくお待ちください。
+					</p>
+					<div class="mt-10 pt-7 border-t border-slate-200">
+						<p class="text-sm text-slate-500 tracking-widest font-light">創英祭 2026</p>
+						<p class="mt-2 text-xs text-slate-400 font-sans tracking-[0.18em]">Yokohama Soei School Festival</p>
+					</div>
+				</div>
+				<section class="mini-game mt-12 p-6 sm:p-8">
+					<div class="text-center">
+						<p class="text-xs sm:text-sm font-sans font-bold tracking-[0.2em] text-brand-lime mb-3">MINI GAME</p>
+						<h3 class="text-2xl md:text-3xl font-bold tracking-[0.12em] text-slate-900">「繋」を探せ！</h3>
+						<p class="mt-4 text-sm md:text-base leading-relaxed tracking-wide text-slate-600 font-light">
+							15秒間で「繋」のマスをできるだけたくさん見つけてください。<br class="hidden sm:block">
+							工事中のページですが、ここだけは準備万端です。
+						</p>
+					</div>
+					<div
+						class="mt-7 flex flex-wrap justify-center items-center gap-5 font-sans text-xs sm:text-sm tracking-wider text-slate-500"
+					>
+						<span
+							>TIME
+							<strong id="game-time" class="text-slate-900">15</strong></span
+						>
+						<span>/</span>
+						<span
+							>SCORE
+							<strong id="game-score" class="text-slate-900">0</strong></span
+						>
+						<span>/</span>
+						<span
+							>BEST
+							<strong id="game-best" class="text-brand-orange">0</strong></span
+						>
+					</div>
+					<div
+						id="game-message"
+						class="mt-5 min-h-[1.5rem] text-center text-xs sm:text-sm tracking-wider text-slate-500 font-sans"
+						aria-live="polite"
+					>
+						スタートボタンを押してゲーム開始
+					</div>
+					<div id="mini-game-grid" class="mini-game-grid mt-5" aria-label="ミニゲームのマス目"></div>
+					<div class="mt-6 flex justify-center">
+						<button
+							id="game-start"
+							type="button"
+							class="inline-flex items-center gap-3 border border-slate-900 px-7 py-3 tracking-widest text-sm hover:bg-slate-900 hover:text-white transition-colors duration-300 text-slate-900"
+						>
+							<i class="fa-solid fa-play"></i>
+							スタート
+						</button>
+					</div>
+				</section>
+				<div class="mt-12 flex justify-center">
+					<a
+						href="https://www.soei-fes.com/"
+						class="inline-flex items-center gap-3 border border-slate-900 px-8 py-4 tracking-widest text-sm hover:bg-slate-900 hover:text-white transition-colors duration-300 text-slate-900"
+					>
+						<i class="fa-solid fa-house"></i>
+						トップページへ戻る
+					</a>
+				</div>
+			</div>
+		</section>
+	</main>
+	<script src="../../scripts/mini-game.ts"></script>
+	<script src="../../scripts/site-interactions.ts"></script>
+</BaseLayout>

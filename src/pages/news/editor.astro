@@ -1,0 +1,363 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import RemoteImage from "../../components/RemoteImage.astro";
+import "../../style/base01.css";
+import "../../style/base04.css";
+---
+
+<BaseLayout title="ニュース投稿 | 創英祭 2026" noindex>
+	<style>
+	.post-hero-title {
+		text-shadow: 0 2px 10px rgba(0, 0, 0, 0.45);
+	}
+	.panel {
+		background: rgba(255, 255, 255, 0.94);
+		border: 1px solid rgba(148, 163, 184, 0.18);
+		box-shadow: 0 20px 45px rgba(15, 23, 42, 0.08);
+	}
+	.field-label {
+		display: block;
+		margin-bottom: 0.55rem;
+		font-size: 0.78rem;
+		font-family: ui-sans-serif, system-ui, sans-serif;
+		font-weight: 700;
+		letter-spacing: 0.12em;
+		color: rgb(51 65 85);
+	}
+	.field {
+		width: 100%;
+		border: 1px solid rgba(148, 163, 184, 0.45);
+		border-radius: 2px;
+		background: rgba(248, 250, 252, 0.95);
+		color: rgb(15 23 42);
+		padding: 0.8rem 0.9rem;
+		outline: none;
+		transition:
+			border-color 0.2s ease,
+			box-shadow 0.2s ease,
+			background-color 0.2s ease;
+		font-family: ui-sans-serif, system-ui, sans-serif;
+	}
+	.field:focus {
+		border-color: rgb(132 204 22);
+		box-shadow: 0 0 0 3px rgba(132, 204, 22, 0.12);
+	}
+	.field-textarea {
+		min-height: 120px;
+		resize: vertical;
+		line-height: 1.85;
+	}
+	.editor {
+		min-height: 330px;
+		padding: 1rem;
+		line-height: 1.9;
+	}
+	.editor:empty::before {
+		content: attr(data-placeholder);
+		color: rgb(148 163 184);
+		pointer-events: none;
+	}
+	.toolbar {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 0.45rem;
+		border: 1px solid rgba(148, 163, 184, 0.35);
+		border-bottom: 0;
+		padding: 0.55rem;
+		background: rgba(248, 250, 252, 0.8);
+	}
+	.tool-btn {
+		min-width: 2.3rem;
+		height: 2.3rem;
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+		border: 1px solid transparent;
+		font-family: ui-sans-serif, system-ui, sans-serif;
+		font-weight: 700;
+	}
+	.tool-btn:hover,
+	.tool-btn.active {
+		border-color: rgba(132, 204, 22, 0.8);
+		background: rgba(132, 204, 22, 0.08);
+	}
+	.radio-card {
+		display: block;
+		cursor: pointer;
+		border: 1px solid rgba(148, 163, 184, 0.38);
+		padding: 1rem;
+		transition: 0.2s ease;
+	}
+	.radio-card:hover {
+		border-color: rgba(132, 204, 22, 0.7);
+	}
+	.radio-card.active {
+		border-color: rgb(132 204 22);
+		box-shadow: inset 0 0 0 1px rgb(132 204 22);
+		background: rgba(132, 204, 22, 0.05);
+	}
+	.status-message {
+		min-height: 1.6rem;
+		font-size: 0.86rem;
+		line-height: 1.7;
+	}
+	.is-hidden {
+		display: none !important;
+	}
+	.media-preview {
+		max-width: 300px;
+		max-height: 220px;
+		object-fit: contain;
+		display: block;
+		border: 1px solid rgba(148, 163, 184, 0.3);
+	}
+	.help-text {
+		font-family: ui-sans-serif, system-ui, sans-serif;
+		font-size: 0.72rem;
+		line-height: 1.7;
+		color: rgb(100 116 139);
+	}
+	.youtube-ok {
+		color: rgb(22 163 74);
+	}
+	.youtube-ng {
+		color: rgb(220 38 38);
+	}
+	</style>
+
+	<section class="relative w-full h-[300px] md:h-[390px] overflow-hidden flex bg-slate-900">
+		<RemoteImage src="https://yokohamasoei.sakura.ne.jp/wp/wp-content/uploads/2022/09/IMG_0529-scaled.jpg" alt="" width={1920} height={1080} class="absolute inset-0 w-full h-full object-cover object-center opacity-55" style="filter: grayscale(10%);" />
+		<div class="absolute inset-0 bg-gradient-to-t from-slate-900 via-slate-900/65 to-transparent"></div>
+		<div class="relative w-full max-w-7xl mx-auto h-full flex items-end pb-12 px-6 sm:px-12 z-10">
+			<div>
+				<p class="text-xs md:text-sm font-sans tracking-[0.28em] text-brand-orange mb-4">NEWS ADMINISTRATION</p>
+				<h1 class="post-hero-title text-4xl md:text-5xl font-bold tracking-[0.12em] text-white mb-3">ニュース投稿</h1>
+				<p class="text-slate-300 tracking-widest font-light text-sm md:text-base">Firebase認証ユーザー専用</p>
+			</div>
+		</div>
+	</section>
+
+	<main class="py-20 md:py-24 bg-brand-surfaceLight slant-top transition-colors duration-300">
+		<div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+			<section id="login-panel" class="panel p-7 sm:p-10 md:p-12">
+				<div class="mb-9 border-b border-slate-200 pb-5">
+					<p class="text-xs font-sans font-bold tracking-[0.18em] text-brand-orange mb-3">AUTHENTICATION</p>
+					<h2 class="text-2xl md:text-3xl font-bold tracking-widest text-slate-900">ログイン</h2>
+					<p class="text-sm text-slate-600 mt-4 leading-relaxed">
+						Firebase Authenticationに事前登録されたユーザーのみ利用できます。<br>このページから新しいメールアドレスを登録する機能はありません。
+					</p>
+				</div>
+
+				<form id="login-form" class="space-y-6" novalidate>
+					<div>
+						<label class="field-label" for="login-email">メールアドレス</label>
+						<input
+							id="login-email"
+							class="field"
+							type="email"
+							autocomplete="username"
+							inputmode="email"
+							required
+							placeholder="example@example.com"
+						>
+					</div>
+					<div>
+						<label class="field-label" for="login-password">パスワード</label>
+						<input
+							id="login-password"
+							class="field"
+							type="password"
+							autocomplete="current-password"
+							required
+							placeholder="パスワード"
+						>
+					</div>
+					<div class="flex flex-col sm:flex-row gap-3">
+						<button
+							id="login-button"
+							type="submit"
+							class="inline-flex items-center justify-center gap-3 px-7 py-3.5 border border-slate-900 bg-slate-900 text-white hover:opacity-85 transition tracking-widest text-sm font-sans"
+						>
+							<i class="fa-solid fa-right-to-bracket"></i>ログイン
+						</button>
+						<button
+							id="reset-button"
+							type="button"
+							class="inline-flex items-center justify-center gap-3 px-7 py-3.5 border border-slate-300 text-slate-800 hover:bg-white/60 transition tracking-widest text-sm font-sans"
+						>
+							<i class="fa-regular fa-envelope"></i>パスワード再設定
+						</button>
+					</div>
+					<p id="login-message" class="status-message text-slate-500" aria-live="polite"></p>
+				</form>
+			</section>
+
+			<section id="post-panel" class="panel p-7 sm:p-10 md:p-12 is-hidden">
+				<div
+					class="flex flex-col md:flex-row md:items-end md:justify-between gap-5 mb-9 border-b border-slate-200 pb-5"
+				>
+					<div>
+						<p class="text-xs font-sans font-bold tracking-[0.18em] text-brand-lime mb-3">POST</p>
+						<h2 class="text-2xl md:text-3xl font-bold tracking-widest text-slate-900">新しい記事を投稿</h2>
+						<p id="current-user" class="text-xs text-slate-500 font-sans mt-3"></p>
+					</div>
+					<button
+						id="logout-button"
+						type="button"
+						class="self-start md:self-auto inline-flex items-center justify-center gap-2 px-5 py-2.5 border border-slate-300 text-slate-800 hover:bg-white/60 transition tracking-widest text-xs font-sans"
+					>
+						<i class="fa-solid fa-arrow-right-from-bracket"></i>ログアウト
+					</button>
+				</div>
+
+				<form id="post-form" class="space-y-7" novalidate>
+					<div>
+						<span class="field-label">属性</span>
+						<div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+							<label class="radio-card active" data-category-card>
+								<input type="radio" name="post-type" value="news_release" checked class="sr-only">
+								<span class="flex items-start gap-4"
+									><span
+										class="radio-dot mt-1 h-3.5 w-3.5 rounded-full border border-brand-lime bg-brand-lime shrink-0"
+									></span><span
+										><span class="block text-base font-bold tracking-widest text-slate-900">ニュースリリース</span
+										><span class="block text-xs leading-relaxed text-slate-500 mt-2 font-sans"
+											>公式発表・重要なお知らせ</span
+										></span
+									></span
+								>
+							</label>
+							<label class="radio-card" data-category-card>
+								<input type="radio" name="post-type" value="topic" class="sr-only">
+								<span class="flex items-start gap-4"
+									><span class="radio-dot mt-1 h-3.5 w-3.5 rounded-full border border-slate-300 shrink-0"></span
+									><span
+										><span class="block text-base font-bold tracking-widest text-slate-900">トピック</span
+										><span class="block text-xs leading-relaxed text-slate-500 mt-2 font-sans"
+											>実行委員会からの話題・紹介</span
+										></span
+									></span
+								>
+							</label>
+						</div>
+					</div>
+
+					<div>
+						<label class="field-label" for="post-title">タイトル</label>
+						<input
+							id="post-title"
+							class="field"
+							type="text"
+							maxlength="120"
+							required
+							placeholder="記事タイトルを入力してください"
+						>
+					</div>
+
+					<div class="border border-slate-200 p-4 bg-slate-50/60">
+						<p class="field-label mb-2">公開番号</p>
+						<p class="text-sm text-slate-700 leading-relaxed">
+							記事番号は投稿順に自動付与されます。最初の投稿が
+							<strong>#1</strong>、次が <strong>#2</strong> …となり、公開URLは
+							<code class="font-sans">https://www.soei-fes.com/news/#番号</code>
+							です。
+						</p>
+					</div>
+
+					<div>
+						<label class="field-label" for="post-author">投稿者名</label>
+						<input
+							id="post-author"
+							class="field"
+							type="text"
+							maxlength="80"
+							required
+							placeholder="例：創英祭実行委員会"
+						>
+					</div>
+
+					<div>
+						<label class="field-label">本文</label>
+						<div class="toolbar" id="editor-toolbar" aria-label="本文の書式設定">
+							<button type="button" class="tool-btn" data-command="bold" title="太字">
+								<i class="fa-solid fa-bold"></i>
+							</button>
+							<button type="button" class="tool-btn" data-command="underline" title="下線">
+								<i class="fa-solid fa-underline"></i>
+							</button>
+							<button type="button" class="tool-btn" data-command="strikeThrough" title="取り消し線">
+								<i class="fa-solid fa-strikethrough"></i>
+							</button>
+							<button type="button" class="tool-btn" data-command="removeFormat" title="書式を解除">
+								<i class="fa-solid fa-eraser"></i>
+							</button>
+						</div>
+						<div
+							id="post-content"
+							class="field editor"
+							contenteditable="true"
+							role="textbox"
+							aria-multiline="true"
+							data-placeholder="本文を入力してください。URL（https://… や www.…）は表示時に自動でリンクになります。"
+						></div>
+						<p class="help-text mt-2">本文の一部を選択して、太字・下線・取り消し線を設定できます。</p>
+					</div>
+
+					<div>
+						<label class="field-label" for="post-image">画像（任意）</label>
+						<input id="post-image" class="field" type="file" accept="image/*">
+						<p class="help-text mt-2">
+							ブラウザ内で最も長い辺を600px以下へ縮小し、JPEGのBase64として保存します。Firestoreのサイズ制限を考慮し、必要に応じて追加圧縮します。
+						</p>
+						<div id="image-preview-wrap" class="hidden mt-4">
+							<img id="image-preview" class="media-preview" alt="画像プレビュー">
+							<p id="image-size-text" class="help-text mt-2"></p>
+							<button
+								id="image-clear-button"
+								type="button"
+								class="mt-2 text-xs border border-slate-300 px-3 py-2 font-sans tracking-wider"
+							>
+								画像を取り除く
+							</button>
+						</div>
+					</div>
+
+					<div>
+						<label class="field-label" for="post-youtube">YouTube動画（任意）</label>
+						<input
+							id="post-youtube"
+							class="field"
+							type="url"
+							inputmode="url"
+							placeholder="https://www.youtube.com/watch?v=XXXXXXXXXXX"
+						>
+						<p id="youtube-message" class="help-text mt-2">
+							YouTubeの通常URL・youtu.be・Shorts・embed
+							URLを利用できます。公開ページでは埋め込みプレーヤーとして表示します。
+						</p>
+					</div>
+
+					<div class="border-t border-slate-200 pt-7">
+						<button
+							id="post-button"
+							type="submit"
+							class="inline-flex w-full sm:w-auto items-center justify-center gap-3 px-9 py-4 border border-slate-900 bg-slate-900 text-white hover:opacity-85 transition tracking-widest text-sm font-sans"
+						>
+							<i class="fa-solid fa-paper-plane"></i>投稿する
+						</button>
+						<p class="text-xs text-slate-500 mt-4 leading-relaxed font-sans">
+							投稿後、公開ページで記事を確認できます。番号とURLの #番号
+							はFirestore上で自動的に採番されます。
+						</p>
+					</div>
+					<p id="post-message" class="status-message" aria-live="polite"></p>
+				</form>
+			</section>
+		</div>
+	</main>
+
+	<script src="../../scripts/site-interactions.ts"></script>
+	<script src="../../scripts/secret-trigger.ts"></script>
+
+	<script src="../../scripts/news-editor.ts"></script>
+</BaseLayout>

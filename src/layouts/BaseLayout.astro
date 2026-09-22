@@ -1,0 +1,62 @@
+---
+import "../style/global.css";
+import Header from "../components/Header.astro";
+import Footer from "../components/Footer.astro";
+import { Font } from "astro:assets";
+import favicon from "../image/Favicon01.ico";
+import top from "../image/top.jpg";
+
+interface Props {
+	title: string;
+	description?: string;
+	noindex?: boolean;
+}
+
+const { title, description, noindex = false } = Astro.props;
+const canonicalUrl = new URL(Astro.url.pathname, Astro.site ?? Astro.url.origin);
+---
+
+<!doctype html>
+<html lang="ja">
+	<head>
+		<meta charset="UTF-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+		{description && <meta name="description" content={description} />}
+		<meta name="robots" content={noindex ? "noindex,nofollow,noarchive" : "index,follow,max-image-preview:large"} />
+		{!noindex && <meta name="author" content="横浜創英中学・高等学校 創英祭実行委員会" />}
+		{!noindex && <link rel="canonical" href={canonicalUrl.href} />}
+		{!noindex && <link rel="sitemap" href="/sitemap-index.xml" />}
+		{!noindex && <meta property="og:type" content="website" />}
+		{!noindex && <meta property="og:locale" content="ja_JP" />}
+		{!noindex && <meta property="og:site_name" content="創英祭 2026" />}
+		{!noindex && <meta property="og:title" content={title} />}
+		{!noindex && description && <meta property="og:description" content={description} />}
+		{!noindex && <meta property="og:url" content={canonicalUrl.href} />}
+		{!noindex && <meta property="og:image" content={top.src} />}
+		{!noindex && <meta property="og:image:alt" content="創英祭2026 メインビジュアル" />}
+		{!noindex && <meta property="og:image:width" content="1388" />}
+		{!noindex && <meta property="og:image:height" content="2000" />}
+		{!noindex && <meta name="twitter:card" content="summary_large_image" />}
+		{!noindex && <meta name="twitter:title" content={title} />}
+		{!noindex && description && <meta name="twitter:description" content={description} />}
+		{!noindex && <meta name="twitter:image" content={top.src} />}
+		{!noindex && <script type="application/ld+json" set:html={JSON.stringify({
+			"@context": "https://schema.org",
+			"@graph": [
+				{ "@type": "WebSite", "@id": "https://www.soei-fes.com/#website", "url": "https://www.soei-fes.com/", "name": "創英祭 2026", "inLanguage": "ja-JP" },
+				{ "@type": "EducationalOrganization", "@id": "https://www.soei-fes.com/#organization", "name": "横浜創英中学・高等学校", "url": "https://www.soei-fes.com/" },
+				{ "@type": "WebPage", "@id": `${canonicalUrl.href}#webpage`, "url": canonicalUrl.href, "name": title, "description": description, "isPartOf": { "@id": "https://www.soei-fes.com/#website" }, "inLanguage": "ja-JP" }
+			]
+		})} />}
+		<link rel="icon" href={favicon.src}>
+		<title>{title}</title>
+		<Font cssVariable="--font-shippori-mincho" />
+		<Font cssVariable="--font-montserrat" />
+		<slot name="head" />
+	</head>
+	<body class="font-serif bg-brand-bgLight text-slate-900 antialiased transition-colors duration-300">
+		<Header />
+		<slot />
+		<Footer />
+	</body>
+</html>

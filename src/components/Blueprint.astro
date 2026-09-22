@@ -1,0 +1,49 @@
+---
+interface MapItem {
+	id?: string;
+	attributes?: Record<string, string>;
+}
+
+interface Props {
+	data: Record<string, MapItem[]>;
+	title: string;
+}
+
+const { data, title } = Astro.props;
+const items = Object.values(data).find(Array.isArray) ?? [];
+
+let minX = Infinity;
+let minY = Infinity;
+let maxX = -Infinity;
+let maxY = -Infinity;
+
+for (const item of items) {
+	const numbers = item.attributes?.d?.match(/-?\d+(?:\.\d+)?/g)?.map(Number) ?? [];
+	for (let index = 0; index + 1 < numbers.length; index += 2) {
+		minX = Math.min(minX, numbers[index]);
+		maxX = Math.max(maxX, numbers[index]);
+		minY = Math.min(minY, numbers[index + 1]);
+		maxY = Math.max(maxY, numbers[index + 1]);
+	}
+}
+
+const padX = (maxX - minX) * 0.05 || 50;
+const padY = (maxY - minY) * 0.05 || 50;
+const viewBox = Number.isFinite(minX)
+	? `${Math.max(0, minX - padX)} ${Math.max(0, minY - padY)} ${maxX - minX + padX * 2} ${maxY - minY + padY * 2}`
+	: "0 0 5000 2000";
+---
+
+<div class="w-full h-full relative flex items-center justify-center min-h-[420px] bg-white border border-dashed border-gray-300 p-4 rounded-sm">
+	<div id="map-click-surface" class="relative w-full h-full flex items-center justify-center p-2">
+		<svg
+			viewBox={viewBox}
+			class="w-full h-full max-h-[600px] drop-shadow-sm pointer-events-none"
+			preserveAspectRatio="xMidYMid meet"
+			aria-label={title}
+		>
+			{items.map((item) => <path id={item.id} {...item.attributes} />)}
+		</svg>
+		<div id="pins-layer" class="absolute inset-0 pointer-events-auto"></div>
+	</div>
+</div>

@@ -84,6 +84,31 @@
         <script src="https://www.soei-fes.com/javascript/load-components.js" defer></script>
         <link rel="stylesheet" href="https://www.soei-fes.com/css/base01.css">
         <style>
+            .hero-event-date {
+                display: flex;
+                flex-direction: column;
+                align-items: flex-start;
+                line-height: 1.15;
+            }
+
+            .hero-event-date__main {
+                display: block;
+            }
+
+            .hero-event-time {
+                display: block;
+                margin-top: 0.35rem;
+                font-size: 0.48em;
+                line-height: 1.2;
+                letter-spacing: 0.12em;
+                font-weight: 500;
+                opacity: 0.95;
+            }
+
+            .hero-event-school {
+                margin-top: 0.8rem !important;
+            }
+
             @media (orientation: portrait) and (max-width: 767px) {
                 #home-hero {
                     height: auto !important;
@@ -162,6 +187,21 @@
                 #home-hero .home-hero-copy>p:first-child {
                     font-size: clamp(1.15rem, 5vw, 1.55rem) !important;
                     letter-spacing: 0.12em !important;
+                }
+
+                #home-hero .hero-event-date {
+                    align-items: center !important;
+                    line-height: 1.15 !important;
+                }
+
+                #home-hero .hero-event-time {
+                    margin-top: 0.3rem !important;
+                    font-size: 0.52em !important;
+                    letter-spacing: 0.1em !important;
+                }
+
+                #home-hero .hero-event-school {
+                    margin-top: 0.8rem !important;
                 }
 
                 #home-hero .home-hero-copy>p:nth-child(2) {
@@ -401,9 +441,11 @@
                 <div class="flex flex-col w-full h-full justify-center items-center sm:items-start pl-0 sm:pl-12 md:pl-16 lg:pl-24 md:pt-20 lg:pt-24">
                     <h2 class="hero-title">繋</h2>
                     <div class="home-hero-copy mt-8 md:mt-12 flex flex-col items-center sm:items-start border-t-2 md:border-t-0 md:border-l-2 md:pl-6 border-white pt-6 md:pt-0 pointer-events-auto text-center sm:text-left" style="filter: drop-shadow(0 2px 8px rgba(0,0,0,0.6));">
-                        <p class="hero-subtitle text-white text-xl md:text-3xl tracking-[0.2em] font-medium"> 2026.10.3 <span class="text-sm">sat</span> - 4 <span class="text-sm">sun</span>
+                        <p class="hero-subtitle hero-event-date text-white text-xl md:text-3xl tracking-[0.2em] font-medium">
+                            <span class="hero-event-date__main">2026.10.3 <span class="text-sm">sat</span> - 4 <span class="text-sm">sun</span></span>
+                            <span class="hero-event-time">10:00～14:30</span>
                         </p>
-                        <p class="hero-subtitle text-white text-sm md:text-base mt-3 tracking-widest font-medium"> 横浜創英中学・高等学校 文化祭 </p>
+                        <p class="hero-subtitle hero-event-school text-white text-sm md:text-base mt-3 tracking-widest font-medium"> 横浜創英中学・高等学校 文化祭 </p>
                         <a href="https://peatix.com/event/5167457" class="mt-6 md:mt-8 inline-flex items-center justify-center border border-white/50 bg-black/20 hover:bg-white hover:text-slate-900 text-white px-8 py-2.5 text-sm tracking-widest transition-all duration-300 backdrop-blur-md rounded-sm" style="text-decoration: none;"> チケット予約 <i class="fa-solid fa-angle-right ml-3 text-xs"></i>
                         </a>
                     </div>
@@ -415,7 +457,7 @@
                 <div class="home-quick-nav__grid">
                     <a href="https://www.soei-fes.com/news/" class="home-quick-nav__item home-quick-nav__item--lime">
                         <i class="fa-regular fa-newspaper home-quick-nav__icon" aria-hidden="true"></i>
-                        <span class="home-quick-nav__label">お知らせ</span>
+                        <span class="home-quick-nav__label">ニュース</span>
                     </a>
                     <a href="https://www.soei-fes.com/concept/" class="home-quick-nav__item home-quick-nav__item--orange">
                         <i class="fa-solid fa-link home-quick-nav__icon" aria-hidden="true"></i>

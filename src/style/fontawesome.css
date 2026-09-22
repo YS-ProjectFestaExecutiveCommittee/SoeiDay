@@ -1,0 +1,116 @@
+@font-face {
+  font-family: "Font Awesome 7 Free";
+  font-style: normal;
+  font-weight: 900;
+  font-display: block;
+  src: url("@fortawesome/fontawesome-free/webfonts/fa-solid-900.woff2");
+}
+
+@font-face {
+  font-family: "Font Awesome 7 Free";
+  font-style: normal;
+  font-weight: 400;
+  font-display: block;
+  src: url("@fortawesome/fontawesome-free/webfonts/fa-regular-400.woff2");
+}
+
+@font-face {
+  font-family: "Font Awesome 7 Brands";
+  font-style: normal;
+  font-weight: 400;
+  font-display: block;
+  src: url("@fortawesome/fontawesome-free/webfonts/fa-brands-400.woff2");
+}
+
+.fa,
+.fa-solid,
+.fa-regular,
+.fa-brands {
+  display: var(--fa-display, inline-block);
+  font-family: var(--fa-family, "Font Awesome 7 Free");
+  font-style: normal;
+  font-variant: normal;
+  font-weight: 900;
+  line-height: 1;
+  text-align: center;
+  text-rendering: auto;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  width: 1.25em;
+}
+
+.fa::before,
+.fa-solid::before,
+.fa-regular::before,
+.fa-brands::before {
+  content: var(--fa);
+}
+
+.fa-regular {
+  --fa-family: "Font Awesome 7 Free";
+  font-weight: 400;
+}
+
+.fa-brands {
+  --fa-family: "Font Awesome 7 Brands";
+  font-weight: 400;
+}
+
+.fa-spin {
+  animation: fa-spin 2s linear infinite;
+}
+
+@keyframes fa-spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+.fa-house { --fa: "\f015"; }
+.fa-lightbulb { --fa: "\f0eb"; }
+.fa-screwdriver-wrench { --fa: "\f7d9"; }
+.fa-play { --fa: "\f04b"; }
+.fa-calendar { --fa: "\f133"; }
+.fa-map-location-dot { --fa: "\f5a0"; }
+.fa-right-to-bracket { --fa: "\f2f6"; }
+.fa-envelope { --fa: "\f0e0"; }
+.fa-arrow-right-from-bracket { --fa: "\f08b"; }
+.fa-bold { --fa: "\f032"; }
+.fa-underline { --fa: "\f0cd"; }
+.fa-strikethrough { --fa: "\f0cc"; }
+.fa-eraser { --fa: "\f12d"; }
+.fa-paper-plane { --fa: "\f1d8"; }
+.fa-arrow-down { --fa: "\f063"; }
+.fa-spinner { --fa: "\f110"; }
+.fa-link { --fa: "\f0c1"; }
+.fa-map { --fa: "\f279"; }
+.fa-hand-pointer { --fa: "\f25a"; }
+.fa-compass { --fa: "\f14e"; }
+.fa-store { --fa: "\f54e"; }
+.fa-city { --fa: "\f64f"; }
+.fa-arrow-up-right-from-square { --fa: "\f08e"; }
+.fa-location-dot { --fa: "\f3c5"; }
+.fa-broom-ball { --fa: "\f458"; }
+.fa-compass-drafting { --fa: "\f568"; }
+.fa-angle-right { --fa: "\f105"; }
+.fa-newspaper { --fa: "\f1ea"; }
+.fa-calendar-check { --fa: "\f274"; }
+.fa-star { --fa: "\f005"; }
+.fa-film { --fa: "\f008"; }
+.fa-shield-halved { --fa: "\f3ed"; }
+.fa-arrow-right { --fa: "\f061"; }
+.fa-arrow-right-long { --fa: "\f178"; }
+.fa-bars { --fa: "\f0c9"; }
+.fa-calendar-plus { --fa: "\f271"; }
+.fa-location-crosshairs { --fa: "\f601"; }
+.fa-plus { --fa: "\2b"; }
+.fa-floppy-disk { --fa: "\f0c7"; }
+.fa-trash-can { --fa: "\f2ed"; }
+.fa-magnifying-glass { --fa: "\f002"; }
+.fa-xmark { --fa: "\f00d"; }
+.fa-layer-group { --fa: "\f5fd"; }
+.fa-users { --fa: "\f0c0"; }
+.fa-arrow-left { --fa: "\f060"; }
+.fa-triangle-exclamation { --fa: "\f071"; }
+.fa-instagram { --fa: "\f16d"; }
+.fa-facebook-f { --fa: "\f39e"; }
+.fa-youtube { --fa: "\f167"; }

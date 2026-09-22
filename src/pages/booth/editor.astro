@@ -1,0 +1,361 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import RemoteImage from "../../components/RemoteImage.astro";
+import "../../style/base01.css";
+import "../../style/base04.css";
+---
+
+<BaseLayout title="出店・会場マップ管理 | 創英祭 2026" noindex>
+	<style>
+	.panel {
+		background: rgba(255, 255, 255, 0.94);
+		border: 1px solid rgba(148, 163, 184, 0.18);
+		box-shadow: 0 20px 45px rgba(15, 23, 42, 0.08);
+	}
+	.field-label {
+		display: block;
+		margin-bottom: 0.55rem;
+		font-size: 0.78rem;
+		font-family: ui-sans-serif, system-ui, sans-serif;
+		font-weight: 700;
+		letter-spacing: 0.12em;
+		color: rgb(51 65 85);
+	}
+	.field {
+		width: 100%;
+		border: 1px solid rgba(148, 163, 184, 0.45);
+		border-radius: 2px;
+		background: rgba(248, 250, 252, 0.95);
+		color: rgb(15 23 42);
+		padding: 0.8rem 0.9rem;
+		outline: none;
+		font-family: ui-sans-serif, system-ui, sans-serif;
+	}
+	.field:focus {
+		border-color: rgb(132 204 22);
+		box-shadow: 0 0 0 3px rgba(132, 204, 22, 0.12);
+	}
+	.field-textarea {
+		min-height: 180px;
+		resize: vertical;
+		line-height: 1.85;
+	}
+	.status-message {
+		min-height: 1.6rem;
+		font-size: 0.86rem;
+		line-height: 1.7;
+	}
+	.is-hidden {
+		display: none !important;
+	}
+	.category-choice {
+		border: 1px solid rgba(148, 163, 184, 0.38);
+		border-radius: 2px;
+		padding: 1rem;
+		cursor: pointer;
+		transition: all 0.2s ease;
+	}
+	.category-choice.active {
+		box-shadow: inset 0 0 0 2px currentColor;
+	}
+	.category-choice-dot {
+		width: 12px;
+		height: 12px;
+		border-radius: 999px;
+		flex: none;
+		margin-top: 3px;
+	}
+	.map-editor-pin {
+		position: absolute;
+		transform: translate(-50%, -50%);
+		z-index: 20;
+	}
+	.map-editor-shell {
+		min-height: 480px;
+	}
+	.image-preview {
+		aspect-ratio: 210 / 297;
+		max-width: 240px;
+		width: 100%;
+		object-fit: contain;
+		background: #f1f5f9;
+	}
+	</style>
+
+	<section class="relative w-full h-[300px] md:h-[390px] overflow-hidden flex bg-slate-900">
+		<RemoteImage src="https://www.soei.ed.jp/oclp_j/assets/img/sec01_thumb.jpg" alt="" width={1920} height={1080} class="absolute inset-0 w-full h-full object-cover object-center opacity-55" style="filter: grayscale(15%);" />
+		<div class="absolute inset-0 bg-gradient-to-t from-slate-900 via-slate-900/65 to-transparent"></div>
+		<div class="relative w-full max-w-7xl mx-auto h-full flex items-end pb-12 px-6 sm:px-12 z-10">
+			<div>
+				<p class="text-xs md:text-sm font-sans tracking-[0.28em] text-brand-orange mb-4">BOOTH & MAP ADMINISTRATION</p>
+				<h1 class="text-4xl md:text-5xl font-bold tracking-[0.12em] text-white mb-3">出店・会場マップ管理</h1>
+				<p class="text-slate-300 tracking-widest font-light text-sm md:text-base">Firebase認証ユーザー専用</p>
+			</div>
+		</div>
+	</section>
+	<main class="py-20 md:py-24 bg-brand-surfaceLight slant-top transition-colors duration-300">
+		<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+			<section id="login-panel" class="panel p-7 sm:p-10 md:p-12 max-w-3xl mx-auto">
+				<div class="mb-9 border-b border-slate-200 pb-5">
+					<p class="text-xs font-sans font-bold tracking-[0.18em] text-brand-orange mb-3">AUTHENTICATION</p>
+					<h2 class="text-2xl md:text-3xl font-bold tracking-widest text-slate-900">ログイン</h2>
+					<p class="text-sm text-slate-600 mt-4 leading-relaxed">
+						Firebase Authenticationに事前登録されたユーザーのみ利用できます。<br>このページから新しいメールアドレスを登録する機能はありません。
+					</p>
+				</div>
+				<form id="login-form" class="space-y-6" novalidate>
+					<div>
+						<label class="field-label" for="login-email">メールアドレス</label>
+						<input id="login-email" class="field" type="email" autocomplete="username" required>
+					</div>
+					<div>
+						<label class="field-label" for="login-password">パスワード</label>
+						<input id="login-password" class="field" type="password" autocomplete="current-password" required>
+					</div>
+					<div class="flex flex-col sm:flex-row gap-3">
+						<button
+							id="login-button"
+							type="submit"
+							class="inline-flex items-center justify-center gap-3 px-7 py-3.5 border border-slate-900 bg-slate-900 text-white tracking-widest text-sm font-sans"
+						>
+							<i class="fa-solid fa-right-to-bracket"></i>ログイン
+						</button><button
+							id="reset-button"
+							type="button"
+							class="inline-flex items-center justify-center gap-3 px-7 py-3.5 border border-slate-300 tracking-widest text-sm font-sans"
+						>
+							<i class="fa-regular fa-envelope"></i>パスワード再設定
+						</button>
+					</div>
+					<p id="login-message" class="status-message text-slate-500"></p>
+				</form>
+			</section>
+
+			<section id="post-panel" class="is-hidden">
+				<div
+					class="flex flex-col lg:flex-row lg:items-end lg:justify-between gap-5 mb-9 border-b border-slate-200 pb-5"
+				>
+					<div>
+						<p class="text-xs font-sans font-bold tracking-[0.18em] text-brand-lime mb-3">BOOTH DATABASE</p>
+						<h2 class="text-2xl md:text-3xl font-bold tracking-widest text-slate-900">出店情報を一元管理</h2>
+						<p id="current-user" class="text-xs text-slate-500 font-sans mt-3"></p>
+					</div>
+					<button
+						id="logout-button"
+						type="button"
+						class="self-start lg:self-auto inline-flex items-center justify-center gap-2 px-5 py-2.5 border border-slate-300 tracking-widest text-xs font-sans"
+					>
+						<i class="fa-solid fa-arrow-right-from-bracket"></i>ログアウト
+					</button>
+				</div>
+				<div class="grid grid-cols-1 xl:grid-cols-3 gap-8 items-start">
+					<div class="xl:col-span-2 space-y-8">
+						<section class="panel p-6 md:p-8">
+							<div class="flex flex-wrap justify-center gap-2 sm:gap-3 border-b border-gray-200 pb-5 mb-6">
+								<button
+									type="button"
+									data-floor="h1"
+									class="admin-floor-btn px-4 py-2.5 text-xs sm:text-sm tracking-widest border rounded-sm"
+								>
+									本館 1F
+								</button><button
+									type="button"
+									data-floor="h2"
+									class="admin-floor-btn px-4 py-2.5 text-xs sm:text-sm tracking-widest border rounded-sm"
+								>
+									本館 2F
+								</button><button
+									type="button"
+									data-floor="h3"
+									class="admin-floor-btn px-4 py-2.5 text-xs sm:text-sm tracking-widest border rounded-sm"
+								>
+									本館 3F / 新館 B1F
+								</button><button
+									type="button"
+									data-floor="s1"
+									class="admin-floor-btn px-4 py-2.5 text-xs sm:text-sm tracking-widest border rounded-sm"
+								>
+									本館 4F / 新館 1F / 体育館
+								</button><button
+									type="button"
+									data-floor="s2"
+									class="admin-floor-btn px-4 py-2.5 text-xs sm:text-sm tracking-widest border rounded-sm"
+								>
+									新館 2F
+								</button><button
+									type="button"
+									data-floor="s3"
+									class="admin-floor-btn px-4 py-2.5 text-xs sm:text-sm tracking-widest border rounded-sm"
+								>
+									新館 3F
+								</button>
+							</div>
+							<div id="admin-blueprint-target" class="map-editor-shell"></div>
+							<p class="text-xs text-slate-500 mt-3 font-sans leading-relaxed">
+								<i class="fa-solid fa-location-crosshairs mr-1"></i
+								>地図をクリックすると同じSVG座標系でX・Y位置を設定します。公開ページにも同じ座標が使われます。
+							</p>
+						</section>
+						<section class="panel p-6 md:p-8">
+							<div class="flex items-center justify-between mb-6 border-b border-gray-100 pb-3">
+								<div>
+									<p class="text-xs font-sans tracking-[0.16em] text-brand-orange">BOOTH INFORMATION</p>
+									<h3 id="editing-status" class="text-xl font-bold tracking-widest text-slate-900 mt-1">新規投稿</h3>
+								</div>
+								<button
+									id="new-button"
+									type="button"
+									class="inline-flex items-center gap-2 px-4 py-2 border border-slate-300 text-xs tracking-widest"
+								>
+									<i class="fa-solid fa-plus"></i>新規
+								</button>
+							</div>
+							<form id="booth-form" class="space-y-6" novalidate>
+								<div>
+									<label class="field-label" for="booth-floor">フロア</label
+									><select id="booth-floor" class="field" required>
+										<option value="h1">本館 1F</option>
+										<option value="h2">本館 2F</option>
+										<option value="h3">本館 3F / 新館 B1F</option>
+										<option value="s1">本館 4F / 新館 1F / 体育館</option>
+										<option value="s2">新館 2F</option>
+										<option value="s3">新館 3F</option>
+									</select>
+								</div>
+								<div>
+									<label class="field-label" for="booth-title">出店タイトル（ブース名）</label>
+									<input id="booth-title" class="field" type="text" maxlength="120" required>
+								</div>
+								<div>
+									<label class="field-label" for="booth-room">場所・部屋名</label>
+									<input id="booth-room" class="field" type="text" maxlength="80" required>
+								</div>
+								<div>
+									<label class="field-label" for="booth-organizer"
+										>主催団体
+										<span class="font-normal text-slate-400 ml-1">任意</span></label
+									><input
+										id="booth-organizer"
+										class="field"
+										type="text"
+										maxlength="120"
+										placeholder="例：3年A組、創英祭実行委員会"
+									>
+								</div>
+								<div>
+									<span class="field-label">カテゴリ</span
+									><select id="booth-category" class="sr-only" required>
+										<option value="food">模擬店・飲食</option>
+										<option value="exhibition">展示・体験</option>
+										<option value="stage">ステージ・公演</option>
+										<option value="other">本部・休憩所・その他</option>
+									</select>
+									<div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+										<button type="button" data-category="food" class="category-choice text-left">
+											<span class="flex gap-3"
+												><span class="category-choice-dot bg-brand-orange"></span
+												><span class="text-sm font-bold tracking-widest">模擬店・飲食</span></span
+											>
+										</button>
+										<button type="button" data-category="exhibition" class="category-choice text-left">
+											<span class="flex gap-3"
+												><span class="category-choice-dot bg-brand-lime"></span
+												><span class="text-sm font-bold tracking-widest">展示・体験</span></span
+											>
+										</button>
+										<button type="button" data-category="stage" class="category-choice text-left">
+											<span class="flex gap-3"
+												><span class="category-choice-dot bg-blue-500"></span
+												><span class="text-sm font-bold tracking-widest">ステージ・公演</span></span
+											>
+										</button>
+										<button type="button" data-category="other" class="category-choice text-left">
+											<span class="flex gap-3"
+												><span class="category-choice-dot bg-slate-400"></span
+												><span class="text-sm font-bold tracking-widest">本部・休憩所・その他</span></span
+											>
+										</button>
+									</div>
+								</div>
+								<div>
+									<label class="field-label" for="booth-description">出店の詳細</label
+									><textarea id="booth-description" class="field field-textarea" maxlength="5000" required></textarea>
+								</div>
+								<div>
+									<label class="field-label" for="booth-image">出店概要の画像</label>
+									<input id="booth-image" class="field" type="file" accept="image/*">
+									<p id="image-info" class="text-[11px] text-slate-500 mt-2 font-sans">
+										A4 JIS縦（210:297）に中央トリミングし、長辺850px以内・Base64へ圧縮します。
+									</p>
+									<div id="image-preview-wrap" class="is-hidden mt-4">
+										<img id="image-preview" class="image-preview border border-gray-200" alt="画像プレビュー">
+									</div>
+								</div>
+								<div>
+									<label class="field-label" for="booth-youtube"
+										>動画（YouTubeリンク）<span class="font-normal text-slate-400 ml-1">任意</span></label
+									><input id="booth-youtube" class="field" type="url" placeholder="https://www.youtube.com/watch?v=...">
+								</div>
+								<div>
+									<label class="field-label" for="booth-tags">タグ</label>
+									<input
+										id="booth-tags"
+										class="field"
+										type="text"
+										maxlength="300"
+										required
+										placeholder="例：展示, 体験, 3年A組"
+									>
+									<p class="text-[11px] text-slate-500 mt-1.5 font-sans">カンマ区切りで1つ以上。</p>
+								</div>
+								<div>
+									<label class="field-label" for="booth-url"
+										>ブースごとのページURL
+										<span class="font-normal text-slate-400 ml-1">任意</span></label
+									><input id="booth-url" class="field" type="url" placeholder="https://example.com/booth">
+								</div>
+								<div class="grid grid-cols-2 gap-4">
+									<div>
+										<label class="field-label" for="booth-pos-x">マップX座標</label>
+										<input id="booth-pos-x" class="field font-mono" type="text" readonly required>
+									</div>
+									<div>
+										<label class="field-label" for="booth-pos-y">マップY座標</label>
+										<input id="booth-pos-y" class="field font-mono" type="text" readonly required>
+									</div>
+								</div>
+								<div class="pt-4 border-t border-slate-200 flex flex-col sm:flex-row gap-3">
+									<button
+										id="save-button"
+										type="submit"
+										class="flex-1 inline-flex items-center justify-center gap-3 px-6 py-3.5 border border-slate-900 bg-slate-900 text-white tracking-widest text-sm font-sans"
+									>
+										<i class="fa-solid fa-floppy-disk"></i>保存する
+									</button><button
+										id="delete-button"
+										type="button"
+										class="is-hidden inline-flex items-center justify-center gap-2 px-5 py-3.5 border border-red-300 text-red-700 tracking-widest text-sm font-sans"
+									>
+										<i class="fa-regular fa-trash-can"></i>削除
+									</button>
+								</div>
+								<p id="post-message" class="status-message" aria-live="polite"></p>
+							</form>
+						</section>
+					</div>
+					<aside class="panel p-6 xl:sticky xl:top-6">
+						<div class="flex items-center justify-between mb-5 border-b border-gray-100 pb-3">
+							<h3 class="text-lg font-bold tracking-widest">現在の出店</h3>
+							<span id="booth-count" class="text-xs text-slate-400 font-mono">0</span>
+						</div>
+						<div id="booth-list" class="space-y-2">
+							<div class="text-center py-8 text-slate-400 text-sm">読み込み中...</div>
+						</div>
+					</aside>
+				</div>
+			</section>
+		</div>
+	</main>
+	<script src="../../scripts/site-interactions.ts"></script>
+	<script src="../../scripts/booth-editor.ts"></script>
+</BaseLayout>

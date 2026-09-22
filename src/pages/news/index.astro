@@ -1,0 +1,305 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import RemoteImage from "../../components/RemoteImage.astro";
+import "../../style/base01.css";
+import "../../style/base04.css";
+---
+
+<BaseLayout
+	title="ニュース・お知らせ | 創英祭 2026"
+	description="創英祭2026のニュース・お知らせ。開催情報、実行委員会からのお知らせ、最新トピックをご紹介します。"
+>
+	<style>
+	.news-hero-title {
+		text-shadow: 0 2px 10px rgba(0, 0, 0, 0.45);
+	}
+	.news-card {
+		position: relative;
+		display: block;
+		padding: 1.45rem 0;
+		border-bottom: 1px solid rgba(148, 163, 184, 0.28);
+	}
+	.news-card:first-child {
+		border-top: 1px solid rgba(148, 163, 184, 0.28);
+	}
+	.news-card:hover .news-card__title {
+		opacity: 0.7;
+	}
+	.news-card__meta {
+		display: flex;
+		flex-wrap: wrap;
+		align-items: center;
+		gap: 0.5rem 0.8rem;
+		margin-bottom: 0.55rem;
+	}
+	.news-card__date {
+		font-family: ui-sans-serif, system-ui, sans-serif;
+		font-size: 0.72rem;
+		letter-spacing: 0.12em;
+		color: rgb(100 116 139);
+	}
+	.news-card__badge {
+		display: inline-flex;
+		align-items: center;
+		min-height: 23px;
+		padding: 0.1rem 0.62rem;
+		border: 1px solid currentColor;
+		border-radius: 999px;
+		font-family: ui-sans-serif, system-ui, sans-serif;
+		font-size: 0.67rem;
+		font-weight: 700;
+		letter-spacing: 0.08em;
+	}
+	.news-card__title {
+		font-size: 1.08rem;
+		line-height: 1.75;
+		font-weight: 700;
+		letter-spacing: 0.07em;
+		color: rgb(15 23 42);
+		transition: opacity 0.2s ease;
+	}
+	.news-card__excerpt {
+		margin-top: 0.48rem;
+		line-height: 1.8;
+		font-size: 0.9rem;
+		color: rgb(71 85 105);
+		letter-spacing: 0.02em;
+	}
+	.news-card__arrow {
+		margin-top: 0.6rem;
+		font-family: ui-sans-serif, system-ui, sans-serif;
+		font-size: 0.72rem;
+		letter-spacing: 0.15em;
+		opacity: 0.75;
+	}
+	.empty-state,
+	.loading-state {
+		padding: 3rem 1rem;
+		text-align: center;
+		color: rgb(100 116 139);
+		font-size: 0.9rem;
+		letter-spacing: 0.08em;
+	}
+	.empty-state {
+		border: 1px dashed rgba(148, 163, 184, 0.4);
+	}
+	.section-anchor {
+		scroll-margin-top: 90px;
+	}
+
+	.is-hidden {
+		display: none !important;
+	}
+	.article-panel {
+		background: rgba(255, 255, 255, 0.94);
+		border: 1px solid rgba(148, 163, 184, 0.18);
+		box-shadow: 0 20px 45px rgba(15, 23, 42, 0.08);
+	}
+	.article-body {
+		color: rgb(51 65 85);
+		line-height: 2;
+		font-size: 1rem;
+		letter-spacing: 0.02em;
+		overflow-wrap: anywhere;
+	}
+	.article-body a {
+		text-decoration: underline;
+		text-decoration-thickness: 1px;
+		text-underline-offset: 3px;
+		color: rgb(101 163 13);
+	}
+	.article-body p,
+	.article-body div {
+		margin: 0 0 1rem;
+	}
+	.article-body strong,
+	.article-body b {
+		font-weight: 800;
+		color: inherit;
+	}
+	.article-body u {
+		text-decoration: underline;
+		text-decoration-thickness: 1px;
+		text-underline-offset: 3px;
+	}
+	.article-body s,
+	.article-body strike {
+		text-decoration: line-through;
+	}
+	.article-image {
+		display: block;
+		max-width: 100%;
+		max-height: 600px;
+		width: auto;
+		height: auto;
+		margin: 0 auto;
+		object-fit: contain;
+	}
+	.video-frame {
+		position: relative;
+		width: 100%;
+		aspect-ratio: 16 / 9;
+		overflow: hidden;
+		background: #0f172a;
+	}
+	.video-frame iframe {
+		position: absolute;
+		inset: 0;
+		width: 100%;
+		height: 100%;
+		border: 0;
+	}
+	.meta-label {
+		font-family: ui-sans-serif, system-ui, sans-serif;
+		font-size: 0.7rem;
+		letter-spacing: 0.15em;
+		font-weight: 700;
+	}
+	.detail-number {
+		font-family: ui-sans-serif, system-ui, sans-serif;
+		font-size: 0.72rem;
+		letter-spacing: 0.16em;
+		color: rgb(100 116 139);
+	}
+	</style>
+
+	<section class="relative w-full h-[330px] md:h-[430px] overflow-hidden flex bg-slate-900">
+		<RemoteImage src="https://yokohamasoei.sakura.ne.jp/wp/wp-content/uploads/2026/01/1-1536x1152.jpg" alt="" width={1920} height={1080} class="absolute inset-0 w-full h-full object-cover object-center opacity-60" style="filter: grayscale(10%);" />
+		<div class="absolute inset-0 bg-gradient-to-t from-slate-900 via-slate-900/60 to-transparent"></div>
+		<div class="relative w-full max-w-7xl mx-auto h-full flex items-end pb-14 px-6 sm:px-12 z-10">
+			<div>
+				<p class="text-xs md:text-sm font-sans tracking-[0.28em] text-brand-orange mb-4">NEWS &amp; UPDATES</p>
+				<h1 class="news-hero-title text-4xl md:text-5xl font-bold tracking-[0.12em] text-white mb-3">
+					ニュース・お知らせ
+				</h1>
+				<p class="text-slate-300 tracking-widest font-light text-sm md:text-base">創英祭 2026 からのお知らせ</p>
+			</div>
+		</div>
+	</section>
+
+	<main>
+		<div id="news-list-view">
+			<section class="py-20 md:py-24 relative bg-brand-bgLight bg-pattern-dots transition-colors duration-300">
+				<div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+					<div class="flex flex-wrap gap-3 mb-14 font-sans">
+						<a
+							href="#news-releases"
+							class="inline-flex items-center gap-2 border border-brand-lime px-5 py-3 text-xs tracking-[0.14em] text-slate-900 hover:bg-brand-lime/10 transition"
+							>ニュースリリース
+							<i class="fa-solid fa-arrow-down text-[10px]"></i></a
+						>
+						<a
+							href="#topics"
+							class="inline-flex items-center gap-2 border border-brand-orange px-5 py-3 text-xs tracking-[0.14em] text-slate-900 hover:bg-brand-orange/10 transition"
+							>トピック <i class="fa-solid fa-arrow-down text-[10px]"></i></a
+						>
+					</div>
+
+					<section id="news-releases" class="section-anchor mb-20">
+						<div class="flex items-end gap-4 mb-7 border-b-2 border-brand-lime pb-3">
+							<div>
+								<h2 class="text-2xl md:text-3xl font-bold tracking-widest text-slate-900">ニュースリリース</h2>
+								<p class="text-xs text-slate-500 font-sans tracking-[0.16em] mt-2">NEWS RELEASES</p>
+							</div>
+						</div>
+						<div id="news-release-list" class="news-list">
+							<div class="loading-state">
+								<i class="fa-solid fa-spinner fa-spin mr-2"></i>最新情報を読み込んでいます
+							</div>
+						</div>
+					</section>
+
+					<section id="topics" class="section-anchor">
+						<div class="flex items-end gap-4 mb-7 border-b-2 border-brand-orange pb-3">
+							<div>
+								<h2 class="text-2xl md:text-3xl font-bold tracking-widest text-slate-900">トピック</h2>
+								<p class="text-xs text-slate-500 font-sans tracking-[0.16em] mt-2">TOPICS</p>
+							</div>
+						</div>
+						<div id="topic-list" class="news-list">
+							<div class="loading-state">
+								<i class="fa-solid fa-spinner fa-spin mr-2"></i>最新情報を読み込んでいます
+							</div>
+						</div>
+					</section>
+				</div>
+			</section>
+
+			<section class="py-20 bg-brand-surfaceLight transition-colors duration-300">
+				<div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 text-center relative z-10">
+					<p class="text-sm text-slate-500 tracking-widest font-light mb-8">Contents</p>
+					<div class="flex flex-wrap justify-center gap-6">
+						<a
+							href="https://www.soei-fes.com/"
+							class="inline-flex items-center gap-3 border border-slate-900 px-8 py-4 tracking-widest text-sm hover:bg-slate-900 hover:text-white transition-colors duration-300 text-slate-900"
+							><i class="fa-solid fa-house"></i>トップページへ戻る</a
+						>
+						<a
+							href="https://www.soei-fes.com/concept/"
+							class="inline-flex items-center gap-3 border border-slate-900 px-8 py-4 tracking-widest text-sm hover:bg-slate-900 hover:text-white transition-colors duration-300 text-slate-900"
+							><i class="fa-solid fa-link"></i>コンセプト・実行委員会より</a
+						>
+					</div>
+				</div>
+			</section>
+		</div>
+
+		<section id="news-detail-view" class="is-hidden">
+			<section class="py-16 md:py-24 bg-brand-bgLight bg-pattern-dots transition-colors duration-300">
+				<div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+					<article id="article-panel" class="article-panel p-7 sm:p-10 md:p-12">
+						<div id="article-meta" class="flex flex-wrap items-center gap-3 mb-5"></div>
+						<div class="border-b border-slate-200 pb-6 mb-8">
+							<div id="detail-number" class="detail-number mb-2"></div>
+							<h2
+								id="article-title"
+								class="text-2xl md:text-4xl font-bold tracking-widest leading-relaxed text-slate-900"
+							>
+								読み込み中…
+							</h2>
+						</div>
+						<div id="article-content" class="article-body"></div>
+						<div id="image-wrap" class="hidden mt-12 pt-10 border-t border-slate-200">
+							<img id="article-image" class="article-image" alt="">
+						</div>
+						<div id="video-wrap" class="hidden mt-12 pt-10 border-t border-slate-200">
+							<div class="video-frame">
+								<iframe
+									id="youtube-frame"
+									title="YouTube動画"
+									loading="lazy"
+									allow="
+										accelerometer;
+										autoplay;
+										clipboard-write;
+										encrypted-media;
+										gyroscope;
+										picture-in-picture;
+										web-share;
+									"
+									allowfullscreen
+								></iframe>
+							</div>
+						</div>
+						<div
+							class="mt-12 pt-8 border-t border-slate-200 flex flex-col sm:flex-row gap-4 sm:items-center sm:justify-between"
+						>
+							<p id="article-author" class="text-xs text-slate-500 font-sans tracking-[0.1em]"></p>
+							<a
+								href="https://www.soei-fes.com/"
+								id="back-to-news"
+								class="inline-flex items-center justify-center gap-3 border border-slate-900 px-7 py-3 tracking-widest text-sm hover:bg-slate-900 hover:text-white transition text-slate-900"
+								><i class="fa-solid fa-house"></i>ホームへ戻る</a
+							>
+						</div>
+					</article>
+				</div>
+			</section>
+		</section>
+	</main>
+
+	<script src="../../scripts/site-interactions.ts"></script>
+	<script src="../../scripts/secret-trigger.ts"></script>
+
+	<script src="../../scripts/news-list.ts"></script>
+</BaseLayout>

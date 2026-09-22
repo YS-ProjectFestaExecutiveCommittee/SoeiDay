@@ -1,9 +1,0 @@
-User-agent: *
-Allow: /
-
-Disallow: /news-admin/
-Disallow: /schedule-admin/
-Disallow: /map-admin/
-Disallow: /booth-admin/
-
-Sitemap: https://www.soei-fes.com/sitemap.xml

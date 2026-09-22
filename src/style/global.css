@@ -1,0 +1,18 @@
+@import "tailwindcss";
+@import "./fontawesome.css";
+
+@theme inline {
+  --color-brand-lime: #65a30d;
+  --color-brand-limeDark: #84cc16;
+  --color-brand-orange: #ea580c;
+  --color-brand-orangeDark: #f97316;
+  --color-brand-bgLight: #ffffff;
+  --color-brand-bgDark: #0f172a;
+  --color-brand-surfaceLight: #f8fafc;
+  --color-brand-surfaceDark: #1e293b;
+  --font-serif: var(--font-shippori-mincho), serif;
+}
+
+.num-font {
+	font-family: var(--font-montserrat), sans-serif;
+}
